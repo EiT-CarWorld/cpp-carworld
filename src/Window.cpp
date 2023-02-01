@@ -3,6 +3,7 @@
 #include "entities/FloorGrid.h"
 #include "entities/ModelRenderer.h"
 #include "entities/Node.h"
+#include "entities/World.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -11,11 +12,11 @@ Window::Window(const char *title, int width, int height) {
     SetExitKey(0); // Disable single key exit
     FloorGrid::loadStatic();
     ModelRenderer::loadStatic();
-    Node::loadStatic();
+    Path::loadStatic();
 }
 
 Window::~Window() {
-    Node::unloadStatic();
+    Path::unloadStatic();
     ModelRenderer::unloadStatic();
     FloorGrid::unloadStatic();
     CloseWindow();
@@ -26,18 +27,10 @@ void Window::mainloop() {
     cameraController.resetCamera({0, 30, 0});
 
     FloorGrid floorGrid({500, 500}, 1, BLUE);
+    World world;
+    world.loadFromFile("res/maps/circuit.map");
 
     ModelRenderer renderer({0.4, 0.4, 0.5}, {0.7, 0.7, 0.6}, {1, -2, 1});
-
-    PathNode pathNodes[4] = {{10, 0, 10},
-                             {30, 0, 10},
-                             {60, 0, 60},
-                             {110, 0, 20}};
-    Node start({0, 0, 0});
-    Node end({140, 0, 20});
-    Path path(pathNodes, 4);
-    start.addOutPath(&path);
-    end.addInPath(&path);
 
     while (!WindowShouldClose()) {
         // handle updates
@@ -52,8 +45,7 @@ void Window::mainloop() {
         floorGrid.render(camera);
 
         renderer.uploadState(camera);
-        start.render();
-        end.render();
+        world.render();
         EndMode3D();
 
         DrawFPS(10, 10);

@@ -32,7 +32,8 @@ void CameraController::updateCamera() {
         m_pitch = fmin(PI/2, fmax(-PI/2, m_pitch));
     }
 
-    float cameraSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? 10: 5;
+    float cameraSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? 25 : 10;
+
     cameraSpeed *= GetFrameTime();
     Vector3 forwards = {sin(m_yaw) * cos(m_pitch), sin(m_pitch), -cos(m_yaw) * cos(m_pitch)};
     Vector3 xz_forwards = {sin(m_yaw), 0, -cos(m_yaw)};

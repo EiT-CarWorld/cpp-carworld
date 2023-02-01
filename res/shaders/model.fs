@@ -17,7 +17,9 @@ uniform vec3 directionalLightDirection;
 out vec4 finalColor;
 
 void main() {
-    vec3 textureValue = texture(texture0, fragPosition.xz/3).xyz;
+    vec3 textureValue1 = texture(texture0, fragPosition.xz/7).xyz;
+    vec3 textureValue2 = texture(texture0, fragPosition.xz/11).xyz;
+    vec3 textureValue = (textureValue1+textureValue2)/2;
     float directionalLightAngle = dot(normalize(fragNormal), -normalize(directionalLightDirection));
     vec3 light = ambientLight + directionalLight * max(0, directionalLightAngle);
     finalColor = colDiffuse * vec4(textureValue * light, 1);
