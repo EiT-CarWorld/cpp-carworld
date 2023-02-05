@@ -1,13 +1,9 @@
 #include "CameraController.h"
 #include "carMath.h"
 
-CameraController::CameraController() : m_camera({0}), m_mouseLock(false), m_pitch(0), m_yaw(0) {
+CameraController::CameraController() : m_camera({0}), m_mouseLock(false), m_pitch(0), m_yaw(0) {}
 
-}
-
-CameraController::~CameraController() {
-
-}
+CameraController::~CameraController() = default;
 
 void CameraController::resetCamera(Vector3 position) {
     m_camera.position = position;

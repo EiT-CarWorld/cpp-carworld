@@ -4,27 +4,38 @@
 #include "ModelRenderer.h"
 #include "carMath.h"
 
-Texture Path::asphalt;
+Texture Path::asphalt, Path::asphaltSpecular;
 Model Path::roadModel, Path::onewayRoadModel, Path::pathNodeModel;
 
 void Path::loadStatic() {
     asphalt = LoadTexture("res/textures/asphalt.png");
     GenTextureMipmaps(&asphalt);
     SetTextureFilter(asphalt, TEXTURE_FILTER_BILINEAR);
+    asphaltSpecular = LoadTexture("res/textures/asphalt_specular.png");
+    GenTextureMipmaps(&asphaltSpecular);
+    SetTextureFilter(asphaltSpecular, TEXTURE_FILTER_BILINEAR);
 
     roadModel = ModelRenderer::loadModel("res/models/road.glb");
     onewayRoadModel = ModelRenderer::loadModel("res/models/roadOneWay.glb");
     pathNodeModel = ModelRenderer::loadModel("res/models/pathnode.glb");
 
     roadModel.materials[1].maps[MATERIAL_MAP_DIFFUSE].texture = asphalt;
+    roadModel.materials[1].maps[MATERIAL_MAP_SPECULAR].texture = asphaltSpecular;
+    roadModel.materials[1].maps[MATERIAL_MAP_SPECULAR].color = {80, 80, 80};
     onewayRoadModel.materials[1].maps[MATERIAL_MAP_DIFFUSE].texture = asphalt;
+    onewayRoadModel.materials[1].maps[MATERIAL_MAP_SPECULAR].texture = asphaltSpecular;
+    onewayRoadModel.materials[1].maps[MATERIAL_MAP_SPECULAR].color = {80, 80, 80};
     pathNodeModel.materials[1].maps[MATERIAL_MAP_DIFFUSE].texture = asphalt;
+    pathNodeModel.materials[1].maps[MATERIAL_MAP_SPECULAR].texture = asphaltSpecular;
+    pathNodeModel.materials[1].maps[MATERIAL_MAP_SPECULAR].color = {80, 80, 80};
 }
 
 void Path::unloadStatic() {
     ModelRenderer::unloadModel(roadModel);
     ModelRenderer::unloadModel(onewayRoadModel);
+    ModelRenderer::unloadModel(pathNodeModel);
     UnloadTexture(asphalt);
+    UnloadTexture(asphaltSpecular);
 }
 
 Path::Path(Node *a, Node *b, bool oneway, PathNode *nodes, int nodeCount) :

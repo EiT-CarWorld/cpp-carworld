@@ -1,9 +1,11 @@
 #include "Window.h"
 #include "raylib.h"
 #include "entities/FloorGrid.h"
-#include "entities/ModelRenderer.h"
+#include "ModelRenderer.h"
 #include "entities/Node.h"
 #include "entities/World.h"
+#include "entities/Car.h"
+#include "entities/Skybox.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -11,13 +13,17 @@ Window::Window(const char *title, int width, int height) {
     SetTargetFPS(60);
     SetExitKey(0); // Disable single key exit
     FloorGrid::loadStatic();
+    Skybox::loadStatic();
     ModelRenderer::loadStatic();
     Path::loadStatic();
+    Car::loadStatic();
 }
 
 Window::~Window() {
+    Car::unloadStatic();
     Path::unloadStatic();
     ModelRenderer::unloadStatic();
+    Skybox::unloadStatic();
     FloorGrid::unloadStatic();
     CloseWindow();
 }
@@ -30,7 +36,12 @@ void Window::mainloop() {
     World world;
     world.loadFromFile("res/maps/circuit.map");
 
-    ModelRenderer renderer({0.4, 0.4, 0.5}, {0.7, 0.7, 0.6}, {1, -2, 1});
+    ModelRenderer renderer(
+            {0.3, 0.3, 0.3},
+            {0.7, 0.7, 0.7},
+            {1, -2, 1});
+
+    Car car({0, 0.2, 0});
 
     while (!WindowShouldClose()) {
         // handle updates
@@ -39,13 +50,14 @@ void Window::mainloop() {
 
         // render frame
         BeginDrawing();
-
         ClearBackground(RAYWHITE);
-        BeginMode3D(camera);
-        floorGrid.render(camera);
 
+        BeginMode3D(camera);
+        Skybox::render(camera);
+        floorGrid.render(camera);
         renderer.uploadState(camera);
         world.render();
+        car.render();
         EndMode3D();
 
         DrawFPS(10, 10);

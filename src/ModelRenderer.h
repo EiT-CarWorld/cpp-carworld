@@ -1,9 +1,15 @@
 #include "raylib.h"
 
+enum ModelShaderMode {
+    MODEL_MODE = 0,
+    GLOBAL_TEXTURE_MODE = 1,
+};
+
 class ModelRenderer {
 private:
     static Shader shader;
     static int ambientLightLoc, directionalLightLoc, directionalLightDirectionLoc;
+    static int shaderModeLoc;
 
     Vector3 m_ambientLight, m_directionalLight, m_directionalLightDirection;
 public:
@@ -11,6 +17,7 @@ public:
     static void unloadStatic();
     static Model loadModel(char const *name);
     static void unloadModel(Model model);
+    static void setMode(ModelShaderMode mode);
 
     ModelRenderer(Vector3 ambientLight, Vector3 directionalLight, Vector3 directionalLightDirection);
     ~ModelRenderer();

@@ -21,7 +21,7 @@ public:
     int m_pathNodeCount;
 
     static Model roadModel, onewayRoadModel, pathNodeModel;
-    static Texture asphalt;
+    static Texture asphalt, asphaltSpecular;
 
     static void loadStatic();
     static void unloadStatic();

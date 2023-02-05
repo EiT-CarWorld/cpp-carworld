@@ -1,4 +1,5 @@
 #include "World.h"
+#include "ModelRenderer.h"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -61,8 +62,10 @@ void World::loadFromFile(const std::string& path) {
 }
 
 void World::render() {
+    ModelRenderer::setMode(GLOBAL_TEXTURE_MODE);
     for(Node& node : m_nodes)
         node.render();
     for(Path& path: m_paths)
         path.render();
+    ModelRenderer::setMode(MODEL_MODE);
 }
