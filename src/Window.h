@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include "CameraController.h"
+#include "rendering/CameraController.h"
 
 class Window {
 private:

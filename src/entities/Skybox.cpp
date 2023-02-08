@@ -1,5 +1,5 @@
 #include "Skybox.h"
-#include "ModelRenderer.h"
+#include "rendering/ModelRenderer.h"
 
 Model Skybox::model;
 Texture Skybox::texture;

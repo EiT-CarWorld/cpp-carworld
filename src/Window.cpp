@@ -1,9 +1,9 @@
 #include "Window.h"
 #include "raylib.h"
 #include "entities/FloorGrid.h"
-#include "ModelRenderer.h"
+#include "rendering/ModelRenderer.h"
 #include "entities/Node.h"
-#include "entities/World.h"
+#include "World.h"
 #include "entities/Car.h"
 #include "entities/Skybox.h"
 
@@ -35,18 +35,21 @@ void Window::mainloop() {
     FloorGrid floorGrid({500, 500}, 1, BLUE);
     World world;
     world.loadFromFile("res/maps/circuit.map");
+    world.createRoutes(1234, 1);
 
     ModelRenderer renderer(
             {0.3, 0.3, 0.3},
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
-    Car car({0, 0.2, 0});
-
     while (!WindowShouldClose()) {
         // handle updates
         cameraController.updateCamera();
         Camera3D camera = cameraController.getCamera();
+
+        while (world.getCarCount() < 100)
+            world.spawnCar();
+        world.updateCars();
 
         // render frame
         BeginDrawing();
@@ -57,7 +60,6 @@ void Window::mainloop() {
         floorGrid.render(camera);
         renderer.uploadState(camera);
         world.render();
-        car.render();
         EndMode3D();
 
         DrawFPS(10, 10);

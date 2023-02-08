@@ -1,7 +1,7 @@
 #include <cassert>
 #include "Path.h"
 #include "Node.h"
-#include "ModelRenderer.h"
+#include "rendering/ModelRenderer.h"
 #include "carMath.h"
 
 Texture Path::asphalt, Path::asphaltSpecular;
@@ -38,7 +38,7 @@ void Path::unloadStatic() {
     UnloadTexture(asphaltSpecular);
 }
 
-Path::Path(Node *a, Node *b, bool oneway, PathNode *nodes, int nodeCount) :
+Path::Path(Node *a, Node *b, bool oneway, PathNode *nodes, size_t nodeCount) :
         m_a(a), m_b(b), m_oneway(oneway), m_pathNodes(nodes), m_pathNodeCount(nodeCount) {
     m_a->addedToPath(this);
     m_b->addedToPath(this);
