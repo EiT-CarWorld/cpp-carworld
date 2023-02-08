@@ -2,12 +2,10 @@
 #include <vector>
 #include "Path.h"
 
-class Node {
+class Node : public PathNode {
 public:
-    Vector3 m_position;
-    std::vector<Path*> m_paths;
-    explicit Node(Vector3 position) : m_position(position), m_paths({}) {}
+    std::vector<Path*> paths;
+    explicit Node(Vector3 position) : PathNode{position, ROAD_WIDTH+2}, paths({}) {}
     ~Node() = default;
     void addedToPath(Path *path);
-    void render();
 };

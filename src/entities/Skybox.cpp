@@ -1,5 +1,6 @@
 #include "Skybox.h"
 #include "rendering/ModelRenderer.h"
+#include "carMath.h"
 
 Model Skybox::model;
 Texture Skybox::texture;
@@ -18,6 +19,6 @@ void Skybox::unloadStatic() {
 #include "rlgl.h"
 void Skybox::render(Camera3D camera) {
     rlDisableDepthTest();
-    DrawModel(model, camera.position, 1.0f, WHITE);
+    DrawModel(model, camera.position - Vector3{0, .2, 0}, 1.0f, WHITE);
     rlEnableDepthTest();
 }

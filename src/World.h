@@ -12,7 +12,7 @@ class World {
     std::vector<Node> m_nodes;
     std::vector<PathNode> m_pathNodes;
 
-    // A path connects two Nodes, using a continuous segment of the m_pathNodes list
+    // A path connects two Nodes, using a continuous segment of the path_nodes list
     std::vector<std::unique_ptr<Path>> m_paths;
 
     // A route is a series of paths, possibly looping
@@ -27,7 +27,8 @@ public:
     void loadFromFile(const std::string& path);
     void createRoutes(unsigned seed, size_t count);
     void spawnCar();
-    size_t getCarCount();
+    std::vector<std::unique_ptr<Car>>& getCars();
+    void takeCarActions();
     void updateCars();
     void render();
 };

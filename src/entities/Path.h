@@ -2,14 +2,14 @@
 #include <cstddef>
 #include "raylib.h"
 
-#define ROAD_WIDTH 8
+#define ROAD_WIDTH 10
 
 class Node;
-class World;
-struct Route;
 
 struct PathNode {
-    Vector3 position;
+    Vector3 position{};
+    float diameter = ROAD_WIDTH;
+    void render();
 };
 
 /*
@@ -17,22 +17,21 @@ struct PathNode {
  * The path can optionally be one-way, in which case it goes from a to b only.
  */
 class Path {
-    Node *m_a, *m_b;
-    bool m_oneway;
-    PathNode* m_pathNodes;
-    size_t m_pathNodeCount;
-
+private:
     static Model roadModel, onewayRoadModel, pathNodeModel;
     static Texture asphalt, asphaltSpecular;
-
     friend Node;
-    friend Route;
-    friend World;
+    friend PathNode;
 public:
     static void loadStatic();
     static void unloadStatic();
 
-    Path(Node* a, Node* b, bool oneway, PathNode* nodes, size_t nodeCount);
+    Node *a, *b;
+    bool oneway;
+    PathNode* path_nodes;
+    size_t path_node_count;
+
+    Path(Node* a, Node* b, bool oneway, PathNode* path_nodes, size_t path_node_count);
     Path(const Path& other) = delete;
     Path(Path&& other) = delete;
     ~Path() = default;

@@ -80,24 +80,30 @@ void World::createRoutes(unsigned seed, size_t count) {
     while(m_routes.size() < count) {
         Node* start_node = &m_nodes[node_choice(gen)];
         Route route;
+        route.nodes.push_back(start_node);
+
         Path* last_path = nullptr;
         Node* head_node = start_node;
         while (true) {
-            if (head_node->m_paths.size() <= 1) // We can't go on from here
+            if (head_node->paths.size() <= 1) // We can't go on from here
                 break;
-            std::uniform_int_distribution<size_t> path_choice(0, head_node->m_paths.size()-1);
-            Path* next_path = head_node->m_paths[path_choice(gen)];
+            std::uniform_int_distribution<size_t> path_choice(0, head_node->paths.size()-1);
+            Path* next_path = head_node->paths[path_choice(gen)];
             if (next_path == last_path)
                 continue; // Try again until we pick a path that isn't last_path
 
             route.paths.push_back(next_path);
             last_path = next_path;
-            head_node = next_path->m_a == head_node ? next_path->m_b : next_path->m_a;
+            head_node = next_path->a == head_node ? next_path->b : next_path->a;
+            route.nodes.push_back(head_node);
+
             if (head_node == start_node) {
                 route.loops = true;
                 break;
             }
         }
+
+        assert(route.verifyRoute());
 
         if (!route.paths.empty())
             m_routes.emplace_back(std::move(route));
@@ -113,8 +119,13 @@ void World::spawnCar() {
     m_cars.emplace_back(std::make_unique<Car>(&m_routes[route_choice(gen)]));
 }
 
-size_t World::getCarCount() {
-    return m_cars.size();
+std::vector<std::unique_ptr<Car>>& World::getCars() {
+    return m_cars;
+}
+
+void World::takeCarActions() {
+    for(auto& car:m_cars)
+        car->chooseAction(this);
 }
 
 void World::updateCars() {

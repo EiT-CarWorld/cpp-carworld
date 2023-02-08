@@ -38,34 +38,38 @@ void Path::unloadStatic() {
     UnloadTexture(asphaltSpecular);
 }
 
-Path::Path(Node *a, Node *b, bool oneway, PathNode *nodes, size_t nodeCount) :
-        m_a(a), m_b(b), m_oneway(oneway), m_pathNodes(nodes), m_pathNodeCount(nodeCount) {
-    m_a->addedToPath(this);
-    m_b->addedToPath(this);
+Path::Path(Node *a, Node *b, bool oneway, PathNode *path_nodes, size_t path_node_count) :
+        a(a), b(b), oneway(oneway), path_nodes(path_nodes), path_node_count(path_node_count) {
+    a->addedToPath(this);
+    b->addedToPath(this);
 }
 
 void Path::render() {
-    Model &model = m_oneway ? onewayRoadModel : roadModel;
+    Model &model = oneway ? onewayRoadModel : roadModel;
 
-    assert (m_a != nullptr && m_b != nullptr);
-    Vector3 prevPos = m_a->m_position;
-    for (int i = 0; i <= m_pathNodeCount; i++) {
-        Vector3 to;
-        if(i < m_pathNodeCount)
-            to = m_pathNodes[i].position;
+    assert (a != nullptr && b != nullptr);
+    Vector3 prevPos = a->position;
+    for (int i = 0; i <= path_node_count; i++) {
+        PathNode* to;
+        if(i < path_node_count)
+            to = &path_nodes[i];
         else
-            to = m_b->m_position;
+            to = b;
 
         // Draw road from prevPos to nextNode
-        Vector3 diff = to - prevPos;
+        Vector3 diff = to->position - prevPos;
         float length = Vector3Length(diff);
         DrawModelEx(model, prevPos,
                     {0, 1, 0}, atan2(-diff.z, diff.x) * RAD2DEG,
                     {length, 1, ROAD_WIDTH}, WHITE);
-        prevPos = to;
+        prevPos = to->position;
 
-        if(i < m_pathNodeCount)
-            DrawModelEx(pathNodeModel, to,
-                        {0,1,0}, 0, {ROAD_WIDTH, 1, ROAD_WIDTH}, WHITE);
+        if(i < path_node_count)
+            to->render();
     }
+}
+
+void PathNode::render() {
+    DrawModelEx(Path::pathNodeModel, position,
+                {0,1,0}, 0, {diameter, 1, diameter}, WHITE);
 }

@@ -17,25 +17,53 @@ public:
     static void unloadStatic();
 
 private:
-    size_t m_modelNumber;
-    Color m_color;
+    size_t m_modelNumber{};
+    Color m_color{};
 
     Route* m_route;
     // Which path along the route we are on
-    size_t m_route_path_index;
+    size_t m_route_path_index{};
     // Which PathNode along the given path we are on
-    size_t m_route_path_pathnode_index;
+    // 0 means we target the 0th PathNode
+    // if pathnode index == path_node_count, the Node ending the path is the target
+    size_t m_route_path_pathnode_index{};
+    // The current target, based on
+    PathNode* m_target{};
 
-    Vector3 m_position;
-    float m_speed;
-    float m_yaw;
+    enum TurnInput {
+        TURN_LEFT,
+        TURN_RIGHT,
+        TURN_NO_TURN
+    };
+    enum GasInput {
+        GAS_DRIVE,
+        GAS_REVERSE,
+        GAS_FREE
+    };
+    TurnInput m_turnInput;
+    GasInput m_gasInput;
 
-    bool m_player_controlled;
+    Vector3 m_position{};
+
+    // in meters per frame (60fps target)
+    float m_speed{};
+    // in radians, 0 is positive x, positive angle towards negative z
+    float m_yaw{};
+    // only used for player controlled cars, for the time being
+    float m_yaw_speed{};
 
 public:
     explicit Car(Route* route);
     ~Car() = default;
+
+    void takePlayerInput();
+    void chooseAction(World* world);
     void update(World* world);
+    void followCamera(Camera* camera);
     bool hasFinishedRoute();
     void render();
+    void renderHud();
+
+private:
+    void findTarget();
 };

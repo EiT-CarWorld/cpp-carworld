@@ -35,7 +35,7 @@ void Window::mainloop() {
     FloorGrid floorGrid({500, 500}, 1, BLUE);
     World world;
     world.loadFromFile("res/maps/circuit.map");
-    world.createRoutes(1234, 1);
+    world.createRoutes(1234, 2);
 
     ModelRenderer renderer(
             {0.3, 0.3, 0.3},
@@ -47,9 +47,12 @@ void Window::mainloop() {
         cameraController.updateCamera();
         Camera3D camera = cameraController.getCamera();
 
-        while (world.getCarCount() < 100)
+        while (world.getCars().size() < 1000)
             world.spawnCar();
+        world.takeCarActions();
+        //world.getCars()[0]->takePlayerInput();
         world.updateCars();
+        //world.getCars()[0]->followCamera(&camera);
 
         // render frame
         BeginDrawing();
@@ -62,6 +65,7 @@ void Window::mainloop() {
         world.render();
         EndMode3D();
 
+        //world.getCars()[0]->renderHud();
         DrawFPS(10, 10);
         EndDrawing();
     }
