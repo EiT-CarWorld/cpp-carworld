@@ -68,11 +68,18 @@ void Car::findTarget() {
         if (hasFinishedRoute())
             return;
 
-        if (m_route_path_pathnode_index == m_route->paths[m_route_path_index]->path_node_count) {
+        Path* currentPath = m_route->paths[m_route_path_index];
+        if (m_route_path_pathnode_index == currentPath->path_node_count) {
             m_target = m_route->nodes[m_route_path_index + 1];
         }
-        else
-            m_target = &m_route->paths[m_route_path_index]->path_nodes[m_route_path_pathnode_index];
+        else {
+            Node* nextNode = m_route->nodes[m_route_path_index + 1];
+            if (nextNode == currentPath->b) { // The currentPath goes from a to b
+                m_target = &currentPath->path_nodes[m_route_path_pathnode_index];
+            } else { // The currentPath goes from b to a, aka the path nodes go in reverse
+                m_target = &currentPath->path_nodes[currentPath->path_node_count-1-m_route_path_pathnode_index];
+            }
+        }
     }
 
     // Check if we have reached the target

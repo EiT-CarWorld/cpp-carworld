@@ -47,7 +47,7 @@ void Window::mainloop() {
         cameraController.updateCamera();
         Camera3D camera = cameraController.getCamera();
 
-        while (world.getCars().size() < 1000)
+        while (world.getCars().size() < 500)
             world.spawnCar();
         world.takeCarActions();
         //world.getCars()[0]->takePlayerInput();
