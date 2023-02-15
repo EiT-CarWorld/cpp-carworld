@@ -2,7 +2,7 @@
 #include <cstddef>
 #include "raylib.h"
 
-#define ROAD_WIDTH 10
+#define ROAD_WIDTH 8.f
 
 class Node;
 

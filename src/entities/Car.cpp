@@ -1,13 +1,16 @@
 #include "Car.h"
 #include <cstdlib>
 #include <cmath>
-#include <cassert>
+#include "World.h"
 #include "rendering/ModelRenderer.h"
 #include "carMath.h"
 
 Texture Car::diffuseTexture, Car::metalnessTexture;
 Model Car::carModels[NUM_CAR_MODELS];
 const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, YELLOW};
+
+const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-PI/2, -PI/4, 0, PI/4, PI/2};
+const float MAX_LIDAR_DIST = 100.f;
 
 #include "rlgl.h"
 void Car::loadStatic() {
@@ -111,6 +114,13 @@ void Car::chooseAction(World* world) {
         return;
     }
 
+    // Simulate LIDAR rays to get data about distances
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        float angle = m_yaw + LIDAR_ANGLES[i];
+        Vector2 dir = {cosf(angle), -sinf(angle)};
+        m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
+    }
+
     m_gasInput = GAS_DRIVE;
     Vector3 distance = m_target->position - m_position;
     float direction = atan2(-distance.z, distance.x);
@@ -173,7 +183,15 @@ void Car::render() {
     carModels[m_modelNumber].materials[1].maps[MATERIAL_MAP_DIFFUSE].color = m_color;
     DrawModelEx(carModels[m_modelNumber], m_position, Vector3{0,1,0}, m_yaw*RAD2DEG, Vector3{1,1,1}, WHITE);
     if (m_target) {
-        DrawCircle3D(m_target->position+Vector3{0,2,0}, m_target->diameter/2, Vector3{1,0,0}, 90.f, RED);
+    //    DrawCircle3D(m_target->position+Vector3{0,2,0}, m_target->diameter/2, Vector3{1,0,0}, 90.f, RED);
+    }
+
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        if(m_lidarDistances[i] < MAX_LIDAR_DIST) {
+            float dist = m_lidarDistances[i];
+            float angle = m_yaw + LIDAR_ANGLES[i];
+            DrawLine3D(m_position, {m_position.x + cosf(angle)*dist, m_position.y, m_position.z-sinf(angle)*dist}, RED);
+        }
     }
 }
 

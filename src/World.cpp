@@ -5,16 +5,16 @@
 #include <cassert>
 #include <random>
 
-World::World(): m_nodes(), m_pathNodes(), m_paths() {}
+World::World(): m_nodes(), m_pathNodes(), m_paths(), m_lineSegments(), m_routes(), m_cars() {}
 
 static void assertNewline(std::ifstream& in) {
     assert(in.get() == '\n');
     assert(in.good());
 }
 
-void World::loadFromFile(const std::string& path) {
+void World::loadFromFile(const std::string& filepath) {
     std::ifstream file;
-    file.open(path);
+    file.open(filepath);
     assert(file.is_open());
     int num_nodes, num_path_nodes, num_paths;
     file >> num_nodes >> num_path_nodes >> num_paths;
@@ -60,6 +60,49 @@ void World::loadFromFile(const std::string& path) {
 
     assert(used_path_nodes == num_path_nodes && "The input didn't use the exact amount of path nodes given");
     assert(file.peek() == EOF && "File had more content after the end of the data");
+
+    // Now populate line segment set
+    const float radius = (ROAD_WIDTH / 2);
+    for (auto& path : m_paths) {
+        Vector2 lastPos{path->a->position.x, path->a->position.z}, nextPos;
+        Vector2 lastLeftCorner, lastRightCorner;
+        for (int i = 0; i < path->path_node_count; i++) {
+            Vector2 pos {path->path_nodes[i].position.x, path->path_nodes[i].position.z};
+            if (i == 0) { // lastPos is moved closer, to leave the node open
+                Vector2 forwards = Vector2Normalize(pos - lastPos);
+                lastPos += radius * forwards;
+                lastLeftCorner = lastPos + radius * Vector2{-forwards.y, forwards.x};
+                lastRightCorner = lastPos + radius * Vector2{forwards.y, -forwards.x};
+            }
+
+            if (i+1 < path->path_node_count) {
+                nextPos = { path->path_nodes[i+1].position.x, path->path_nodes[i+1].position.z };
+            } else {
+                nextPos = {path->b->position.x, path->b->position.z};
+                nextPos -= radius * Vector2Normalize(nextPos - pos);
+            }
+
+            Vector2 angleIn = Vector2Normalize(pos - lastPos);
+            Vector2 angleOut = Vector2Normalize(nextPos - pos);
+            Vector2 tangent = Vector2Normalize(angleIn + angleOut);
+            float our_radius = radius * (1 + (1 - Vector2DotProduct(angleIn, angleOut))/2 );
+            Vector2 leftCorner = pos + our_radius * Vector2{-tangent.y, tangent.x};
+            Vector2 rightCorner = pos + our_radius * Vector2{tangent.y, -tangent.x};
+
+            m_lineSegments.push_back(LineSegment{lastLeftCorner, leftCorner});
+            m_lineSegments.push_back(LineSegment{lastRightCorner, rightCorner});
+
+            lastLeftCorner = leftCorner;
+            lastRightCorner = rightCorner;
+            lastPos = pos;
+        }
+        // finally add the lines to the intersection node ending our path
+        Vector2 forwards = Vector2Normalize(nextPos - lastPos);
+        Vector2 leftCorner = nextPos + radius * Vector2{-forwards.y, forwards.x};
+        Vector2 rightCorner = nextPos + radius * Vector2{forwards.y, -forwards.x};
+        m_lineSegments.push_back(LineSegment{lastLeftCorner, leftCorner});
+        m_lineSegments.push_back(LineSegment{lastRightCorner, rightCorner});
+    }
 }
 
 // TODO: Do A* and stuff to find paths, not just random
@@ -110,6 +153,16 @@ void World::createRoutes(unsigned seed, size_t count) {
     }
 }
 
+float World::getRayDistance(Vector2 pos, Vector2 dir, float max_distance) {
+    float distance = max_distance;
+    for (auto& line : m_lineSegments) {
+        std::optional<float> dist = line.getRayDistance(pos, dir);
+        if (dist.has_value())
+            distance = fminf(distance, dist.value());
+    }
+    return distance;
+}
+
 void World::spawnCar() {
     assert(!m_routes.empty());
 
@@ -148,4 +201,6 @@ void World::render() {
     ModelRenderer::setMode(MODEL_MODE);
     for(auto& car: m_cars)
         car->render();
+    for(auto& lineSegment : m_lineSegments)
+        lineSegment.render();
 }

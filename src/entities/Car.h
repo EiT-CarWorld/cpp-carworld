@@ -5,6 +5,7 @@
 
 #define NUM_CAR_MODELS 1
 #define NUM_CAR_COLORS 6
+#define NUM_LIDAR_ANGLES 5
 
 class World;
 class Car {
@@ -29,6 +30,9 @@ private:
     size_t m_route_path_pathnode_index{};
     // The current target, based on
     PathNode* m_target{};
+
+    static const float LIDAR_ANGLES[NUM_LIDAR_ANGLES];
+    float m_lidarDistances[NUM_LIDAR_ANGLES];
 
     enum TurnInput {
         TURN_LEFT,

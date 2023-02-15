@@ -47,12 +47,12 @@ void Window::mainloop() {
         cameraController.updateCamera();
         Camera3D camera = cameraController.getCamera();
 
-        while (world.getCars().size() < 500)
+        while (world.getCars().size() < 15)
             world.spawnCar();
         world.takeCarActions();
-        //world.getCars()[0]->takePlayerInput();
+        world.getCars()[0]->takePlayerInput();
         world.updateCars();
-        //world.getCars()[0]->followCamera(&camera);
+        world.getCars()[0]->followCamera(&camera);
 
         // render frame
         BeginDrawing();
@@ -65,7 +65,7 @@ void Window::mainloop() {
         world.render();
         EndMode3D();
 
-        //world.getCars()[0]->renderHud();
+        world.getCars()[0]->renderHud();
         DrawFPS(10, 10);
         EndDrawing();
     }
