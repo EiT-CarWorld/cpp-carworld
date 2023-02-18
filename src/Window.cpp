@@ -7,11 +7,12 @@
 #include "World.h"
 #include "entities/Car.h"
 #include "entities/Skybox.h"
+#include "carConfig.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(width, height, title);
-    SetTargetFPS(60);
+    SetTargetFPS(TARGET_FRAMERATE);
     SetExitKey(0); // Disable single key exit
     FloorGrid::loadStatic();
     Skybox::loadStatic();
@@ -53,7 +54,7 @@ void Window::mainloop() {
                                   [](auto& car){
             return car->hasCrashed() || car->hasFinishedRoute() ;
         }), cars.end());
-        while (world.getCars().size() < 15)
+        while (cars.size() < 15)
             world.spawnCar();
         world.takeCarActions();
         world.getCars()[0]->takePlayerInput();

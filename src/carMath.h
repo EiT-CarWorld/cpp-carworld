@@ -17,6 +17,6 @@ Vector2 operator*(float a, Vector2 v);
 Vector2& operator*=(Vector2& v, float a);
 Vector2 operator/(Vector2 v, float a);
 
-template <typename T> int sgn(T val) {
+template <typename T> T sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }

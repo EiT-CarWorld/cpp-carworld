@@ -4,6 +4,7 @@
 #include "World.h"
 #include "rendering/ModelRenderer.h"
 #include "carMath.h"
+#include "carConfig.h"
 
 Texture Car::diffuseTexture, Car::metalnessTexture;
 Model Car::carModels[NUM_CAR_MODELS];
@@ -44,16 +45,6 @@ Car::Car(Route* route): m_routeFollower(route) {
     Vector3 startDirection =  m_routeFollower.getTarget()->position - m_position;
     m_yaw = atan2(-startDirection.z, startDirection.x);
 }
-
-#define ACCELERATION 0.002f
-#define FRICTION 0.0045f
-#define FRICTION_POW 1.8f
-#define TURNING_SPEED_FRICTION 0.03f
-
-#define TURN_SPEED 0.01f
-#define TURN_FRICTION 0.006f
-#define MAX_TURN 0.3f
-#define SPEED_MAX_TURN_PENALTY .4f
 
 void Car::takePlayerInput() {
     if (IsKeyDown(KEY_UP))
@@ -105,13 +96,35 @@ void Car::calculateLIDAR(World* world) {
     }
 }
 
+#define ACCELERATION 4.f
+#define FRICTION 0.0035f
+#define QUADRATIC_FRICTION 0.0045f
+// Used when the current speed is opposite direction of desired. Applied linearly
+#define BREAKING_FRICTION 0.04f
+// Friction applied to the car's speed due to turning. Quadratic
+#define TURNING_SPEED_FRICTION 0.1f
+
+#define TURN_SPEED 0.5f
+// How quickly the wheels move when turning
+#define TURN_FRICTION 0.006f
+#define MAX_TURN 0.3f
+// How much the max turning angle decreases per m/s speed
+#define SPEED_MAX_TURN_PENALTY .009f
+
 void Car::update(World *world) {
     if (m_crashed)
         return;
 
+    bool breaking = false;
     switch(m_gasInput) {
-        case GAS_DRIVE: m_speed += ACCELERATION; break;
-        case GAS_REVERSE: m_speed -= ACCELERATION; break;
+        case GAS_DRIVE:
+            m_speed += ACCELERATION * SIM_DT;
+            breaking = m_speed < 0;
+            break;
+        case GAS_REVERSE:
+            m_speed -= ACCELERATION * SIM_DT;
+            breaking = m_speed > 0;
+            break;
         default: break;
     }
 
@@ -119,28 +132,31 @@ void Car::update(World *world) {
 
     switch (m_turnInput) {
         case TURN_LEFT:
-        m_yaw_speed += TURN_SPEED;
-        m_yaw_speed -= m_yaw_speed * TURN_FRICTION;
+        m_yaw_speed += TURN_SPEED * SIM_DT;
+        m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
         m_yaw_speed = fmaxf(m_yaw_speed, 0);
         m_yaw_speed = fminf(m_yaw_speed, max_turn);
         break;
         case TURN_RIGHT:
-        m_yaw_speed -= TURN_SPEED;
-        m_yaw_speed -= m_yaw_speed * TURN_FRICTION;
+        m_yaw_speed -= TURN_SPEED * SIM_DT;
+        m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
         m_yaw_speed = fminf(m_yaw_speed, 0);
         m_yaw_speed = fmaxf(m_yaw_speed, -max_turn);
         break;
         default:
-        m_yaw_speed -= sgn(m_yaw_speed) * fminf(TURN_SPEED, abs(m_yaw_speed));
+        m_yaw_speed -= sgn(m_yaw_speed) * fminf(TURN_SPEED * SIM_DT, abs(m_yaw_speed));
     }
 
-    m_speed -= m_speed * abs(m_yaw_speed) * TURNING_SPEED_FRICTION;
-    m_yaw += m_yaw_speed * (m_speed > 1 ? powf(m_speed, 0.3) : m_speed);
+    m_yaw += m_yaw_speed * m_speed * SIM_DT;
 
-    m_speed -= sgn(m_speed) * fmaxf(abs(m_speed), powf(abs(m_speed), FRICTION_POW)) * FRICTION;
+    float friction = abs(m_speed) * (
+            FRICTION +
+            abs(m_speed) * (QUADRATIC_FRICTION + abs(m_yaw_speed) * TURNING_SPEED_FRICTION) +
+            breaking * BREAKING_FRICTION);
+    m_speed -= sgn(m_speed) * friction * SIM_DT;
     if(abs(m_speed) > 0.01f) {
-        m_position.x += m_speed * cosf(m_yaw);
-        m_position.z += m_speed * -sinf(m_yaw);
+        m_position.x += m_speed * cosf(m_yaw) * SIM_DT;
+        m_position.z += m_speed * -sinf(m_yaw) * SIM_DT;
     }
 
     calculateLIDAR(world);
@@ -180,5 +196,5 @@ void Car::render() {
 }
 
 void Car::renderHud() {
-    DrawText(TextFormat("%.0f km/h", m_speed*60*3.6f), GetScreenWidth()-200, GetScreenHeight()-40, 30, BLACK);
+    DrawText(TextFormat("%.0f km/h", m_speed*3.6f), GetScreenWidth()-200, GetScreenHeight()-40, 30, BLACK);
 }

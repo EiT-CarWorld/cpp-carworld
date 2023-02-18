@@ -48,11 +48,11 @@ private:
 
     Vector3 m_position{};
 
-    // in meters per frame (60fps target)
+    // in meters per second
     float m_speed{};
     // in radians, 0 is positive x, positive angle towards negative z
     float m_yaw{};
-    // only used for player controlled cars, for the time being
+    // The angle of the front tires, multiplied by speed and applied every frame
     float m_yaw_speed{};
 
     bool m_crashed{};
@@ -70,6 +70,5 @@ public:
     void renderHud();
 
 private:
-    void findTarget();
     void calculateLIDAR(World *world);
 };
