@@ -67,6 +67,7 @@ public:
     bool hasFinishedRoute();
     bool hasCrashed();
     void render();
+    void renderSensory();
     void renderHud();
 
 private:

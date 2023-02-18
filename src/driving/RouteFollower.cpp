@@ -1,7 +1,7 @@
 #include "RouteFollower.h"
 #include "carMath.h"
 
-RouteFollower::RouteFollower(Route *route): m_route(route), m_route_path_index{0}, m_route_path_pathnode_index{0} {
+RouteFollower::RouteFollower(Route *route): m_route(route), m_pathIndex{0}, m_pathNodeIndex{0} {
     calculateTarget();
 }
 
@@ -11,16 +11,16 @@ void RouteFollower::calculateTarget() {
         return;
     }
 
-    Path* currentPath = m_route->paths[m_route_path_index];
-    if (m_route_path_pathnode_index == currentPath->path_node_count) {
-        m_target = m_route->nodes[m_route_path_index + 1];
+    Path* currentPath = m_route->paths[m_pathIndex];
+    if (m_pathNodeIndex == currentPath->path_node_count) {
+        m_target = m_route->nodes[m_pathIndex + 1];
     }
     else {
-        Node* nextNode = m_route->nodes[m_route_path_index + 1];
+        Node* nextNode = m_route->nodes[m_pathIndex + 1];
         if (nextNode == currentPath->b) { // The currentPath goes from a to b
-            m_target = &currentPath->path_nodes[m_route_path_pathnode_index];
+            m_target = &currentPath->path_nodes[m_pathNodeIndex];
         } else { // The currentPath goes from b to a, aka the path nodes go in reverse
-            m_target = &currentPath->path_nodes[currentPath->path_node_count-1-m_route_path_pathnode_index];
+            m_target = &currentPath->path_nodes[currentPath->path_node_count - 1 - m_pathNodeIndex];
         }
     }
 }
@@ -42,21 +42,21 @@ void RouteFollower::updateIfAtTarget(Vector3 position) {
         // We have reached the target, and need a new one.
         // Increase target index either along the path we are on,
         // or move to the next path
-        if (m_route_path_pathnode_index < m_route->paths[m_route_path_index]->path_node_count)
+        if (m_pathNodeIndex < m_route->paths[m_pathIndex]->path_node_count)
             // We have more of the current Path to travel
-            m_route_path_pathnode_index++;
+            m_pathNodeIndex++;
         else {
             // We reached the Node at the end of the current path
-            m_route_path_pathnode_index = 0;
-            m_route_path_index++;
+            m_pathNodeIndex = 0;
+            m_pathIndex++;
             //
-            if (m_route_path_index >= m_route->paths.size() && m_route->loops)
-                m_route_path_index = 0;
+            if (m_pathIndex >= m_route->paths.size() && m_route->loops)
+                m_pathIndex = 0;
         }
         calculateTarget();
     }
 }
 
 bool RouteFollower::hasFinishedRoute() {
-    return m_route_path_index >= m_route->paths.size();
+    return m_pathIndex >= m_route->paths.size();
 }

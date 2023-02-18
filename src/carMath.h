@@ -20,3 +20,7 @@ Vector2 operator/(Vector2 v, float a);
 template <typename T> T sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+template <typename T> T positive_mod(T val, T mod) {
+    return (val % mod + mod) % mod;
+}

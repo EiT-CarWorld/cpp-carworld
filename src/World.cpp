@@ -1,5 +1,6 @@
 #include "World.h"
 #include "rendering/ModelRenderer.h"
+#include "rlgl.h"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -203,4 +204,9 @@ void World::render() {
         car->render();
     for(auto& lineSegment : m_lineSegments)
         lineSegment.render();
+
+    rlDisableDepthMask();
+    for(auto& car : m_cars)
+        car->renderSensory();
+    rlEnableDepthMask();
 }

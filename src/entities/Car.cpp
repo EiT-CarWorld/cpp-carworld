@@ -3,6 +3,7 @@
 #include <cmath>
 #include "World.h"
 #include "rendering/ModelRenderer.h"
+#include "rendering/CarZonesVisualizer.h"
 #include "carMath.h"
 #include "carConfig.h"
 
@@ -11,6 +12,7 @@ Model Car::carModels[NUM_CAR_MODELS];
 const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, YELLOW};
 
 const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-PI/2, -PI/4, 0, PI/4, PI/2};
+// If we are closer than this to the road edge, we have crashed / driven off the road
 const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
 const float Car::MAX_LIDAR_DIST = 100.f;
 const float Car::MAX_CAR_ZONE_DIST = 100.0f;
@@ -83,16 +85,32 @@ void Car::chooseAction(World* world) {
 }
 
 void Car::calculateLIDAR(World* world) {
+    // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
         Vector2 dir = {cosf(angle), -sinf(angle)};
         m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
-    for (auto& other:world->getCars()) {
-        Vector2 distance { other->m_position.x, other->m_position.z };
-        float angle = std::remainder(atan2(distance.y, distance.x) - m_yaw, PI*2);
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i])
+            m_crashed = true;
+    }
 
+    // Calculate distances to other cars. First set all distances to MAX
+    for (float & dist : m_carZoneDistances)
+        dist = MAX_CAR_ZONE_DIST;
+
+    for (auto& other:world->getCars()) {
+        if (other.get() == this)
+            continue;
+
+        Vector2 difference { other->m_position.x - m_position.x, other->m_position.z - m_position.z};
+        float distance = Vector2Length(difference);
+        float angle = atan2(-difference.y, difference.x) - m_yaw;
+        int zone = positive_mod((int)floor((angle / (2*PI)) * NUM_CAR_ZONES + 0.5f), NUM_CAR_ZONES);
+        if (distance < m_carZoneDistances[zone])
+            m_carZoneDistances[zone] = distance;
     }
 }
 
@@ -148,11 +166,12 @@ void Car::update(World *world) {
     }
 
     m_yaw += m_yaw_speed * m_speed * SIM_DT;
+    m_yaw = std::remainder(m_yaw, 2*PI); // Keeping the yaw within +/- 180 degrees
 
     float friction = abs(m_speed) * (
             FRICTION +
             abs(m_speed) * (QUADRATIC_FRICTION + abs(m_yaw_speed) * TURNING_SPEED_FRICTION) +
-            breaking * BREAKING_FRICTION);
+            (float) breaking * BREAKING_FRICTION);
     m_speed -= sgn(m_speed) * friction * SIM_DT;
     if(abs(m_speed) > 0.01f) {
         m_position.x += m_speed * cosf(m_yaw) * SIM_DT;
@@ -160,11 +179,6 @@ void Car::update(World *world) {
     }
 
     calculateLIDAR(world);
-
-    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
-        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i])
-            m_crashed = true;
-    }
 }
 
 void Car::followCamera(Camera* camera) {
@@ -185,7 +199,9 @@ void Car::render() {
     carModels[m_modelNumber].materials[1].maps[MATERIAL_MAP_DIFFUSE].color = m_color;
     DrawModelEx(carModels[m_modelNumber], m_position,
                 Vector3{0,1,0}, m_yaw*RAD2DEG, Vector3{1,1,1}, WHITE);
+}
 
+void Car::renderSensory() {
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if(m_lidarDistances[i] < MAX_LIDAR_DIST) {
             float dist = m_lidarDistances[i];
@@ -193,6 +209,8 @@ void Car::render() {
             DrawLine3D(m_position, {m_position.x + cosf(angle)*dist, m_position.y, m_position.z-sinf(angle)*dist}, RED);
         }
     }
+
+    CarZonesVisualizer::DrawCarZones(m_position, m_yaw, m_carZoneDistances);
 }
 
 void Car::renderHud() {

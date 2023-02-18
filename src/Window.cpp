@@ -6,7 +6,8 @@
 #include "entities/Node.h"
 #include "World.h"
 #include "entities/Car.h"
-#include "entities/Skybox.h"
+#include "rendering/CarZonesVisualizer.h"
+#include "rendering/Skybox.h"
 #include "carConfig.h"
 
 Window::Window(const char *title, int width, int height) {
@@ -19,9 +20,11 @@ Window::Window(const char *title, int width, int height) {
     ModelRenderer::loadStatic();
     Path::loadStatic();
     Car::loadStatic();
+    CarZonesVisualizer::loadStatic();
 }
 
 Window::~Window() {
+    CarZonesVisualizer::unloadStatic();
     Car::unloadStatic();
     Path::unloadStatic();
     ModelRenderer::unloadStatic();

@@ -8,14 +8,13 @@ private:
     Route* m_route;
 
     // Which path along the route we are on.
-    size_t m_route_path_index;
+    size_t m_pathIndex;
 
     // Which PathNode along the given path we are on
-    // -1 means we target the path's start node
     // 0 means we target the 0th PathNode
     // if this variable is equal to path_node_count, the Node ending the path is the target
     // Remember that paths can be traversed both from a->b and b->a
-    size_t m_route_path_pathnode_index;
+    size_t m_pathNodeIndex;
 
     // The current target, either a PathNode or a Node, based on the variables defined above
     PathNode* m_target{};
