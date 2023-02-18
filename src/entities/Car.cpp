@@ -10,7 +10,9 @@ Model Car::carModels[NUM_CAR_MODELS];
 const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, YELLOW};
 
 const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-PI/2, -PI/4, 0, PI/4, PI/2};
-const float MAX_LIDAR_DIST = 100.f;
+const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
+const float Car::MAX_LIDAR_DIST = 100.f;
+const float Car::MAX_CAR_ZONE_DIST = 100.0f;
 
 #include "rlgl.h"
 void Car::loadStatic() {
@@ -18,11 +20,11 @@ void Car::loadStatic() {
     metalnessTexture = LoadTexture("res/models/cars/VehiclePack_Metalnes.png");
     carModels[0] = ModelRenderer::loadModel("res/models/cars/Sedan_A_beige2.obj");
     carModels[0].materials[1].maps[MATERIAL_MAP_DIFFUSE].texture = diffuseTexture;
-    carModels[0].materials[1].maps[MATERIAL_MAP_SPECULAR].texture.id = rlGetTextureIdDefault();
+    carModels[0].materials[1].maps[MATERIAL_MAP_SPECULAR].texture.id = rlGetTextureIdDefault(); // A white texture
     carModels[0].materials[1].maps[MATERIAL_MAP_SPECULAR].color = {200, 200, 200};
 
     carModels[0].materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = diffuseTexture;
-    carModels[0].materials[0].maps[MATERIAL_MAP_SPECULAR].texture.id = rlGetTextureIdDefault();
+    carModels[0].materials[0].maps[MATERIAL_MAP_SPECULAR].texture.id = rlGetTextureIdDefault(); // A white texture
     carModels[0].materials[0].maps[MATERIAL_MAP_SPECULAR].color = {200, 200, 200};
 }
 
@@ -32,10 +34,15 @@ void Car::unloadStatic() {
     UnloadTexture(metalnessTexture);
 }
 
-Car::Car(Route* route): m_route(route) {
+Car::Car(Route* route): m_routeFollower(route) {
     m_color = CAR_COLORS[rand() % NUM_CAR_COLORS];
     m_modelNumber = rand() % NUM_CAR_MODELS;
-    m_position = {10.f + (float)(rand() % 20)*10, 0.2, 10.f + (float)(rand() % 20)*10};
+
+    m_position = m_routeFollower.getStartNode()->position;
+    m_position.y = 0.2;
+
+    Vector3 startDirection =  m_routeFollower.getTarget()->position - m_position;
+    m_yaw = atan2(-startDirection.z, startDirection.x);
 }
 
 #define ACCELERATION 0.002f
@@ -63,50 +70,8 @@ void Car::takePlayerInput() {
         m_turnInput = TURN_RIGHT;
 }
 
-// If the car has no target, a target is given
-// If the current target is reached, a new target is given
-// If the route is over, and hasFinishedRoute() is true, target will be nullptr
-void Car::findTarget() {
-    if (m_target == nullptr) {
-        if (hasFinishedRoute())
-            return;
-
-        Path* currentPath = m_route->paths[m_route_path_index];
-        if (m_route_path_pathnode_index == currentPath->path_node_count) {
-            m_target = m_route->nodes[m_route_path_index + 1];
-        }
-        else {
-            Node* nextNode = m_route->nodes[m_route_path_index + 1];
-            if (nextNode == currentPath->b) { // The currentPath goes from a to b
-                m_target = &currentPath->path_nodes[m_route_path_pathnode_index];
-            } else { // The currentPath goes from b to a, aka the path nodes go in reverse
-                m_target = &currentPath->path_nodes[currentPath->path_node_count-1-m_route_path_pathnode_index];
-            }
-        }
-    }
-
-    // Check if we have reached the target
-    float distance = Vector3Length(m_target->position - m_position);
-    if (distance < m_target->diameter / 2) {
-        // increase one of the two indecies
-        if (m_route_path_pathnode_index < m_route->paths[m_route_path_index]->path_node_count)
-            // We have more of the current Path to travel
-            m_route_path_pathnode_index++;
-        else {
-            // We reached the Node at the end of the current path
-            m_route_path_pathnode_index = 0;
-            m_route_path_index++;
-            if (m_route_path_index >= m_route->paths.size() && m_route->loops)
-                m_route_path_index = 0;
-        }
-
-        m_target = nullptr;
-        findTarget(); // Call again to get a new target
-    }
-}
-
 void Car::chooseAction(World* world) {
-    findTarget();
+    m_routeFollower.updateIfAtTarget(m_position);
 
     if (hasFinishedRoute()) {
         m_gasInput = GAS_FREE;
@@ -114,15 +79,8 @@ void Car::chooseAction(World* world) {
         return;
     }
 
-    // Simulate LIDAR rays to get data about distances
-    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
-        float angle = m_yaw + LIDAR_ANGLES[i];
-        Vector2 dir = {cosf(angle), -sinf(angle)};
-        m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
-    }
-
     m_gasInput = GAS_DRIVE;
-    Vector3 distance = m_target->position - m_position;
+    Vector3 distance = m_routeFollower.getTarget()->position - m_position;
     float direction = atan2(-distance.z, distance.x);
     float turn_offset = remainderf(m_yaw - direction, 2*PI);
     if(turn_offset < -.1)
@@ -133,7 +91,24 @@ void Car::chooseAction(World* world) {
         m_turnInput = TURN_NO_TURN;
 }
 
+void Car::calculateLIDAR(World* world) {
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        float angle = m_yaw + LIDAR_ANGLES[i];
+        Vector2 dir = {cosf(angle), -sinf(angle)};
+        m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
+    }
+
+    for (auto& other:world->getCars()) {
+        Vector2 distance { other->m_position.x, other->m_position.z };
+        float angle = std::remainder(atan2(distance.y, distance.x) - m_yaw, PI*2);
+
+    }
+}
+
 void Car::update(World *world) {
+    if (m_crashed)
+        return;
+
     switch(m_gasInput) {
         case GAS_DRIVE: m_speed += ACCELERATION; break;
         case GAS_REVERSE: m_speed -= ACCELERATION; break;
@@ -167,6 +142,13 @@ void Car::update(World *world) {
         m_position.x += m_speed * cosf(m_yaw);
         m_position.z += m_speed * -sinf(m_yaw);
     }
+
+    calculateLIDAR(world);
+
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i])
+            m_crashed = true;
+    }
 }
 
 void Car::followCamera(Camera* camera) {
@@ -176,15 +158,17 @@ void Car::followCamera(Camera* camera) {
 }
 
 bool Car::hasFinishedRoute() {
-    return m_route_path_index >= m_route->paths.size();
+    return m_routeFollower.hasFinishedRoute();
+}
+
+bool Car::hasCrashed() {
+    return m_crashed;
 }
 
 void Car::render() {
     carModels[m_modelNumber].materials[1].maps[MATERIAL_MAP_DIFFUSE].color = m_color;
-    DrawModelEx(carModels[m_modelNumber], m_position, Vector3{0,1,0}, m_yaw*RAD2DEG, Vector3{1,1,1}, WHITE);
-    if (m_target) {
-    //    DrawCircle3D(m_target->position+Vector3{0,2,0}, m_target->diameter/2, Vector3{1,0,0}, 90.f, RED);
-    }
+    DrawModelEx(carModels[m_modelNumber], m_position,
+                Vector3{0,1,0}, m_yaw*RAD2DEG, Vector3{1,1,1}, WHITE);
 
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if(m_lidarDistances[i] < MAX_LIDAR_DIST) {

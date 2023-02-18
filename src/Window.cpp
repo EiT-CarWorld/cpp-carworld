@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <algorithm>
 #include "raylib.h"
 #include "entities/FloorGrid.h"
 #include "rendering/ModelRenderer.h"
@@ -47,6 +48,11 @@ void Window::mainloop() {
         cameraController.updateCamera();
         Camera3D camera = cameraController.getCamera();
 
+        auto& cars = world.getCars();
+        cars.erase(std::remove_if(cars.begin(), cars.end(),
+                                  [](auto& car){
+            return car->hasCrashed() || car->hasFinishedRoute() ;
+        }), cars.end());
         while (world.getCars().size() < 15)
             world.spawnCar();
         world.takeCarActions();

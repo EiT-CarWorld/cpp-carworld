@@ -2,10 +2,12 @@
 #include <cstddef>
 #include "raylib.h"
 #include "driving/Route.h"
+#include "driving/RouteFollower.h"
 
 #define NUM_CAR_MODELS 1
 #define NUM_CAR_COLORS 6
 #define NUM_LIDAR_ANGLES 5
+#define NUM_CAR_ZONES 8
 
 class World;
 class Car {
@@ -21,18 +23,15 @@ private:
     size_t m_modelNumber{};
     Color m_color{};
 
-    Route* m_route;
-    // Which path along the route we are on
-    size_t m_route_path_index{};
-    // Which PathNode along the given path we are on
-    // 0 means we target the 0th PathNode
-    // if pathnode index == path_node_count, the Node ending the path is the target
-    size_t m_route_path_pathnode_index{};
-    // The current target, based on
-    PathNode* m_target{};
+    RouteFollower m_routeFollower;
 
     static const float LIDAR_ANGLES[NUM_LIDAR_ANGLES];
-    float m_lidarDistances[NUM_LIDAR_ANGLES];
+    static const float MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES];
+    static const float MAX_LIDAR_DIST;
+    static const float MAX_CAR_ZONE_DIST;
+    float m_lidarDistances[NUM_LIDAR_ANGLES]{};
+    // Zone 0 is straight ahead, at angle -180/NUM_CAR_ZONE to 180/NUM_CAR_ZONE
+    float m_carZoneDistances[NUM_CAR_ZONES]{};
 
     enum TurnInput {
         TURN_LEFT,
@@ -44,8 +43,8 @@ private:
         GAS_REVERSE,
         GAS_FREE
     };
-    TurnInput m_turnInput;
-    GasInput m_gasInput;
+    TurnInput m_turnInput{TURN_NO_TURN};
+    GasInput m_gasInput{GAS_FREE};
 
     Vector3 m_position{};
 
@@ -56,6 +55,7 @@ private:
     // only used for player controlled cars, for the time being
     float m_yaw_speed{};
 
+    bool m_crashed{};
 public:
     explicit Car(Route* route);
     ~Car() = default;
@@ -65,9 +65,11 @@ public:
     void update(World* world);
     void followCamera(Camera* camera);
     bool hasFinishedRoute();
+    bool hasCrashed();
     void render();
     void renderHud();
 
 private:
     void findTarget();
+    void calculateLIDAR(World *world);
 };
