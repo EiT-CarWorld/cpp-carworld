@@ -35,4 +35,5 @@ public:
     void takeCarActions();
     void updateCars();
     void render();
+    void renderRoadBorders();
 };

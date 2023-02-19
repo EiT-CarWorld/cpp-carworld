@@ -1,8 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "raylib.h"
-
-#define ROAD_WIDTH 8.f
+#include "carConfig.h"
 
 class Node;
 

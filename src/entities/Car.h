@@ -3,13 +3,24 @@
 #include "raylib.h"
 #include "driving/Route.h"
 #include "driving/RouteFollower.h"
+#include "carConfig.h"
 
 #define NUM_CAR_MODELS 1
 #define NUM_CAR_COLORS 6
-#define NUM_LIDAR_ANGLES 5
-#define NUM_CAR_ZONES 8
 
 class World;
+
+enum TurnInput {
+    TURN_LEFT,
+    TURN_RIGHT,
+    TURN_NO_TURN
+};
+enum GasInput {
+    GAS_DRIVE,
+    GAS_REVERSE,
+    GAS_FREE
+};
+
 class Car {
 private:
     static Texture diffuseTexture, metalnessTexture;
@@ -33,16 +44,6 @@ private:
     // Zone 0 is straight ahead, at angle -180/NUM_CAR_ZONE to 180/NUM_CAR_ZONE
     float m_carZoneDistances[NUM_CAR_ZONES]{};
 
-    enum TurnInput {
-        TURN_LEFT,
-        TURN_RIGHT,
-        TURN_NO_TURN
-    };
-    enum GasInput {
-        GAS_DRIVE,
-        GAS_REVERSE,
-        GAS_FREE
-    };
     TurnInput m_turnInput{TURN_NO_TURN};
     GasInput m_gasInput{GAS_FREE};
 
@@ -63,7 +64,8 @@ public:
     void takePlayerInput();
     void chooseAction(World* world);
     void update(World* world);
-    void followCamera(Camera* camera);
+    void calculateSensors(World *world);
+    Camera3D get3rdPersonCamera();
     bool hasFinishedRoute();
     bool hasCrashed();
     void render();
@@ -71,5 +73,4 @@ public:
     void renderHud();
 
 private:
-    void calculateLIDAR(World *world);
 };

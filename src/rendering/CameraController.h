@@ -4,7 +4,6 @@
 class CameraController {
 private:
     Camera3D m_camera;
-    bool m_mouseLock;
 
     // in radians
     float m_yaw; // 0 is towards -z, positive angle towards +x
@@ -14,7 +13,5 @@ public:
     ~CameraController();
     void resetCamera(Vector3 position);
     void updateCamera();
-    void lockMouse();
-    void unlockMouse();
     Camera3D getCamera();
 };

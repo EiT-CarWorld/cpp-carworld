@@ -4,10 +4,11 @@
 #include "entities/FloorGrid.h"
 #include "rendering/ModelRenderer.h"
 #include "entities/Node.h"
-#include "World.h"
+#include "entities/World.h"
 #include "entities/Car.h"
 #include "rendering/CarZonesVisualizer.h"
 #include "rendering/Skybox.h"
+#include "UserController.h"
 #include "carConfig.h"
 
 Window::Window(const char *title, int width, int height) {
@@ -34,9 +35,6 @@ Window::~Window() {
 }
 
 void Window::mainloop() {
-    CameraController cameraController;
-    cameraController.resetCamera({0, 30, 0});
-
     FloorGrid floorGrid({500, 500}, 1, BLUE);
     World world;
     world.loadFromFile("res/maps/circuit.map");
@@ -47,36 +45,25 @@ void Window::mainloop() {
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
-    while (!WindowShouldClose()) {
-        // handle updates
-        cameraController.updateCamera();
-        Camera3D camera = cameraController.getCamera();
+    UserController controller;
+    controller.resetFreeCamera({-10, 10, 40});
 
-        auto& cars = world.getCars();
-        cars.erase(std::remove_if(cars.begin(), cars.end(),
-                                  [](auto& car){
-            return car->hasCrashed() || car->hasFinishedRoute() ;
-        }), cars.end());
-        while (cars.size() < 15)
-            world.spawnCar();
-        world.takeCarActions();
-        world.getCars()[0]->takePlayerInput();
-        world.updateCars();
-        world.getCars()[0]->followCamera(&camera);
+    while (!WindowShouldClose()) {
+        controller.updateWorld(&world);
 
         // render frame
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        Camera3D camera = controller.getCamera();
         BeginMode3D(camera);
         Skybox::render(camera);
         floorGrid.render(camera);
         renderer.uploadState(camera);
-        world.render();
+        controller.renderWorld(&world);
         EndMode3D();
 
-        world.getCars()[0]->renderHud();
-        DrawFPS(10, 10);
+        controller.renderHUD(&world);
         EndDrawing();
     }
 }

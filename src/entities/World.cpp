@@ -1,6 +1,5 @@
 #include "World.h"
 #include "rendering/ModelRenderer.h"
-#include "rlgl.h"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -178,19 +177,18 @@ std::vector<std::unique_ptr<Car>>& World::getCars() {
 }
 
 void World::takeCarActions() {
+    // Before asking any cars to pick an action, calculate all car sensors
+    for (const auto & m_car : m_cars)
+        m_car->calculateSensors(this);
+
     for(auto& car:m_cars)
         car->chooseAction(this);
 }
 
 void World::updateCars() {
-    for (int i = 0; i < m_cars.size(); i++) {
-        m_cars[i]->update(this);
-        if(m_cars[i]->hasFinishedRoute()) {
-            m_cars[i].swap(m_cars.back());
-            m_cars.pop_back();
-            i--; // To re-do index i
-        }
-    }
+    // Updates all cars, using the actions they last decided on (See: takeCarActions())
+    for (const auto & m_car : m_cars)
+        m_car->update(this);
 }
 
 void World::render() {
@@ -202,11 +200,9 @@ void World::render() {
     ModelRenderer::setMode(MODEL_MODE);
     for(auto& car: m_cars)
         car->render();
+}
+
+void World::renderRoadBorders() {
     for(auto& lineSegment : m_lineSegments)
         lineSegment.render();
-
-    rlDisableDepthMask();
-    for(auto& car : m_cars)
-        car->renderSensory();
-    rlEnableDepthMask();
 }

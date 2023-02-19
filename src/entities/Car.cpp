@@ -84,7 +84,7 @@ void Car::chooseAction(World* world) {
         m_turnInput = TURN_NO_TURN;
 }
 
-void Car::calculateLIDAR(World* world) {
+void Car::calculateSensors(World* world) {
     // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
@@ -177,14 +177,16 @@ void Car::update(World *world) {
         m_position.x += m_speed * cosf(m_yaw) * SIM_DT;
         m_position.z += m_speed * -sinf(m_yaw) * SIM_DT;
     }
-
-    calculateLIDAR(world);
 }
 
-void Car::followCamera(Camera* camera) {
-    camera->position = m_position + Vector3{-cosf(m_yaw)*10, 5, sinf(m_yaw)*10};
-    camera->target = m_position;
-    camera->up = Vector3{0,1,0};
+Camera3D Car::get3rdPersonCamera() {
+    return Camera3D{
+        .position = m_position + Vector3{-cosf(m_yaw)*10, 5, sinf(m_yaw)*10},
+        .target = m_position,
+        .up{0,1,0},
+        .fovy = 80.0f,
+        .projection = CAMERA_PERSPECTIVE
+    };
 }
 
 bool Car::hasFinishedRoute() {

@@ -9,13 +9,13 @@ uniform vec4 colDiffuse;
 
 uniform vec2 carPosition;
 uniform float carYaw;
-uniform float zoneLengths[8];
+uniform float zoneLengths[16];
 
 // Output fragment color
 out vec4 finalColor;
 
 void main() {
-    int zoneCount = 8;
+    int zoneCount = 16;
     // If the closest car in the zone is further away than this, we don't draw anything
     float maxDistanceBother = 40;
 
