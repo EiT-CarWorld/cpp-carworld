@@ -118,15 +118,23 @@ void Car::calculateSensors(World* world) {
 
         Vector2 difference { other->m_position.x - m_position.x, other->m_position.z - m_position.z};
         float distance = Vector2Length(difference);
-        float angle = atan2(-difference.y, difference.x) - m_yaw;
+        // The angle pointing from the center of this that to the center of the other car
+        // Recall that 0 is positive x, positive angles go towards negative z
+        float global_angle = atan2(-difference.y, difference.x);
+        // The angle to the other car, relative to our forward angle
+        float angle = global_angle - m_yaw;
         int zone = positive_mod((int)floor((angle / (2*PI)) * NUM_CAR_ZONES + 0.5f), NUM_CAR_ZONES);
-        float zone_angle = m_yaw + ((2*PI) / NUM_CAR_ZONES) * zone;
-        if (distance < m_carZoneDistances[zone] + CAR_DIAGONAL/2) {
-            float otherCarAngle = abs(std::remainder(other->m_yaw - zone_angle, PI));
+
+        // If the other car's center is close enough, we do more precise calculations.
+        // We pretend the other car is a rectangle, and let a ray between the car centers hit it.
+        // Calculated based on the angle of the ray between car centers, and the angle of the other car.
+        if (distance - CAR_DIAGONAL/2 < m_carZoneDistances[zone]) {
+            // Use remainder and abs to get value between 0 and PI/2, where 0 means we look right at the back of the other
+            float otherCarAngle = abs(std::remainder(other->m_yaw - global_angle, PI));
             float otherCarExtent = (otherCarAngle < CAR_DIAGONAL_ANGLE)
                     ? CAR_LENGTH / cosf(otherCarAngle)
                     : CAR_WIDTH / cosf(PI/2-otherCarAngle);
-            m_carZoneDistances[zone] = fmin(m_carZoneDistances[zone], distance-otherCarExtent / 2);
+            m_carZoneDistances[zone] = fmin(m_carZoneDistances[zone], distance - otherCarExtent/2);
         }
     }
 }
