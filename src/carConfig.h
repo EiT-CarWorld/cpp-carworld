@@ -10,4 +10,9 @@
 // Updating this also requires updating carZones.fs
 #define NUM_CAR_ZONES 16
 
+// Used to calculate distances between cars, taking their rectangular size in account
+#define CAR_WIDTH 2.f
+#define CAR_LENGTH 4.f
+
+// Used to scale roads and node sizes
 #define ROAD_WIDTH 12.f

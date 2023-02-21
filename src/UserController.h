@@ -15,9 +15,11 @@ class UserController {
 
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
+    bool m_freewheelAllCars{false};
 
     void lockMouse();
     void unlockMouse();
+    void trySelectCar(World* world);
 public:
     void resetFreeCamera(Vector3 position);
     void updateWorld(World* world);

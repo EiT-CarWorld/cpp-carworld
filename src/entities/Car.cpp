@@ -48,6 +48,10 @@ Car::Car(Route* route): m_routeFollower(route) {
     m_yaw = atan2(-startDirection.z, startDirection.x);
 }
 
+Vector3 Car::getPosition() {
+    return m_position;
+}
+
 void Car::takePlayerInput() {
     if (IsKeyDown(KEY_UP))
         m_gasInput = GAS_DRIVE;
@@ -84,6 +88,13 @@ void Car::chooseAction(World* world) {
         m_turnInput = TURN_NO_TURN;
 }
 
+void Car::chooseFreewheelAction() {
+    m_gasInput = GAS_FREE;
+}
+
+// Used to calculate the distance to the rectangle bounds of other cars
+static const float CAR_DIAGONAL = std::sqrt(CAR_WIDTH*CAR_WIDTH + CAR_LENGTH*CAR_LENGTH);
+static const float CAR_DIAGONAL_ANGLE = std::atan2(CAR_WIDTH, CAR_LENGTH);
 void Car::calculateSensors(World* world) {
     // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
@@ -102,15 +113,21 @@ void Car::calculateSensors(World* world) {
         dist = MAX_CAR_ZONE_DIST;
 
     for (auto& other:world->getCars()) {
-        if (other.get() == this)
+        if (other.get() == this) // Don't check our distance to ourselves
             continue;
 
         Vector2 difference { other->m_position.x - m_position.x, other->m_position.z - m_position.z};
         float distance = Vector2Length(difference);
         float angle = atan2(-difference.y, difference.x) - m_yaw;
         int zone = positive_mod((int)floor((angle / (2*PI)) * NUM_CAR_ZONES + 0.5f), NUM_CAR_ZONES);
-        if (distance < m_carZoneDistances[zone])
-            m_carZoneDistances[zone] = distance;
+        float zone_angle = m_yaw + ((2*PI) / NUM_CAR_ZONES) * zone;
+        if (distance < m_carZoneDistances[zone] + CAR_DIAGONAL/2) {
+            float otherCarAngle = abs(std::remainder(other->m_yaw - zone_angle, PI));
+            float otherCarExtent = (otherCarAngle < CAR_DIAGONAL_ANGLE)
+                    ? CAR_LENGTH / cosf(otherCarAngle)
+                    : CAR_WIDTH / cosf(PI/2-otherCarAngle);
+            m_carZoneDistances[zone] = fmin(m_carZoneDistances[zone], distance-otherCarExtent / 2);
+        }
     }
 }
 

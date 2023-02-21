@@ -21,36 +21,39 @@ void UserController::updateWorld(World* world) {
         }
     }
 
-    // If the selected car no longer exists, go back to freecam
-    if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
-        m_mode = UserControllerMode::FREECAM;
-
     // Then we check if there are any reasons to change mode
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         lockMouse();
     // Pressing ESC leaves driving, or leaves mouse lock if not driving
     if (IsKeyPressed(KEY_ESCAPE)) {
-        if (m_mode == UserControllerMode::DRIVING) {
+        if (m_mode == UserControllerMode::DRIVING)
             m_mode = UserControllerMode::FREECAM;
-        } else {
+        else
             unlockMouse();
-        }
     }
     // Unfocusing is another way of unlocking the mouse, without leaving driving
     if (!IsWindowFocused())
         unlockMouse();
 
     // Now we handle keypresses
-    if (IsKeyPressed(KEY_K) && !cars.empty() && m_mode != UserControllerMode::DRIVING) {
+    if (m_mouseLock && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && m_mode == UserControllerMode::FREECAM)
+        trySelectCar(world);
+    if (IsKeyPressed(KEY_K) && m_selectedCar)
         m_mode = UserControllerMode::DRIVING;
-        m_selectedCar = world->getCars()[0].get();
-    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        m_selectedCar = nullptr;
     if (IsKeyPressed(KEY_L))
         m_drawRoadBorders = !m_drawRoadBorders;
     if (IsKeyPressed(KEY_V))
         m_drawCarSensors = !m_drawCarSensors;
+    if (IsKeyPressed(KEY_F))
+        m_freewheelAllCars = !m_freewheelAllCars;
     if (IsKeyPressed(KEY_N))
         world->spawnCar();
+
+    // If something has caused our selected car to be deselected, or it no longer exists
+    if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
+        m_mode = UserControllerMode::FREECAM;
 
     // Update the current camera mode
     if (m_mouseLock && m_mode == UserControllerMode::FREECAM)
@@ -58,6 +61,10 @@ void UserController::updateWorld(World* world) {
 
     // Let all cars decide on their action
     world->takeCarActions();
+
+    if (m_freewheelAllCars)
+        for(auto& car:cars)
+            car->chooseFreewheelAction();
 
     // If we are controlling a car, manually override the AIs action
     if (m_mode == UserControllerMode::DRIVING) {
@@ -98,15 +105,28 @@ void UserController::renderWorld(World* world) {
 }
 
 void UserController::renderHUD(World* world) {
+    DrawFPS(10, 10);
+    int y = 0;
+#define DRAW_LINE(text) DrawText((text), 10, 30+(y++)*20, 20, BLACK)
+#define DRAW_TOGGLE(text, state) DRAW_LINE(TextFormat((text), (state)?'X':' '))
+    DRAW_LINE(TextFormat("N - spawn car (%d)", world->getCars().size()));
+    DRAW_TOGGLE("L - toggle lines (%c)", m_drawRoadBorders);
+    DRAW_TOGGLE("V - toggle sensor view (%c)", m_drawCarSensors);
+    if (m_selectedCar) {
+        DRAW_LINE("K - drive selected car");
+        DRAW_LINE("RMB - deselect car");
+    } else {
+        DRAW_LINE("LMB - Select car");
+    }
+    DRAW_TOGGLE("F - freewheel (%c)", m_freewheelAllCars);
+#undef DRAW_LINE
+#undef DRAW_TOGGLE
+
     if (m_selectedCar)
         m_selectedCar->renderHud();
-    size_t carCount = world->getCars().size();
-    DrawFPS(10, 10);
-    DrawText(TextFormat("N - spawn car (%d)", carCount), 10, 30, 20, BLACK);
-    DrawText("L - toggle lines", 10, 50, 20, BLACK);
-    DrawText("V - toggle sensor view", 10, 70, 20, BLACK);
-    if (carCount > 0)
-        DrawText("K - drive a car", 10, 90, 20, BLACK);
+
+    if (m_mode == UserControllerMode::FREECAM && m_mouseLock)
+        DrawRectangle(GetRenderWidth()/2, GetRenderHeight()/2, 2, 2, WHITE);
 }
 
 void UserController::lockMouse() {
@@ -121,4 +141,24 @@ void UserController::unlockMouse() {
         return;
     EnableCursor();
     m_mouseLock = false;
+}
+
+void UserController::trySelectCar(World* world) {
+    Camera3D camera = m_cameraController.getCamera();
+    Vector3 lookingDirection = camera.target-camera.position;
+    if (lookingDirection.y < -0.1) {
+        // Only work if we are actually looking down
+        // We target the plane 0.6f above ground
+        float floorDist = (camera.position.y - 0.6f) / (-lookingDirection.y);
+        Vector3 floorHit = camera.position + floorDist * lookingDirection;
+        for (auto& car: world->getCars()) {
+            Vector3 difference = car->getPosition() - floorHit;
+            difference.y = 0; // Only care about distance in XZ plane
+            float distance = Vector3Length(difference);
+            if (distance < CAR_LENGTH/2) {
+                m_selectedCar = car.get();
+                break;
+            }
+        }
+    }
 }

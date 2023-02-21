@@ -43,6 +43,9 @@ private:
     float m_lidarDistances[NUM_LIDAR_ANGLES]{};
     // Zone 0 is straight ahead, at angle -180/NUM_CAR_ZONE to 180/NUM_CAR_ZONE
     float m_carZoneDistances[NUM_CAR_ZONES]{};
+    // The speed of the closest car in the zone, relative to our own speed
+    // positive x direction is away from own car, positive z is towards previous zone in zone wheel
+    Vector2 m_carZoneSpeed[NUM_CAR_ZONES]{};
 
     TurnInput m_turnInput{TURN_NO_TURN};
     GasInput m_gasInput{GAS_FREE};
@@ -51,7 +54,7 @@ private:
 
     // in meters per second
     float m_speed{};
-    // in radians, 0 is positive x, positive angle towards negative z
+    // in radians, 0 is driving towards positive x, positive angle towards negative z
     float m_yaw{};
     // The angle of the front tires, multiplied by speed and applied every frame
     float m_yaw_speed{};
@@ -61,8 +64,11 @@ public:
     explicit Car(Route* route);
     ~Car() = default;
 
+    Vector3 getPosition();
+
     void takePlayerInput();
     void chooseAction(World* world);
+    void chooseFreewheelAction();
     void update(World* world);
     void calculateSensors(World *world);
     Camera3D get3rdPersonCamera();
