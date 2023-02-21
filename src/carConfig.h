@@ -16,3 +16,7 @@
 
 // Used to scale roads and node sizes
 #define ROAD_WIDTH 12.f
+
+#define SCORE_CRASH_PENALTY 1000
+#define SCORE_GAIN_DISTANCE_COVER 1
+#define SCORE_TIME_PENALTY 10

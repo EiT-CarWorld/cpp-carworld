@@ -52,21 +52,6 @@ Vector3 Car::getPosition() {
     return m_position;
 }
 
-void Car::takePlayerInput() {
-    if (IsKeyDown(KEY_UP))
-        m_gasInput = GAS_DRIVE;
-    else if (IsKeyDown(KEY_DOWN))
-        m_gasInput = GAS_REVERSE;
-    else
-        m_gasInput = GAS_FREE;
-
-    m_turnInput = TURN_NO_TURN;
-    if(IsKeyDown(KEY_LEFT))
-        m_turnInput = TURN_LEFT;
-    else if(IsKeyDown(KEY_RIGHT))
-        m_turnInput = TURN_RIGHT;
-}
-
 void Car::chooseAction(World* world) {
     m_routeFollower.updateIfAtTarget(m_position);
 
@@ -88,6 +73,21 @@ void Car::chooseAction(World* world) {
         m_turnInput = TURN_NO_TURN;
 }
 
+void Car::takePlayerInput() {
+    if (IsKeyDown(KEY_UP))
+        m_gasInput = GAS_DRIVE;
+    else if (IsKeyDown(KEY_DOWN))
+        m_gasInput = GAS_REVERSE;
+    else
+        m_gasInput = GAS_FREE;
+
+    m_turnInput = TURN_NO_TURN;
+    if(IsKeyDown(KEY_LEFT))
+        m_turnInput = TURN_LEFT;
+    else if(IsKeyDown(KEY_RIGHT))
+        m_turnInput = TURN_RIGHT;
+}
+
 void Car::chooseFreewheelAction() {
     m_gasInput = GAS_FREE;
 }
@@ -103,14 +103,11 @@ void Car::calculateSensors(World* world) {
         m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
-    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
-        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i])
-            m_crashed = true;
-    }
-
     // Calculate distances to other cars. First set all distances to MAX
-    for (float & dist : m_carZoneDistances)
-        dist = MAX_CAR_ZONE_DIST;
+    for (int i = 0; i < NUM_CAR_ZONES; i++) {
+        m_carZoneDistances[i] = MAX_CAR_ZONE_DIST;
+        m_carZoneSpeed[i] = {0,0};
+    }
 
     for (auto& other:world->getCars()) {
         if (other.get() == this) // Don't check our distance to ourselves
@@ -125,17 +122,29 @@ void Car::calculateSensors(World* world) {
         float angle = global_angle - m_yaw;
         int zone = positive_mod((int)floor((angle / (2*PI)) * NUM_CAR_ZONES + 0.5f), NUM_CAR_ZONES);
 
-        // If the other car's center is close enough, we do more precise calculations.
+        if (distance - CAR_DIAGONAL/2 >= m_carZoneDistances[zone])
+            continue;
+
+        // The other car's center is close enough that this might be the closest car in the zone
         // We pretend the other car is a rectangle, and let a ray between the car centers hit it.
         // Calculated based on the angle of the ray between car centers, and the angle of the other car.
-        if (distance - CAR_DIAGONAL/2 < m_carZoneDistances[zone]) {
-            // Use remainder and abs to get value between 0 and PI/2, where 0 means we look right at the back of the other
-            float otherCarAngle = abs(std::remainder(other->m_yaw - global_angle, PI));
-            float otherCarExtent = (otherCarAngle < CAR_DIAGONAL_ANGLE)
-                    ? CAR_LENGTH / cosf(otherCarAngle)
-                    : CAR_WIDTH / cosf(PI/2-otherCarAngle);
-            m_carZoneDistances[zone] = fmin(m_carZoneDistances[zone], distance - otherCarExtent/2);
-        }
+        // Use remainder and abs to get value between 0 and PI/2, where 0 means we look right at the back of the other
+        float otherCarAngle = abs(std::remainder(other->m_yaw - global_angle, PI));
+        float otherCarExtent = (otherCarAngle < CAR_DIAGONAL_ANGLE)
+                               ? CAR_LENGTH / cosf(otherCarAngle)
+                               : CAR_WIDTH / cosf(PI/2-otherCarAngle);
+        distance -= otherCarExtent/2;
+
+        if (distance >= m_carZoneDistances[zone])
+            continue;
+
+        // We found a closer car!
+        m_carZoneDistances[zone] = distance;
+        // The relative speed difference, with positive x being speed directly away from us
+        // And positive y means we speed towards the next zone
+        float relative_angle = other->m_yaw - m_yaw;
+        m_carZoneSpeed[zone] = {cosf(relative_angle) * other->m_speed - m_speed,
+                                sinf(relative_angle) * other->m_speed}; //no need to add or sub, since orthogonal
     }
 }
 
@@ -156,10 +165,7 @@ void Car::calculateSensors(World* world) {
 // How much the max turning angle decreases per m/s speed
 #define SPEED_MAX_TURN_PENALTY .009f
 
-void Car::update(World *world) {
-    if (m_crashed)
-        return;
-
+void Car::updatePhysics() {
     bool breaking = false;
     switch(m_gasInput) {
         case GAS_DRIVE:
@@ -177,19 +183,19 @@ void Car::update(World *world) {
 
     switch (m_turnInput) {
         case TURN_LEFT:
-        m_yaw_speed += TURN_SPEED * SIM_DT;
-        m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
-        m_yaw_speed = fmaxf(m_yaw_speed, 0);
-        m_yaw_speed = fminf(m_yaw_speed, max_turn);
-        break;
+            m_yaw_speed += TURN_SPEED * SIM_DT;
+            m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
+            m_yaw_speed = fmaxf(m_yaw_speed, 0);
+            m_yaw_speed = fminf(m_yaw_speed, max_turn);
+            break;
         case TURN_RIGHT:
-        m_yaw_speed -= TURN_SPEED * SIM_DT;
-        m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
-        m_yaw_speed = fminf(m_yaw_speed, 0);
-        m_yaw_speed = fmaxf(m_yaw_speed, -max_turn);
-        break;
+            m_yaw_speed -= TURN_SPEED * SIM_DT;
+            m_yaw_speed -= m_yaw_speed * TURN_FRICTION * SIM_DT;
+            m_yaw_speed = fminf(m_yaw_speed, 0);
+            m_yaw_speed = fmaxf(m_yaw_speed, -max_turn);
+            break;
         default:
-        m_yaw_speed -= sgn(m_yaw_speed) * fminf(TURN_SPEED * SIM_DT, abs(m_yaw_speed));
+            m_yaw_speed -= sgn(m_yaw_speed) * fminf(TURN_SPEED * SIM_DT, abs(m_yaw_speed));
     }
 
     m_yaw += m_yaw_speed * m_speed * SIM_DT;
@@ -205,6 +211,27 @@ void Car::update(World *world) {
         m_position.z += m_speed * -sinf(m_yaw) * SIM_DT;
     } else
         m_speed = 0.f;
+}
+
+void Car::update(World *world) {
+    if (m_crashed)
+        return;
+
+    // We can assume that chooseAction has been called before the call to update
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
+            m_crashed = true;
+            m_score -= SCORE_CRASH_PENALTY;
+            return;
+        }
+    }
+
+    float distanceToTarget = m_routeFollower.getDistanceToTarget2D(m_position);
+    updatePhysics();
+    float distanceImprovement = distanceToTarget - m_routeFollower.getDistanceToTarget2D(m_position);
+
+    m_score += distanceImprovement * SCORE_GAIN_DISTANCE_COVER;
+    m_score -= SCORE_TIME_PENALTY * SIM_DT;
 }
 
 Camera3D Car::get3rdPersonCamera() {
@@ -244,5 +271,6 @@ void Car::renderSensory() {
 }
 
 void Car::renderHud() {
-    DrawText(TextFormat("%.0f km/h", m_speed*3.6f), GetScreenWidth()-200, GetScreenHeight()-40, 30, BLACK);
+    DrawText(TextFormat("%.0f km/h", m_speed*3.6f), GetScreenWidth()-240, GetScreenHeight()-40, 30, BLACK);
+    DrawText(TextFormat("Score: %.0f", m_score), GetScreenWidth()-240, GetScreenHeight()-70, 30, BLACK);
 }

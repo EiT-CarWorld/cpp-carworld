@@ -27,8 +27,10 @@ public:
 
     Node* getStartNode();
     PathNode* getTarget();
+    float getDistanceToTarget2D(Vector3 position);
 
     // Changes the target, if the car has reached it
+    // Also awards the car score for reaching goals, depending on the distance to the last goal
     void updateIfAtTarget(Vector3 position);
     bool hasFinishedRoute();
 };

@@ -33,6 +33,14 @@ PathNode* RouteFollower::getTarget() {
     return m_target;
 }
 
+float RouteFollower::getDistanceToTarget2D(Vector3 position) {
+    if (m_target == nullptr)
+        return 0;
+    Vector3 difference = m_target->position - position;
+    difference.y = 0;
+    return Vector3Length(difference);
+}
+
 void RouteFollower::updateIfAtTarget(Vector3 position) {
     while (m_target) {
         float distance = Vector3Length(m_target->position - position);
