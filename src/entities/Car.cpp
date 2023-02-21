@@ -114,11 +114,13 @@ void Car::calculateSensors(World* world) {
     }
 }
 
-#define ACCELERATION 4.f
+#define ACCELERATION 5.f
+#define BASE_FRICTION 0.2f
+// Scales linearly and quadratically with speed
 #define FRICTION 0.0035f
 #define QUADRATIC_FRICTION 0.0045f
 // Used when the current speed is opposite direction of desired. Applied linearly
-#define BREAKING_FRICTION 0.04f
+#define BREAKING_FRICTION 0.2f
 // Friction applied to the car's speed due to turning. Quadratic
 #define TURNING_SPEED_FRICTION 0.1f
 
@@ -168,15 +170,16 @@ void Car::update(World *world) {
     m_yaw += m_yaw_speed * m_speed * SIM_DT;
     m_yaw = std::remainder(m_yaw, 2*PI); // Keeping the yaw within +/- 180 degrees
 
-    float friction = abs(m_speed) * (
+    float friction = BASE_FRICTION + abs(m_speed) * (
             FRICTION +
             abs(m_speed) * (QUADRATIC_FRICTION + abs(m_yaw_speed) * TURNING_SPEED_FRICTION) +
             (float) breaking * BREAKING_FRICTION);
     m_speed -= sgn(m_speed) * friction * SIM_DT;
-    if(abs(m_speed) > 0.01f) {
+    if(abs(m_speed) > 0.05f) {
         m_position.x += m_speed * cosf(m_yaw) * SIM_DT;
         m_position.z += m_speed * -sinf(m_yaw) * SIM_DT;
-    }
+    } else
+        m_speed = 0.f;
 }
 
 Camera3D Car::get3rdPersonCamera() {

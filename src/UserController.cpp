@@ -41,7 +41,7 @@ void UserController::updateWorld(World* world) {
         unlockMouse();
 
     // Now we handle keypresses
-    if (IsKeyPressed(KEY_K) && !cars.empty()) {
+    if (IsKeyPressed(KEY_K) && !cars.empty() && m_mode != UserControllerMode::DRIVING) {
         m_mode = UserControllerMode::DRIVING;
         m_selectedCar = world->getCars()[0].get();
     }
@@ -100,11 +100,13 @@ void UserController::renderWorld(World* world) {
 void UserController::renderHUD(World* world) {
     if (m_selectedCar)
         m_selectedCar->renderHud();
+    size_t carCount = world->getCars().size();
     DrawFPS(10, 10);
-    DrawText(TextFormat("N - spawn car (%d)", world->getCars().size()), 10, 30, 20, BLACK);
+    DrawText(TextFormat("N - spawn car (%d)", carCount), 10, 30, 20, BLACK);
     DrawText("L - toggle lines", 10, 50, 20, BLACK);
     DrawText("V - toggle sensor view", 10, 70, 20, BLACK);
-    DrawText("K - drive a car", 10, 90, 20, BLACK);
+    if (carCount > 0)
+        DrawText("K - drive a car", 10, 90, 20, BLACK);
 }
 
 void UserController::lockMouse() {
