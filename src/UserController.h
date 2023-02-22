@@ -16,14 +16,20 @@ class UserController {
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};
+    bool m_removeDeadCars{false};
+
+    // To make it very clear that rendering a simulation relies on also updating it
+    // We always render the last simulation updated
+    Simulation* m_lastUpdatedSimulation;
 
     void lockMouse();
     void unlockMouse();
-    void trySelectCar(Simulation* world);
+    void trySelectCar();
+    void makeSureSelectedCarExists();
 public:
     void resetFreeCamera(Vector3 position);
-    void updateSimulation(Simulation* world);
+    void updateSimulation(Simulation* simulation);
     Camera3D getCamera();
-    void render(Simulation* world);
-    void renderHUD(Simulation* world);
+    void render();
+    void renderHUD();
 };

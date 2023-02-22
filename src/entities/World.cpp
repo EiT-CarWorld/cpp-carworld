@@ -13,7 +13,8 @@ static void assertNewline(std::ifstream& in) {
 }
 
 void World::loadFromFile(const std::string& filepath) {
-    assert(!m_freezeWorld);
+    // Once we have routes, we might also have cars, using those routes, so don't allow messing
+    assert(m_routes.empty());
 
     std::ifstream file;
     file.open(filepath);
@@ -87,7 +88,7 @@ void World::loadFromFile(const std::string& filepath) {
             Vector2 angleIn = Vector2Normalize(pos - lastPos);
             Vector2 angleOut = Vector2Normalize(nextPos - pos);
             Vector2 tangent = Vector2Normalize(angleIn + angleOut);
-            float our_radius = radius * (1 + (1 - Vector2DotProduct(angleIn, angleOut))/2 );
+            float our_radius = radius * (1 + (1 - Vector2DotProduct(angleIn, angleOut))/0.5f );
             Vector2 leftCorner = pos + our_radius * Vector2{-tangent.y, tangent.x};
             Vector2 rightCorner = pos + our_radius * Vector2{tangent.y, -tangent.x};
 
@@ -108,12 +109,10 @@ void World::loadFromFile(const std::string& filepath) {
 }
 
 // TODO: Do A* and stuff to find paths, not just random
-void World::createRoutes(unsigned seed, size_t count) {
-    assert(!m_freezeWorld);
+void World::createRoutes(unsigned long seed, size_t count) {
+    assert(m_routes.empty());
     assert(!m_nodes.empty());
 
-    // Remove any old routes
-    m_routes.clear();
     m_routes.reserve(count);
 
     std::mt19937 gen(seed);
@@ -154,7 +153,6 @@ void World::createRoutes(unsigned seed, size_t count) {
 }
 
 std::vector<Route>& World::getRoutes() {
-    m_freezeWorld = true;
     return m_routes;
 }
 

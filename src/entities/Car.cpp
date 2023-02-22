@@ -37,7 +37,7 @@ void Car::unloadStatic() {
     UnloadTexture(metalnessTexture);
 }
 
-Car::Car(Route* route): m_routeFollower(route) {
+Car::Car(Route* route, CarBrain* brain): m_routeFollower(route), m_brain(brain) {
     m_color = CAR_COLORS[rand() % NUM_CAR_COLORS];
     m_modelNumber = rand() % NUM_CAR_MODELS;
 
@@ -50,6 +50,10 @@ Car::Car(Route* route): m_routeFollower(route) {
 
 Vector3 Car::getPosition() {
     return m_position;
+}
+
+float Car::getScore() {
+    return m_score;
 }
 
 void Car::chooseAction() {
@@ -65,9 +69,9 @@ void Car::chooseAction() {
     Vector3 distance = m_routeFollower.getTarget()->position - m_position;
     float direction = atan2(-distance.z, distance.x);
     float turn_offset = remainderf(m_yaw - direction, 2*PI);
-    if(turn_offset < -.1)
+    if(turn_offset < -.02)
         m_turnInput = TURN_LEFT;
-    else if(turn_offset > .1)
+    else if(turn_offset > .02)
         m_turnInput = TURN_RIGHT;
     else
         m_turnInput = TURN_NO_TURN;

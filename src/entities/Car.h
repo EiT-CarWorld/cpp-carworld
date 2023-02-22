@@ -37,6 +37,8 @@ private:
     // positive x direction is away from own car, positive y is orthogonal speed towards the next zone
     Vector2 m_carZoneSpeed[NUM_CAR_ZONES]{};
 
+    CarBrain* m_brain;
+
     TurnInput m_turnInput{TURN_NO_TURN};
     GasInput m_gasInput{GAS_FREE};
 
@@ -48,13 +50,15 @@ private:
     // The angle of the front tires, multiplied by speed and applied every frame
     float m_yaw_speed{};
 
-    float m_score{};
+    float m_score{SCORE_INITIAL_SCORE};
     bool m_crashed{};
 
 public:
-    explicit Car(Route* route);
+    explicit Car(Route* route, CarBrain* brain);
     ~Car() = default;
     Vector3 getPosition();
+    float getScore();
+
     void chooseAction();
     void takePlayerInput();
     void chooseFreewheelAction();

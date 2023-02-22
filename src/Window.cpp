@@ -43,15 +43,22 @@ void Window::mainloop() {
             {1, -2, 1});
 
     World world;
-    world.loadFromFile("res/maps/circuit.map");
+    world.loadFromFile("res/maps/figure8.map");
     world.createRoutes(1234, 2);
 
-    Simulation simulation(&world, 1);
+    CarBrain brain;
+
+    Simulation simulation(&world, &brain, 1234, false);
 
     UserController controller;
     controller.resetFreeCamera({-10, 10, 40});
 
     while (!WindowShouldClose()) {
+
+        if (simulation.getFrameNumber() > TARGET_SIMULATION_FRAMERATE * 10) {
+            simulation = Simulation(&world, &brain, 1234, false);
+        }
+
         controller.updateSimulation(&simulation);
 
         // render frame
@@ -63,10 +70,12 @@ void Window::mainloop() {
         Skybox::render(camera);
         floorGrid.render(camera);
         renderer.uploadState(camera);
-        controller.render(&simulation);
+        controller.render();
         EndMode3D();
 
-        controller.renderHUD(&simulation);
+        controller.renderHUD();
         EndDrawing();
     }
+
+    //simulation.printHistoryToFile("car_history.csv");
 }

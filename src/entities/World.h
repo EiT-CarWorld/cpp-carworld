@@ -23,13 +23,11 @@ class World {
 
     // Once simulations have started, we can no longer change the world,
     // since cars have pointers to our data
-    bool m_freezeWorld;
 public:
     World();
 
     void loadFromFile(const std::string& path);
-    void createRoutes(unsigned seed, size_t count);
-
+    void createRoutes(unsigned long seed, size_t count);
     std::vector<Route>& getRoutes();
     float getRayDistance(Vector2 pos, Vector2 dir, float max_distance);
     void render();
