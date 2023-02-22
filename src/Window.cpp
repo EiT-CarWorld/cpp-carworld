@@ -36,20 +36,23 @@ Window::~Window() {
 
 void Window::mainloop() {
     FloorGrid floorGrid({500, 500}, 1, BLUE);
-    World world;
-    world.loadFromFile("res/maps/circuit.map");
-    world.createRoutes(1234, 2);
 
     ModelRenderer renderer(
             {0.3, 0.3, 0.3},
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
+    World world;
+    world.loadFromFile("res/maps/circuit.map");
+    world.createRoutes(1234, 2);
+
+    Simulation simulation(&world, 1);
+
     UserController controller;
     controller.resetFreeCamera({-10, 10, 40});
 
     while (!WindowShouldClose()) {
-        controller.updateWorld(&world);
+        controller.updateSimulation(&simulation);
 
         // render frame
         BeginDrawing();
@@ -60,10 +63,10 @@ void Window::mainloop() {
         Skybox::render(camera);
         floorGrid.render(camera);
         renderer.uploadState(camera);
-        controller.renderWorld(&world);
+        controller.render(&simulation);
         EndMode3D();
 
-        controller.renderHUD(&world);
+        controller.renderHUD(&simulation);
         EndDrawing();
     }
 }

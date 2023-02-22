@@ -21,19 +21,17 @@ class World {
     // A route is a series of paths, possibly looping
     std::vector<Route> m_routes;
 
-    // The cars of our world
-    std::vector<std::unique_ptr<Car>> m_cars;
-
+    // Once simulations have started, we can no longer change the world,
+    // since cars have pointers to our data
+    bool m_freezeWorld;
 public:
     World();
 
     void loadFromFile(const std::string& path);
     void createRoutes(unsigned seed, size_t count);
+
+    std::vector<Route>& getRoutes();
     float getRayDistance(Vector2 pos, Vector2 dir, float max_distance);
-    void spawnCar();
-    std::vector<std::unique_ptr<Car>>& getCars();
-    void takeCarActions();
-    void updateCars();
     void render();
     void renderRoadBorders();
 };

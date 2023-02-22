@@ -9,7 +9,7 @@
 #define NUM_CAR_MODELS 1
 #define NUM_CAR_COLORS 6
 
-class World;
+class Simulation;
 
 class Car {
 private:
@@ -55,11 +55,11 @@ public:
     explicit Car(Route* route);
     ~Car() = default;
     Vector3 getPosition();
-    void chooseAction(World* world);
+    void chooseAction();
     void takePlayerInput();
     void chooseFreewheelAction();
-    void update(World* world);
-    void calculateSensors(World *world);
+    void update();
+    void calculateSensors(Simulation* simulation);
     Camera3D get3rdPersonCamera();
     bool hasFinishedRoute();
     bool hasCrashed();

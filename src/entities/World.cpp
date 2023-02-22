@@ -5,7 +5,7 @@
 #include <cassert>
 #include <random>
 
-World::World(): m_nodes(), m_pathNodes(), m_paths(), m_lineSegments(), m_routes(), m_cars() {}
+World::World(): m_nodes(), m_pathNodes(), m_paths(), m_lineSegments(), m_routes() {}
 
 static void assertNewline(std::ifstream& in) {
     assert(in.get() == '\n');
@@ -13,6 +13,8 @@ static void assertNewline(std::ifstream& in) {
 }
 
 void World::loadFromFile(const std::string& filepath) {
+    assert(!m_freezeWorld);
+
     std::ifstream file;
     file.open(filepath);
     assert(file.is_open());
@@ -107,9 +109,7 @@ void World::loadFromFile(const std::string& filepath) {
 
 // TODO: Do A* and stuff to find paths, not just random
 void World::createRoutes(unsigned seed, size_t count) {
-    // Since cars have pointers into the m_routes vector,
-    // we may not add or remove routes while ANY car is alive
-    assert(m_cars.empty());
+    assert(!m_freezeWorld);
     assert(!m_nodes.empty());
 
     // Remove any old routes
@@ -153,6 +153,11 @@ void World::createRoutes(unsigned seed, size_t count) {
     }
 }
 
+std::vector<Route>& World::getRoutes() {
+    m_freezeWorld = true;
+    return m_routes;
+}
+
 float World::getRayDistance(Vector2 pos, Vector2 dir, float max_distance) {
     float distance = max_distance;
     for (auto& line : m_lineSegments) {
@@ -163,34 +168,6 @@ float World::getRayDistance(Vector2 pos, Vector2 dir, float max_distance) {
     return distance;
 }
 
-void World::spawnCar() {
-    assert(!m_routes.empty());
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> route_choice(0, m_routes.size()-1);
-    m_cars.emplace_back(std::make_unique<Car>(&m_routes[route_choice(gen)]));
-}
-
-std::vector<std::unique_ptr<Car>>& World::getCars() {
-    return m_cars;
-}
-
-void World::takeCarActions() {
-    // Before asking any cars to pick an action, calculate all car sensors
-    for (const auto & m_car : m_cars)
-        m_car->calculateSensors(this);
-
-    for(auto& car:m_cars)
-        car->chooseAction(this);
-}
-
-void World::updateCars() {
-    // Updates all cars, using the actions they last decided on (See: takeCarActions())
-    for (const auto & m_car : m_cars)
-        m_car->update(this);
-}
-
 void World::render() {
     ModelRenderer::setMode(GLOBAL_TEXTURE_MODE);
     for(Node& node : m_nodes)
@@ -198,8 +175,6 @@ void World::render() {
     for(auto& path: m_paths)
         path->render();
     ModelRenderer::setMode(MODEL_MODE);
-    for(auto& car: m_cars)
-        car->render();
 }
 
 void World::renderRoadBorders() {

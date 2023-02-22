@@ -1,5 +1,5 @@
 #pragma once
-#include "entities/World.h"
+#include "Simulation.h"
 #include "entities/Car.h"
 #include "rendering/CameraController.h"
 
@@ -19,11 +19,11 @@ class UserController {
 
     void lockMouse();
     void unlockMouse();
-    void trySelectCar(World* world);
+    void trySelectCar(Simulation* world);
 public:
     void resetFreeCamera(Vector3 position);
-    void updateWorld(World* world);
+    void updateSimulation(Simulation* world);
     Camera3D getCamera();
-    void renderWorld(World* world);
-    void renderHUD(World* world);
+    void render(Simulation* world);
+    void renderHUD(Simulation* world);
 };

@@ -1,7 +1,7 @@
 #include "Car.h"
 #include <cstdlib>
 #include <cmath>
-#include "World.h"
+#include "Simulation.h"
 #include "rendering/ModelRenderer.h"
 #include "rendering/CarZonesVisualizer.h"
 #include "carMath.h"
@@ -52,7 +52,7 @@ Vector3 Car::getPosition() {
     return m_position;
 }
 
-void Car::chooseAction(World* world) {
+void Car::chooseAction() {
     m_routeFollower.updateIfAtTarget(m_position);
 
     if (hasFinishedRoute()) {
@@ -95,12 +95,12 @@ void Car::chooseFreewheelAction() {
 // Used to calculate the distance to the rectangle bounds of other cars
 static const float CAR_DIAGONAL = std::sqrt(CAR_WIDTH*CAR_WIDTH + CAR_LENGTH*CAR_LENGTH);
 static const float CAR_DIAGONAL_ANGLE = std::atan2(CAR_WIDTH, CAR_LENGTH);
-void Car::calculateSensors(World* world) {
+void Car::calculateSensors(Simulation* simulation) {
     // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
         Vector2 dir = {cosf(angle), -sinf(angle)};
-        m_lidarDistances[i] = world->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
+        m_lidarDistances[i] = simulation->getWorld()->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
     // Calculate distances to other cars. First set all distances to MAX
@@ -109,7 +109,7 @@ void Car::calculateSensors(World* world) {
         m_carZoneSpeed[i] = {0,0};
     }
 
-    for (auto& other:world->getCars()) {
+    for (auto& other:simulation->getCars()) {
         if (other.get() == this) // Don't check our distance to ourselves
             continue;
 
@@ -213,7 +213,7 @@ void Car::updatePhysics() {
         m_speed = 0.f;
 }
 
-void Car::update(World *world) {
+void Car::update() {
     if (m_crashed)
         return;
 

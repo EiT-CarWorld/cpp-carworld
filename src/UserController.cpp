@@ -7,10 +7,10 @@ void UserController::resetFreeCamera(Vector3 position) {
     m_cameraController.resetCamera(position);
 }
 
-void UserController::updateWorld(World* world) {
+void UserController::updateSimulation(Simulation* simulation) {
     // First we remove cars that have crashed, or finished their route
     // Making sure to automatically deselect removed cars
-    auto& cars = world->getCars();
+    auto& cars = simulation->getCars();
     for (int i = 0; i < cars.size(); i++) {
         if (cars[i]->hasCrashed() || cars[i]->hasFinishedRoute()) {
             if (cars[i].get() == m_selectedCar)
@@ -37,7 +37,7 @@ void UserController::updateWorld(World* world) {
 
     // Now we handle keypresses
     if (m_mouseLock && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && m_mode == UserControllerMode::FREECAM)
-        trySelectCar(world);
+        trySelectCar(simulation);
     if (IsKeyPressed(KEY_K) && m_selectedCar)
         m_mode = UserControllerMode::DRIVING;
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
@@ -49,7 +49,7 @@ void UserController::updateWorld(World* world) {
     if (IsKeyPressed(KEY_F))
         m_freewheelAllCars = !m_freewheelAllCars;
     if (IsKeyPressed(KEY_N))
-        world->spawnCar();
+        simulation->spawnCar();
 
     // If something has caused our selected car to be deselected, or it no longer exists
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
@@ -60,7 +60,7 @@ void UserController::updateWorld(World* world) {
         m_cameraController.updateCamera();
 
     // Let all cars decide on their action
-    world->takeCarActions();
+    simulation->takeCarActions();
 
     if (m_freewheelAllCars)
         for(auto& car:cars)
@@ -73,7 +73,7 @@ void UserController::updateWorld(World* world) {
     }
 
     // Finally do the actual update
-    world->updateCars();
+    simulation->updateCars();
 }
 
 Camera3D UserController::getCamera() {
@@ -86,30 +86,30 @@ Camera3D UserController::getCamera() {
     }
 }
 
-void UserController::renderWorld(World* world) {
-    world->render();
+void UserController::render(Simulation* simulation) {
+    simulation->render();
 
     if (m_drawRoadBorders)
-        world->renderRoadBorders();
+        simulation->getWorld()->renderRoadBorders();
 
     if (m_drawCarSensors) {
         if (m_selectedCar)
             m_selectedCar->renderSensory();
         else {
             rlDisableDepthMask();
-            for (auto& car:world->getCars())
+            for (auto& car:simulation->getCars())
                 car->renderSensory();
             rlEnableDepthMask();
         }
     }
 }
 
-void UserController::renderHUD(World* world) {
+void UserController::renderHUD(Simulation* simulation) {
     DrawFPS(10, 10);
     int y = 0;
 #define DRAW_LINE(text) DrawText((text), 10, 30+(y++)*20, 20, BLACK)
 #define DRAW_TOGGLE(text, state) DRAW_LINE(TextFormat((text), (state)?'X':' '))
-    DRAW_LINE(TextFormat("N - spawn car (%d)", world->getCars().size()));
+    DRAW_LINE(TextFormat("N - spawn car (%d)", simulation->getCars().size()));
     DRAW_TOGGLE("L - toggle lines (%c)", m_drawRoadBorders);
     DRAW_TOGGLE("V - toggle sensor view (%c)", m_drawCarSensors);
     if (m_selectedCar) {
@@ -143,7 +143,7 @@ void UserController::unlockMouse() {
     m_mouseLock = false;
 }
 
-void UserController::trySelectCar(World* world) {
+void UserController::trySelectCar(Simulation* simulation) {
     Camera3D camera = m_cameraController.getCamera();
     Vector3 lookingDirection = camera.target-camera.position;
     if (lookingDirection.y < -0.1) {
@@ -151,7 +151,7 @@ void UserController::trySelectCar(World* world) {
         // We target the plane 0.6f above ground
         float floorDist = (camera.position.y - 0.6f) / (-lookingDirection.y);
         Vector3 floorHit = camera.position + floorDist * lookingDirection;
-        for (auto& car: world->getCars()) {
+        for (auto& car: simulation->getCars()) {
             Vector3 difference = car->getPosition() - floorHit;
             difference.y = 0; // Only care about distance in XZ plane
             float distance = Vector3Length(difference);
