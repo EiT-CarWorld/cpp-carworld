@@ -2,6 +2,7 @@
 #include "Simulation.h"
 #include "entities/Car.h"
 #include "rendering/CameraController.h"
+#include "GeneticSimulation.h"
 
 enum class UserControllerMode {
     FREECAM, DRIVING
@@ -13,22 +14,22 @@ class UserController {
     Car* m_selectedCar{nullptr};
     CameraController m_cameraController;
 
+    GeneticSimulation* m_simulations;
+
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};
     bool m_removeDeadCars{false};
 
-    // To make it very clear that rendering a simulation relies on also updating it
-    // We always render the last simulation updated
-    Simulation* m_lastUpdatedSimulation;
-
     void lockMouse();
     void unlockMouse();
-    void trySelectCar();
-    void makeSureSelectedCarExists();
+    void updateRealtimeSimulation();
+    void trySelectCar(Simulation* simulation);
+    void makeSureSelectedCarExists(Simulation* simulation);
 public:
+    UserController(GeneticSimulation* simulations);
     void resetFreeCamera(Vector3 position);
-    void updateSimulation(Simulation* simulation);
+    void update();
     Camera3D getCamera();
     void render();
     void renderHUD();

@@ -3,46 +3,29 @@
 #include "rlgl.h"
 #include <cassert>
 
+UserController::UserController(GeneticSimulation* simulations) : m_simulations(simulations) {}
+
 void UserController::resetFreeCamera(Vector3 position) {
     m_cameraController.resetCamera(position);
 }
 
-void UserController::updateSimulation(Simulation* simulation) {
-    m_lastUpdatedSimulation = simulation;
+void UserController::updateRealtimeSimulation() {
+    Simulation* simulation = m_simulations->getRealtimeSimulation();
+    if (!simulation)
+        return;
+
+    // Does things like spawning new cars, or freezing the score if enough frames have passed
+    m_simulations->preSimulationFrame(simulation);
 
     // First we remove cars that have crashed, or finished their route
     // Making sure to automatically deselect removed cars
     auto& cars = simulation->getCars();
 
-    if (m_removeDeadCars) {
-        for (int i = 0; i < cars.size(); i++) {
-            if (cars[i]->hasCrashed() || cars[i]->hasFinishedRoute()) {
-                cars[i].swap(cars.back());
-                cars.pop_back();
-                i--;
-            }
-        }
-    }
-
-    makeSureSelectedCarExists();
-
-    // Then we check if there are any reasons to change mode
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        lockMouse();
-    // Pressing ESC leaves driving, or leaves mouse lock if not driving
-    if (IsKeyPressed(KEY_ESCAPE)) {
-        if (m_mode == UserControllerMode::DRIVING)
-            m_mode = UserControllerMode::FREECAM;
-        else
-            unlockMouse();
-    }
-    // Unfocusing is another way of unlocking the mouse, without leaving driving
-    if (!IsWindowFocused())
-        unlockMouse();
+    makeSureSelectedCarExists(simulation);
 
     // Now we handle keypresses
     if (m_mouseLock && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && m_mode == UserControllerMode::FREECAM)
-        trySelectCar();
+        trySelectCar(simulation);
     if (IsKeyPressed(KEY_K) && m_selectedCar)
         m_mode = UserControllerMode::DRIVING;
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
@@ -60,15 +43,11 @@ void UserController::updateSimulation(Simulation* simulation) {
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
         m_mode = UserControllerMode::FREECAM;
 
-    // Update the current camera mode
-    if (m_mouseLock && m_mode == UserControllerMode::FREECAM)
-        m_cameraController.updateCamera();
-
     // Let all cars decide on their action
     simulation->takeCarActions();
 
     if (m_freewheelAllCars)
-        for(auto& car:cars)
+        for(auto& car:simulation->getCars())
             car->chooseFreewheelAction();
 
     // If we are controlling a car, manually override the AIs action
@@ -79,6 +58,36 @@ void UserController::updateSimulation(Simulation* simulation) {
 
     // Finally do the actual update
     simulation->updateCars();
+}
+
+void UserController::update() {
+    // Then we check if there are any reasons to change mode
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        lockMouse();
+    // Pressing ESC leaves driving, or leaves mouse lock if not driving
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        if (m_mode == UserControllerMode::DRIVING)
+            m_mode = UserControllerMode::FREECAM;
+        else
+            unlockMouse();
+    }
+    // Unfocusing is another way of unlocking the mouse, without leaving driving
+    if (!IsWindowFocused())
+        unlockMouse();
+
+    // Start a new generation when ready, and G is pressed
+    if (m_simulations->getCurrentlyRunning() == 0 && IsKeyPressed(KEY_G)) {
+        m_simulations->finishGeneration();
+        m_selectedCar = nullptr;
+        m_simulations->startParallelGeneration(true);
+    }
+
+    // Is a NO-OP if there is no realtime simulation running
+    updateRealtimeSimulation();
+
+    // Update the current camera mode
+    if (m_mouseLock && m_mode == UserControllerMode::FREECAM)
+        m_cameraController.updateCamera();
 }
 
 Camera3D UserController::getCamera() {
@@ -92,18 +101,21 @@ Camera3D UserController::getCamera() {
 }
 
 void UserController::render() {
-    assert(m_lastUpdatedSimulation);
-    m_lastUpdatedSimulation->render();
+    Simulation* simulation = m_simulations->getRealtimeSimulation();
+    if (!simulation)
+        return;
+
+    simulation->render();
 
     if (m_drawRoadBorders)
-        m_lastUpdatedSimulation->getWorld()->renderRoadBorders();
+        simulation->getWorld()->renderRoadBorders();
 
     if (m_drawCarSensors) {
         if (m_selectedCar)
             m_selectedCar->renderSensory();
         else {
             rlDisableDepthMask();
-            for (auto& car:m_lastUpdatedSimulation->getCars())
+            for (auto& car:simulation->getCars())
                 car->renderSensory();
             rlEnableDepthMask();
         }
@@ -112,10 +124,26 @@ void UserController::render() {
 
 void UserController::renderHUD() {
     DrawFPS(10, 10);
+
+    if (m_mode == UserControllerMode::FREECAM && m_mouseLock)
+        DrawRectangle(GetRenderWidth()/2, GetRenderHeight()/2, 2, 2, WHITE);
+
     int y = 0;
 #define DRAW_LINE(text) DrawText((text), 10, 30+(y++)*20, 20, BLACK)
 #define DRAW_TOGGLE(text, state) DRAW_LINE(TextFormat((text), (state)?'X':' '))
-    DRAW_LINE(TextFormat("N - spawn car (%d)", m_lastUpdatedSimulation->getCars().size()));
+
+    DRAW_LINE(TextFormat("Generation %d", m_simulations->getGenerationNumber()));
+    DRAW_LINE(TextFormat("Simulations left: %d", m_simulations->getCurrentlyRunning()));
+
+    // The rest of this function is only run when a simulation is being run in realtime
+    Simulation* simulation = m_simulations->getRealtimeSimulation();
+    if (!simulation)
+        return;
+
+    DRAW_LINE("=== Realtime simulation ===");
+    DRAW_LINE(TextFormat("Frame %d/%d", simulation->getFrameNumber(), m_simulations->getFramesPerSimulation()));
+
+    DRAW_LINE(TextFormat("N - spawn car (%d)", simulation->getCars().size()));
     DRAW_TOGGLE("L - toggle lines (%c)", m_drawRoadBorders);
     DRAW_TOGGLE("V - toggle sensor view (%c)", m_drawCarSensors);
     if (m_selectedCar) {
@@ -125,16 +153,13 @@ void UserController::renderHUD() {
         DRAW_LINE("LMB - Select car");
     }
     DRAW_TOGGLE("F - freewheel (%c)", m_freewheelAllCars);
-    float totalScore = m_lastUpdatedSimulation->getTotalSimulationScore();
+    float totalScore = simulation->getTotalSimulationScore();
     DRAW_LINE(TextFormat("Total score: %.0f", totalScore));
 #undef DRAW_LINE
 #undef DRAW_TOGGLE
 
     if (m_selectedCar)
         m_selectedCar->renderHud();
-
-    if (m_mode == UserControllerMode::FREECAM && m_mouseLock)
-        DrawRectangle(GetRenderWidth()/2, GetRenderHeight()/2, 2, 2, WHITE);
 }
 
 void UserController::lockMouse() {
@@ -152,9 +177,8 @@ void UserController::unlockMouse() {
 }
 
 // Uses the center of the camera, and camera direction, to shoot a ray at the ground, and select the car there, if any
-void UserController::trySelectCar() {
+void UserController::trySelectCar(Simulation* simulation) {
     assert(m_mode == UserControllerMode::FREECAM);
-    assert(m_lastUpdatedSimulation);
 
     Camera3D camera = m_cameraController.getCamera();
     Vector3 lookingDirection = camera.target-camera.position;
@@ -163,7 +187,7 @@ void UserController::trySelectCar() {
         // We target the plane 0.6f above ground
         float floorDist = (camera.position.y - 0.6f) / (-lookingDirection.y);
         Vector3 floorHit = camera.position + floorDist * lookingDirection;
-        for (auto& car: m_lastUpdatedSimulation->getCars()) {
+        for (auto& car: simulation->getCars()) {
             Vector3 difference = car->getPosition() - floorHit;
             difference.y = 0; // Only care about distance in XZ plane
             float distance = Vector3Length(difference);
@@ -178,9 +202,8 @@ void UserController::trySelectCar() {
 // The Simulation being passed to update can suddenly be replaced by a new simulation,
 // Or the selected car could have been removed for some reason.
 // Therefore we need to check that the car we have selected, still exists
-void UserController::makeSureSelectedCarExists() {
-    assert(m_lastUpdatedSimulation);
-    for (auto& car:m_lastUpdatedSimulation->getCars())
+void UserController::makeSureSelectedCarExists(Simulation* simulation) {
+    for (auto& car:simulation->getCars())
         if (car.get() == m_selectedCar)
             return;
     m_selectedCar = nullptr;

@@ -1,6 +1,8 @@
 #pragma once
+#include <vector>
 #include "carConfig.h"
 #include "raylib.h"
+#include "CarMatrix.h"
 
 enum TurnInput {
     TURN_LEFT,
@@ -27,16 +29,28 @@ struct CarBrainInput {
     Vector2 (*carZoneSpeeds)[NUM_CAR_ZONES];
 };
 #define BRAIN_INPUT_LAYER_SIZE (3+NUM_LIDAR_ANGLES+NUM_CAR_ZONES*3)
+#define BRAIN_OUTPUT_LAYER_SIZE 4
 
 struct CarBrainOutput {
     GasInput gasInput;
     TurnInput turnInput;
 };
 
+#define MAX_LAYER_SIZE 128
 class CarBrain {
-
-
-
+    std::vector<CarMatrix> m_matrices;
+    // The score given to this brain, by a simulation running it
+    float m_evaluationScore{};
 public:
+    explicit CarBrain(std::vector<CarMatrix> matrices);
     CarBrainOutput takeAction(CarBrainInput input);
+    void setEvaluationScore(float score);
+    float getEvaluationScore();
+
+    // Creates an array of matrices between the layers in a brain
+    static std::vector<CarMatrix> initializeMatrices(
+            unsigned long seed,
+            std::vector<size_t> hidden_layer_sizes);
 };
+
+

@@ -35,7 +35,7 @@ Window::~Window() {
 }
 
 void Window::mainloop() {
-    FloorGrid floorGrid({500, 500}, 1, BLUE);
+    FloorGrid floorGrid({1000, 1000}, 1, BLUE);
 
     ModelRenderer renderer(
             {0.3, 0.3, 0.3},
@@ -46,20 +46,23 @@ void Window::mainloop() {
     world.loadFromFile("res/maps/figure8.map");
     world.createRoutes(1234, 2);
 
-    CarBrain brain;
+    // Create one initial brain
+    std::vector<CarBrain> initial_brains;
+    initial_brains.emplace_back(CarBrain::initializeMatrices(1234, {20, 20}));
 
-    Simulation simulation(&world, &brain, 1234, false);
+    GeneticSimulation simulations(&world, 1234,
+                                  {
+                                          {0,1}, {10,1}, {20,1}, {30,1},
+                                          {40,1}, {50,1}, {60,1}, {70,1},
+                                          {80,1}, {90,1}, {100,1}, {110,1}},
+                                  std::move(initial_brains),
+                                  100, 5, TARGET_SIMULATION_FRAMERATE * 10);
 
-    UserController controller;
+    UserController controller(&simulations);
     controller.resetFreeCamera({-10, 10, 40});
 
     while (!WindowShouldClose()) {
-
-        if (simulation.getFrameNumber() > TARGET_SIMULATION_FRAMERATE * 10) {
-            simulation = Simulation(&world, &brain, 1234, false);
-        }
-
-        controller.updateSimulation(&simulation);
+        controller.update();
 
         // render frame
         BeginDrawing();
@@ -76,6 +79,5 @@ void Window::mainloop() {
         controller.renderHUD();
         EndDrawing();
     }
-
-    //simulation.printHistoryToFile("car_history.csv");
+    simulations.abortGeneration();
 }

@@ -15,6 +15,11 @@ class Simulation {
     // How many steps of simulation have been performed?
     size_t m_frameNumber;
 
+    // We have the option of freezing the score.
+    // This lets us continue to drive and have fun, without affecting the learning
+    std::optional<float> m_frozenScore{};
+
+    // Optional functionality for storing a bunch of data from the simulation
     bool m_store_history;
     std::unordered_map<Car*, std::pair<size_t, std::vector<float>>> m_score_history{};
 
@@ -30,6 +35,7 @@ public:
     void updateCars();
     void render();
     float getTotalSimulationScore();
+    void storeTotalScoreInBrain();
     void printHistoryToFile(const std::string& filename);
 };
 

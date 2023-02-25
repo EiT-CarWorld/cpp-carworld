@@ -65,16 +65,22 @@ void Car::chooseAction() {
         return;
     }
 
-    m_gasInput = GAS_DRIVE;
     Vector3 distance = m_routeFollower.getTarget()->position - m_position;
+    distance.y = 0;
     float direction = atan2(-distance.z, distance.x);
     float turn_offset = remainderf(m_yaw - direction, 2*PI);
-    if(turn_offset < -.02)
-        m_turnInput = TURN_LEFT;
-    else if(turn_offset > .02)
-        m_turnInput = TURN_RIGHT;
-    else
-        m_turnInput = TURN_NO_TURN;
+
+    CarBrainInput input{};
+    input.own_speed = m_speed;
+    input.target_angle = turn_offset;
+    input.target_distance = Vector3Length(distance);
+    input.lidarData = &m_lidarDistances;
+    input.carZoneDistances = &m_carZoneDistances;
+    input.carZoneSpeeds = &m_carZoneSpeed;
+
+    CarBrainOutput out = m_brain->takeAction(input);
+    m_gasInput = out.gasInput;
+    m_turnInput = out.turnInput;
 }
 
 void Car::takePlayerInput() {

@@ -64,6 +64,10 @@ float Simulation::getTotalSimulationScore() {
     return (float) sum;
 }
 
+void Simulation::storeTotalScoreInBrain() {
+    m_carBrain->setEvaluationScore(getTotalSimulationScore());
+}
+
 void Simulation::printHistoryToFile(const std::string& filename) {
     assert(m_store_history);
 

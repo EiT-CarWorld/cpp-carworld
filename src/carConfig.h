@@ -5,6 +5,9 @@
 // The delta time of each frame
 #define SIM_DT (1.f/TARGET_SIMULATION_FRAMERATE)
 
+// Number of threads used for parallel learning
+#define THREAD_COUNT 8
+
 // Updating this also requires updating the angles defined in Car.cpp
 #define NUM_LIDAR_ANGLES 5
 // Updating this also requires updating carZones.fs
@@ -17,6 +20,7 @@
 // Used to scale roads and node sizes
 #define ROAD_WIDTH 12.f
 
+// Score tuning
 #define SCORE_CRASH_PENALTY 1000
 #define SCORE_GAIN_DISTANCE_COVER 1
 #define SCORE_TIME_PENALTY 10
