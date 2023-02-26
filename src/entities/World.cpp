@@ -88,7 +88,7 @@ void World::loadFromFile(const std::string& filepath) {
             Vector2 angleIn = Vector2Normalize(pos - lastPos);
             Vector2 angleOut = Vector2Normalize(nextPos - pos);
             Vector2 tangent = Vector2Normalize(angleIn + angleOut);
-            float our_radius = radius * (1 + (1 - Vector2DotProduct(angleIn, angleOut))/0.5f );
+            float our_radius = radius * (1 + (1 - Vector2DotProduct(angleIn, angleOut))/2 );
             Vector2 leftCorner = pos + our_radius * Vector2{-tangent.y, tangent.x};
             Vector2 rightCorner = pos + our_radius * Vector2{tangent.y, -tangent.x};
 

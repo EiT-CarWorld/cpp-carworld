@@ -53,6 +53,27 @@ void CarMatrix::multiply(const float *input, float *output) {
     }
 }
 
+void CarMatrix::mixIn(const CarMatrix &other, std::mt19937 random) {
+    assert(cols == other.cols && rows == other.rows);
+    std::uniform_int_distribution picker(0, 1);
+    for(int i = 0; i < rows*cols; i++) {
+        if( picker(random) == 0)
+            values[i] = other.values[i];
+    }
+}
+
+void CarMatrix::mutate(std::mt19937 random) {
+    std::uniform_int_distribution picker(0, 20);
+    for(int i = 0; i < rows*cols; i++) {
+        switch( picker(random) ) {
+            case 0: values[i] += 0.2f; break;
+            case 1: values[i] -= 0.2f; break;
+            default: break;
+        }
+    }
+}
+
+
 
 
 

@@ -19,7 +19,7 @@ class UserController {
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};
-    bool m_removeDeadCars{false};
+    bool m_autoNextGeneration{false};
 
     void lockMouse();
     void unlockMouse();

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <random>
 
 struct CarMatrix {
     size_t rows, cols;
@@ -18,5 +19,8 @@ struct CarMatrix {
 
     // Assumes input is a vector of length cols, and output a vector of length rows
     void multiply(const float* input, float* output);
+
+    void mixIn(const CarMatrix& other, std::mt19937 random);
+    void mutate(std::mt19937 random);
 };
 

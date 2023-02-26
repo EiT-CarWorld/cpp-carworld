@@ -106,6 +106,9 @@ void Car::chooseFreewheelAction() {
 static const float CAR_DIAGONAL = std::sqrt(CAR_WIDTH*CAR_WIDTH + CAR_LENGTH*CAR_LENGTH);
 static const float CAR_DIAGONAL_ANGLE = std::atan2(CAR_WIDTH, CAR_LENGTH);
 void Car::calculateSensors(Simulation* simulation) {
+    if (m_crashed)
+        return;
+
     // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
@@ -224,6 +227,8 @@ void Car::updatePhysics() {
 }
 
 void Car::update() {
+    m_score -= SCORE_TIME_PENALTY * SIM_DT;
+
     if (m_crashed)
         return;
 
@@ -241,7 +246,6 @@ void Car::update() {
     float distanceImprovement = distanceToTarget - m_routeFollower.getDistanceToTarget2D(m_position);
 
     m_score += distanceImprovement * SCORE_GAIN_DISTANCE_COVER;
-    m_score -= SCORE_TIME_PENALTY * SIM_DT;
 }
 
 Camera3D Car::get3rdPersonCamera() {
@@ -275,6 +279,13 @@ void Car::renderSensory() {
             float angle = m_yaw + LIDAR_ANGLES[i];
             DrawLine3D(m_position, {m_position.x + cosf(angle)*dist, m_position.y, m_position.z-sinf(angle)*dist}, RED);
         }
+    }
+
+    PathNode* target = m_routeFollower.getTarget();
+    if (target) {
+        Vector3 pos = target->position;
+        pos.y += 2;
+        DrawCircle3D(pos, ROAD_WIDTH/2, {1,0,0}, 90.f, RED);
     }
 
     CarZonesVisualizer::DrawCarZones(m_position, m_yaw, m_carZoneDistances);

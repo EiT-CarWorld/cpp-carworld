@@ -18,7 +18,10 @@ CarBrain::CarBrain(std::vector<CarMatrix> matrices) : m_matrices(std::move(matri
 }
 
 static float activation_function(float in) {
-    return fmaxf(0.f, in);
+    //return fmaxf(0.f, in);
+    if(in < 0)
+        return in * 0.5f;
+    return in;
 }
 
 static float last_activation_function(float in) {
@@ -102,4 +105,19 @@ std::vector<CarMatrix> CarBrain::initializeMatrices(
         inputs = outputs;
     }
     return matrices;
+}
+
+void CarBrain::mixIn(const CarBrain& other, std::mt19937& random) {
+    assert(m_matrices.size() == other.m_matrices.size());
+    for (int i = 0; i < m_matrices.size(); i++) {
+        auto& matrix = m_matrices[i];
+        auto& matrix2 = other.m_matrices[i];
+        matrix.mixIn(matrix2, random);
+    }
+}
+
+void CarBrain::mutate(std::mt19937& random) {
+    for (auto & matrix : m_matrices) {
+        matrix.mutate(random);
+    }
 }

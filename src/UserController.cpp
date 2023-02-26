@@ -75,11 +75,26 @@ void UserController::update() {
     if (!IsWindowFocused())
         unlockMouse();
 
-    // Start a new generation when ready, and G is pressed
-    if (m_simulations->getCurrentlyRunning() == 0 && IsKeyPressed(KEY_G)) {
-        m_simulations->finishGeneration();
-        m_selectedCar = nullptr;
-        m_simulations->startParallelGeneration(true);
+    if (IsKeyPressed(KEY_T))
+        m_autoNextGeneration = !m_autoNextGeneration;
+
+    if (m_simulations->hasGenerationRunning()) {
+        if (m_simulations->getSimulationsRunning() == 0 && (IsKeyPressed(KEY_ENTER) || m_autoNextGeneration)) {
+            m_simulations->finishGeneration();
+            m_selectedCar = nullptr;
+        }
+        else if (IsKeyPressed(KEY_BACKSPACE)) {
+            m_simulations->abortGeneration();
+            m_selectedCar = nullptr;
+        }
+    }
+
+    if (!m_simulations->hasGenerationRunning()) {
+        // TODO: Make changes to the genetic simulation
+
+        if (IsKeyPressed(KEY_R) || m_autoNextGeneration) {
+            m_simulations->startParallelGeneration(!m_autoNextGeneration);
+        }
     }
 
     // Is a NO-OP if there is no realtime simulation running
@@ -133,7 +148,15 @@ void UserController::renderHUD() {
 #define DRAW_TOGGLE(text, state) DRAW_LINE(TextFormat((text), (state)?'X':' '))
 
     DRAW_LINE(TextFormat("Generation %d", m_simulations->getGenerationNumber()));
-    DRAW_LINE(TextFormat("Simulations left: %d", m_simulations->getCurrentlyRunning()));
+    DRAW_TOGGLE("T - Auto next generation (%c)", m_autoNextGeneration);
+    if (m_simulations->hasGenerationRunning()) {
+        DRAW_LINE(TextFormat("Simulations left: %d", m_simulations->getSimulationsRunning()));
+        if (m_simulations->getSimulationsRunning() == 0)
+            DRAW_LINE(TextFormat("Enter - Finish Generation"));
+        DRAW_LINE(TextFormat("Backspace - Cancel Generation"));
+    } else {
+        DRAW_LINE(TextFormat("R - Start generation"));
+    }
 
     // The rest of this function is only run when a simulation is being run in realtime
     Simulation* simulation = m_simulations->getRealtimeSimulation();

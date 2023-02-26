@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <random>
 #include "carConfig.h"
 #include "raylib.h"
 #include "CarMatrix.h"
@@ -46,6 +47,9 @@ public:
     CarBrainOutput takeAction(CarBrainInput input);
     void setEvaluationScore(float score);
     float getEvaluationScore();
+
+    void mixIn(const CarBrain& other, std::mt19937& random);
+    void mutate(std::mt19937& random);
 
     // Creates an array of matrices between the layers in a brain
     static std::vector<CarMatrix> initializeMatrices(

@@ -4,15 +4,8 @@
 #include "entities/World.h"
 #include "carConfig.h"
 
-GeneticSimulation::GeneticSimulation(World *world, unsigned long seed, std::unordered_map<size_t, size_t> carSpawnTimes,
-                                     std::vector<CarBrain> initial_brains, size_t poolSize,
-                                     size_t survivorsPerGeneration, size_t framesPerSimulation) :
-                                     m_world(world), m_seed(seed), m_carSpawnTimes(std::move(carSpawnTimes)), m_geneticPool(std::move(initial_brains)),
-                                     m_poolSize(poolSize), m_survivorsPerGeneration(survivorsPerGeneration), m_framesPerSimulation(framesPerSimulation),
-                                     m_generation(0) {
+GeneticSimulation::GeneticSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
     assert(!m_geneticPool.empty());
-    assert(m_poolSize && m_survivorsPerGeneration && m_framesPerSimulation);
-    assert(m_survivorsPerGeneration < m_poolSize);
 }
 
 size_t GeneticSimulation::getGenerationNumber() {
@@ -24,29 +17,45 @@ size_t GeneticSimulation::getFramesPerSimulation() {
 }
 
 void GeneticSimulation::fillGenePool() {
-    assert (!m_geneticPool.empty());
+    assert(!m_geneticPool.empty());
+    m_parentsThisGeneration = m_geneticPool.size();
+    assert(m_parentsThisGeneration <= m_poolSize);
+    std::uniform_int_distribution<size_t> parentSelect(0, m_parentsThisGeneration-1);
+
+    std::mt19937 prng (m_seed + m_generation);
 
     while (m_geneticPool.size() < m_poolSize) {
-        m_geneticPool.push_back(m_geneticPool[0]);
-        //TODO: Make changes
+        size_t parent1 = parentSelect(prng);
+        size_t parent2 = parentSelect(prng);
+
+        CarBrain brain = m_geneticPool[parent1];
+        if(parent1 != parent2)
+            brain.mixIn(m_geneticPool[parent2], prng);
+
+        brain.mutate(prng);
+        m_geneticPool.emplace_back(std::move(brain));
     }
 }
 
 void GeneticSimulation::runSimulationsInThread(size_t begin, size_t end) {
-    for(size_t i = begin; i < end && !m_isAborted; i++) {
-        auto& simulation = m_simulations[i];
-        while (preSimulationFrame(&simulation)) {
-            simulation.takeCarActions();
-            simulation.updateCars();
+    m_threads.emplace_back([=]() {
+        for (size_t i = begin; i < end && !m_isGenerationAborted.load(std::memory_order_relaxed); i++) {
+            auto &simulation = m_simulations[i];
+            while (preSimulationFrame(&simulation)) {
+                simulation.takeCarActions();
+                simulation.updateCars();
+            }
         }
-    }
+    });
+}
+
+bool GeneticSimulation::hasGenerationRunning() {
+    return !m_simulations.empty();
 }
 
 void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
-    // Aborted generations can not be restarted
-    assert (!m_isAborted);
     // The last generation must be done
-    assert (m_simulations.empty());
+    assert (!hasGenerationRunning());
     assert (m_threads.empty());
 
     m_hasRealtimeSimulation = oneRealtime;
@@ -65,8 +74,7 @@ void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
     for(int i = 0; i < THREAD_COUNT; i++) {
         size_t begin = start+(count*i/THREAD_COUNT);
         size_t end = start+(count*(i+1)/THREAD_COUNT);
-        std::thread thread([=]() { this->runSimulationsInThread(begin, end); });
-        m_threads.emplace_back(std::move(thread));
+        runSimulationsInThread(begin, end);
     }
 }
 
@@ -94,13 +102,13 @@ bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
     return true;
 }
 
-size_t GeneticSimulation::getCurrentlyRunning() {
+// Gives the number of simulations that have yet to finish in the generation
+size_t GeneticSimulation::getSimulationsRunning() {
     return m_simulationsLeft.load(std::memory_order_acquire);
 }
 
 void GeneticSimulation::finishGeneration() {
-    assert (getCurrentlyRunning() == 0);
-    assert (!m_isAborted);
+    assert (hasGenerationRunning() && getSimulationsRunning() == 0);
 
     // All threads should be done by now, but join up for good measure
     for (auto& thread:m_threads)
@@ -117,20 +125,37 @@ void GeneticSimulation::finishGeneration() {
     // Put the largest scores first
     std::sort(scores.rbegin(), scores.rend());
 
-    // Remove all brains at or below this limit
+    // Keep all brains above, and one equal to this score
     float removal_limit = scores[m_survivorsPerGeneration];
-    m_geneticPool.erase(std::remove_if(m_geneticPool.begin(), m_geneticPool.end(), [=](CarBrain& it) {
+    bool keptOne = false;
+    m_geneticPool.erase(std::remove_if(m_geneticPool.begin(), m_geneticPool.end(), [&](CarBrain& it) {
+        if (it.getEvaluationScore() == removal_limit && !keptOne) {
+            keptOne = true;
+            return false;
+        }
         return it.getEvaluationScore() <= removal_limit;
     }), m_geneticPool.end());
-    // Make sure we kept at least one
-    assert(!m_geneticPool.empty());
 
     m_hasRealtimeSimulation = false;
 }
 
 void GeneticSimulation::abortGeneration() {
-    m_isAborted = true;
+    if (!hasGenerationRunning())
+        return;
+
+    m_isGenerationAborted.store(true, std::memory_order_release); // Makes the threads finish quicker
     for (auto& thread:m_threads)
         thread.join();
     m_threads.clear();
+
+    // Remove all brains except those who were survivors from the previous finished generation
+    m_geneticPool.erase(m_geneticPool.begin() + m_parentsThisGeneration, m_geneticPool.end());
+
+    // Remove all signs of the generation running, or having ever ran
+    m_simulations.clear();
+    m_simulationsLeft.store(0);
+    m_generation--;
+
+    m_isGenerationAborted.store(false, std::memory_order_release);
 }
+
