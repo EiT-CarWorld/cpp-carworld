@@ -12,13 +12,16 @@ static void assertNewline(std::ifstream& in) {
     assert(in.good());
 }
 
+// Important: loading a new file will invalidate all references to the current world data
 void World::loadFromFile(const std::string& filepath) {
-    // Once we have routes, we might also have cars, using those routes, so don't allow messing
-    assert(m_routes.empty());
+    std::cerr << "info: loading world from '" << filepath << "'" << std::endl;
 
     std::ifstream file;
     file.open(filepath);
-    assert(file.is_open());
+    if (!file.good()) {
+        std::cerr << "error: opening world file '" << filepath << "' failed" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
     int num_nodes, num_path_nodes, num_paths;
     file >> num_nodes >> num_path_nodes >> num_paths;
     assertNewline(file);
@@ -26,6 +29,7 @@ void World::loadFromFile(const std::string& filepath) {
     m_nodes.clear();
     m_pathNodes.clear();
     m_paths.clear();
+    m_routes.clear();
     m_nodes.reserve(num_nodes);
     m_pathNodes.reserve(num_path_nodes);
     m_paths.reserve(num_paths);
@@ -106,6 +110,10 @@ void World::loadFromFile(const std::string& filepath) {
         m_lineSegments.push_back(LineSegment{lastLeftCorner, leftCorner});
         m_lineSegments.push_back(LineSegment{lastRightCorner, rightCorner});
     }
+}
+
+bool World::isLoaded() {
+    return !m_nodes.empty();
 }
 
 // TODO: Do A* and stuff to find paths, not just random

@@ -27,6 +27,7 @@ public:
     World();
 
     void loadFromFile(const std::string& path);
+    bool isLoaded();
     void createRoutes(unsigned long seed, size_t count);
     std::vector<Route>& getRoutes();
     float getRayDistance(Vector2 pos, Vector2 dir, float max_distance);

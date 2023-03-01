@@ -42,17 +42,14 @@ void Window::mainloop() {
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
-    World world;
-    world.loadFromFile("res/maps/circuit.map");
-    world.createRoutes(1234, 2);
-
     // Create one initial brain
     std::vector<CarBrain> initial_brains;
     initial_brains.emplace_back(CarBrain::initializeMatrices(123, {20, 20}));
 
     GeneticSimulation simulations(std::move(initial_brains));
+    simulations.setScoreOutputFile("out/scores.csv");
 
-    UserController controller(&simulations);
+    UserController controller(&simulations, "res/config/");
     controller.resetFreeCamera({-10, 10, 40});
 
     while (!WindowShouldClose()) {

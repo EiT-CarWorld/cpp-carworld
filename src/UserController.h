@@ -9,12 +9,13 @@ enum class UserControllerMode {
 };
 
 class UserController {
+    GeneticSimulation* m_simulations;
+    std::string m_configDir;
+
     bool m_mouseLock{false};
     UserControllerMode m_mode{UserControllerMode::FREECAM};
     Car* m_selectedCar{nullptr};
     CameraController m_cameraController;
-
-    GeneticSimulation* m_simulations;
 
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
@@ -27,7 +28,7 @@ class UserController {
     void trySelectCar(Simulation* simulation);
     void makeSureSelectedCarExists(Simulation* simulation);
 public:
-    UserController(GeneticSimulation* simulations);
+    UserController(GeneticSimulation* simulations, std::string configDir);
     void resetFreeCamera(Vector3 position);
     void update();
     Camera3D getCamera();

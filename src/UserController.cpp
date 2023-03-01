@@ -2,8 +2,10 @@
 #include "raylib.h"
 #include "rlgl.h"
 #include <cassert>
+#include "util.h"
 
-UserController::UserController(GeneticSimulation* simulations) : m_simulations(simulations) {}
+UserController::UserController(GeneticSimulation* simulations, std::string configDir)
+        : m_simulations(simulations), m_configDir(std::move(configDir)) {}
 
 void UserController::resetFreeCamera(Vector3 position) {
     m_cameraController.resetCamera(position);
@@ -37,7 +39,7 @@ void UserController::updateRealtimeSimulation() {
     if (IsKeyPressed(KEY_F))
         m_freewheelAllCars = !m_freewheelAllCars;
     if (IsKeyPressed(KEY_N))
-        simulation->spawnCar();
+        simulation->spawnCar(0); // Use route 0
 
     // If something has caused our selected car to be deselected, or it no longer exists
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
@@ -89,10 +91,17 @@ void UserController::update() {
         }
     }
 
+    // If no generation is running, we can make changes and start next generation
     if (!m_simulations->hasGenerationRunning()) {
-        // TODO: Make changes to the genetic simulation
-
         if (IsKeyPressed(KEY_R) || m_autoNextGeneration) {
+
+            // If there exists a config file for this generation, run it first
+            char configFileName[100];
+            snprintf(configFileName, sizeof(configFileName),
+                     "%s/%ld.txt", m_configDir.c_str(), m_simulations->getGenerationNumber());
+            if ( fileExists(configFileName) )
+                m_simulations->loadParameterFile(configFileName);
+
             m_simulations->startParallelGeneration(!m_autoNextGeneration);
         }
     }

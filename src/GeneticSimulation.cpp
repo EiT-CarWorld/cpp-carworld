@@ -1,6 +1,7 @@
 #include "GeneticSimulation.h"
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 #include "entities/World.h"
 #include "carConfig.h"
 
@@ -14,6 +15,85 @@ size_t GeneticSimulation::getGenerationNumber() {
 
 size_t GeneticSimulation::getFramesPerSimulation() {
     return m_framesPerSimulation;
+}
+
+void GeneticSimulation::loadParameterFile(const char* path) {
+    assert(!hasGenerationRunning()); // We can't change parameters during execution
+
+    std::ifstream file;
+    file.open(path);
+    if (file.fail()) {
+        std::cerr << "error: opening parameter file '" << path << "'" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
+    std::cerr << "info: loading parameters from '" << path << "'" << std::endl;
+
+    std::string option;
+    while(true) {
+        file >> option;
+        if (file.eof())
+            break;
+        if (option == "world") {
+            std::string filepath;
+            file >> filepath;
+            m_world.loadFromFile(filepath);
+            assert(m_seed);
+            m_world.createRoutes(m_seed, 2);
+        } else if(option == "spawnTimes") {
+            m_carSpawnTimes.clear();
+            size_t count;
+            file >> count;
+            for (int i = 0; i < count; i++) {
+                assert (file.good() && file.get() == '\n');
+                size_t frame, route;
+                file >> frame >> route;
+                m_carSpawnTimes.insert({frame, route});
+            }
+        } else if (option == "seed")
+            file >> m_seed;
+        else if (option == "poolSize")
+            file >> m_poolSize;
+        else if (option == "survivorsPerGeneration")
+            file >> m_survivorsPerGeneration;
+        else if (option == "framesPerSimulation")
+            file >> m_framesPerSimulation;
+        else {
+            std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
+            break;
+        }
+
+        if (file.get() != '\n') {
+            std::cerr << "error: expected newline after option '" << option << "'" << std::endl;
+            break;
+        }
+        if (file.fail()) {
+            std::cerr << "error: setting the parameter '" << option << "' failed" << std::endl;
+            break;
+        }
+    }
+    file.close();
+
+    // Do a bunch of asserts to make sure the state is legal
+    assert (m_world.isLoaded());
+    assert (m_seed);
+    assert (m_poolSize);
+    assert (m_survivorsPerGeneration);
+    assert (m_framesPerSimulation);
+}
+
+void GeneticSimulation::setScoreOutputFile(const char* path) {
+    if (path) {
+        if (m_brainScoreOutput.is_open())
+            m_brainScoreOutput.close();
+
+        m_brainScoreOutput.open(path);
+        if (m_brainScoreOutput.fail()) {
+            std::cerr << "warning: opening file for brain score output failed: " << path << std::endl;
+        }
+    } else {
+        m_brainScoreOutput.close();
+    }
 }
 
 void GeneticSimulation::fillGenePool() {
@@ -57,14 +137,15 @@ void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
     // The last generation must be done
     assert (!hasGenerationRunning());
     assert (m_threads.empty());
+    // Having a world serves as a sentinel for being initialized
+    assert (m_world.isLoaded());
 
     m_hasRealtimeSimulation = oneRealtime;
-    m_generation++;
     fillGenePool(); // Creates enough brains to do poolSize simulations
 
     // Creates one simulation per brain, with identical seed and world
     for (auto& brain:m_geneticPool)
-        m_simulations.emplace_back(m_world, &brain, m_seed, false);
+        m_simulations.emplace_back(&m_world, &brain, m_seed, false);
     assert(m_simulations.size() == m_poolSize);
     m_simulationsLeft.store(m_poolSize);
 
@@ -95,16 +176,45 @@ bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
     if (frame > m_framesPerSimulation)
         return false;
 
-    auto it = m_carSpawnTimes.find(frame);
-    if (it != m_carSpawnTimes.end())
-        for (int i = 0; i < it->second; i++)
-            simulation->spawnCar();
+    for (auto it =  m_carSpawnTimes.find(frame);
+         it != m_carSpawnTimes.end() && it->first == frame; ++it)
+        simulation->spawnCar(it->second);
     return true;
 }
 
 // Gives the number of simulations that have yet to finish in the generation
 size_t GeneticSimulation::getSimulationsRunning() {
     return m_simulationsLeft.load(std::memory_order_acquire);
+}
+
+void GeneticSimulation::pruneGenePool() {
+    // Only keep the best brains. Sort their scores to find the cutoff
+    std::vector<float> scores;
+    scores.reserve(m_poolSize);
+    for (auto& brain:m_geneticPool)
+        scores.push_back(brain.getEvaluationScore());
+    // Put the largest scores first
+    std::sort(scores.rbegin(), scores.rend());
+
+    // If we have a file for printing brain scores open, print them all there
+    if (m_brainScoreOutput.is_open()) {
+        m_brainScoreOutput << m_generation;
+        for(float score : scores) {
+            m_brainScoreOutput << "," << score;
+        }
+        m_brainScoreOutput << std::endl;
+    }
+
+    // Keep all brains above, and one equal to this score
+    float removal_limit = scores[m_survivorsPerGeneration];
+    bool keptOne = false;
+    m_geneticPool.erase(std::remove_if(m_geneticPool.begin(), m_geneticPool.end(), [&](CarBrain& it) {
+        if (it.getEvaluationScore() == removal_limit && !keptOne) {
+            keptOne = true;
+            return false;
+        }
+        return it.getEvaluationScore() <= removal_limit;
+    }), m_geneticPool.end());
 }
 
 void GeneticSimulation::finishGeneration() {
@@ -117,25 +227,9 @@ void GeneticSimulation::finishGeneration() {
 
     m_simulations.clear(); // The scores are stored in the brains, so the simulations are longer needed
 
-    // Only keep the best brains. Sort their scores to find the cutoff
-    std::vector<float> scores;
-    scores.reserve(m_poolSize);
-    for (auto& brain:m_geneticPool)
-        scores.push_back(brain.getEvaluationScore());
-    // Put the largest scores first
-    std::sort(scores.rbegin(), scores.rend());
+    pruneGenePool();
 
-    // Keep all brains above, and one equal to this score
-    float removal_limit = scores[m_survivorsPerGeneration];
-    bool keptOne = false;
-    m_geneticPool.erase(std::remove_if(m_geneticPool.begin(), m_geneticPool.end(), [&](CarBrain& it) {
-        if (it.getEvaluationScore() == removal_limit && !keptOne) {
-            keptOne = true;
-            return false;
-        }
-        return it.getEvaluationScore() <= removal_limit;
-    }), m_geneticPool.end());
-
+    m_generation++;
     m_hasRealtimeSimulation = false;
 }
 
@@ -154,7 +248,7 @@ void GeneticSimulation::abortGeneration() {
     // Remove all signs of the generation running, or having ever ran
     m_simulations.clear();
     m_simulationsLeft.store(0);
-    m_generation--;
+    m_hasRealtimeSimulation = false;
 
     m_isGenerationAborted.store(false, std::memory_order_release);
 }

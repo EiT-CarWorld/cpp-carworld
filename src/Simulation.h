@@ -29,7 +29,7 @@ public:
 
     World* getWorld();
     size_t getFrameNumber();
-    void spawnCar();
+    void spawnCar(size_t route);
     std::vector<std::unique_ptr<Car>>& getCars();
     void takeCarActions();
     void updateCars();

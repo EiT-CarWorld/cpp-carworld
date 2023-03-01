@@ -13,10 +13,10 @@ size_t Simulation::getFrameNumber() {
     return m_frameNumber;
 }
 
-void Simulation::spawnCar() {
+void Simulation::spawnCar(size_t route) {
     auto& routes = m_world->getRoutes();
-    std::uniform_int_distribution<size_t> route_choice(0, routes.size()-1);
-    m_cars.emplace_back(std::make_unique<Car>(&routes[route_choice(m_random)], m_carBrain));
+    assert (route < routes.size());
+    m_cars.emplace_back(std::make_unique<Car>(&routes[route], m_carBrain));
 }
 
 std::vector<std::unique_ptr<Car>>& Simulation::getCars() {

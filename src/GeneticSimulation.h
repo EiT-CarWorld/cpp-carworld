@@ -3,16 +3,17 @@
 #include <atomic>
 #include <map>
 #include <thread>
+#include <fstream>
 #include "Simulation.h"
 
 // A class for running multiple simulations with different brains, and using their scores to create new brains.
 // Multithreading is used internally, but all public functions must be called from the same thread
 class GeneticSimulation {
-    World* m_world{};
+    World m_world{};
     // The seed used for every simulation
     unsigned long m_seed{};
-    // For each frame number, contains how many cars should be spawned on that frame
-    std::unordered_map<size_t, size_t> m_carSpawnTimes{};
+    // For each frame number, contains what route should have a car spawned
+    std::multimap<size_t, size_t> m_carSpawnTimes{};
 
     // How many brains to simulate per generations
     size_t m_poolSize{};
@@ -25,6 +26,8 @@ class GeneticSimulation {
     size_t m_generation{0};
     // The brains being simulated this generation, or the survivors from previous
     std::vector<CarBrain> m_geneticPool;
+    // The file output for printing brain scores every round
+    std::ofstream m_brainScoreOutput{};
 
     // The rest of the member variables only apply during a generation
     // To allow aborting of generations, we remember how many parents to keep in the gene pool
@@ -42,6 +45,8 @@ class GeneticSimulation {
 
     // Uses the existing brains in the pool, to create new ones
     void fillGenePool();
+    // Keeps only the best brains, run after a complete generation
+    void pruneGenePool();
     // Spawns a thread to run the simulations in the half-open interval [begin, end)
     void runSimulationsInThread(size_t begin, size_t end);
 public:
@@ -49,6 +54,10 @@ public:
 
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
+
+    void loadParameterFile(const char* path);
+
+    void setScoreOutputFile(const char* path);
 
     // Returns true if the genetic simulation is in the middle of a generation.
     // Becomes true with startParallelGeneration()
