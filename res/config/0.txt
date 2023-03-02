@@ -1,8 +1,10 @@
 seed 1234
-world res/maps/circuit.map
-spawnTimes 2
+world res/maps/line.map
+spawnTimes 4
 0 0
-60 1
+120 1
+140 0
+240 1
 poolSize 100
 survivorsPerGeneration 5
-framesPerSimulation 3600
+framesPerSimulation 1000

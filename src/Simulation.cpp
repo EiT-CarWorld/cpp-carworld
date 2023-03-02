@@ -1,5 +1,6 @@
 #include <fstream>
 #include <cassert>
+#include <algorithm>
 #include "Simulation.h"
 
 Simulation::Simulation(World *world, CarBrain* carBrain, unsigned long seed, bool store_history)
@@ -34,8 +35,16 @@ void Simulation::takeCarActions() {
 
 void Simulation::updateCars() {
     // Updates all cars, using the actions they last decided on (See: takeCarActions())
-    for (auto& car : m_cars)
-        car->update();
+    for (int i = 0; i < m_cars.size(); i++) {
+        if (m_cars[i]->hasFinishedRoute()) {
+            m_finishedCarsScore += m_cars[i]->getScore();
+
+            std::swap(m_cars[i--], m_cars.back());
+            m_cars.pop_back();
+            continue;
+        }
+        m_cars[i]->update();
+    }
 
     if (m_store_history) {
         for (auto& car : m_cars) {
@@ -57,8 +66,9 @@ void Simulation::render() {
         car->render();
 }
 
+// Add up the scores of all finished cars, as well as the ones still alive
 float Simulation::getTotalSimulationScore() {
-    double sum = 0;
+    double sum = m_finishedCarsScore;
     for(auto& car:m_cars)
         sum += car->getScore();
     return (float) sum;

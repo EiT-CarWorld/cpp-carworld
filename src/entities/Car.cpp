@@ -15,7 +15,10 @@ const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-PI/2, -PI/4, 0, PI/4, PI/2};
 // If we are closer than this to the road edge, we have crashed / driven off the road
 const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
 const float Car::MAX_LIDAR_DIST = 100.f;
+
 const float Car::MAX_CAR_ZONE_DIST = 100.0f;
+const float Car::MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES] = {2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f,
+                                                         2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f};
 
 #include "rlgl.h"
 void Car::loadStatic() {
@@ -235,6 +238,14 @@ void Car::update() {
     // We can assume that chooseAction has been called before the call to update
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
+            m_crashed = true;
+            m_score -= SCORE_CRASH_PENALTY;
+            return;
+        }
+    }
+
+    for (int i = 0; i < NUM_CAR_ZONES; i++) {
+        if (m_carZoneDistances[i] < MIN_CAR_ZONE_DISTANCE[i]) {
             m_crashed = true;
             m_score -= SCORE_CRASH_PENALTY;
             return;

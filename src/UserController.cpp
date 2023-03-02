@@ -13,8 +13,11 @@ void UserController::resetFreeCamera(Vector3 position) {
 
 void UserController::updateRealtimeSimulation() {
     Simulation* simulation = m_simulations->getRealtimeSimulation();
-    if (!simulation)
+    if (!simulation) {
+        m_selectedCar = nullptr;
+        m_mode = UserControllerMode::FREECAM;
         return;
+    }
 
     // Does things like spawning new cars, or freezing the score if enough frames have passed
     m_simulations->preSimulationFrame(simulation);

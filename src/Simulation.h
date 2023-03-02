@@ -15,6 +15,8 @@ class Simulation {
     // How many steps of simulation have been performed?
     size_t m_frameNumber;
 
+    float m_finishedCarsScore{};
+
     // We have the option of freezing the score.
     // This lets us continue to drive and have fun, without affecting the learning
     std::optional<float> m_frozenScore{};

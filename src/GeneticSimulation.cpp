@@ -205,6 +205,9 @@ void GeneticSimulation::pruneGenePool() {
         m_brainScoreOutput << std::endl;
     }
 
+    if (m_survivorsPerGeneration == m_poolSize)
+        return;
+
     // Keep all brains above, and one equal to this score
     float removal_limit = scores[m_survivorsPerGeneration];
     bool keptOne = false;

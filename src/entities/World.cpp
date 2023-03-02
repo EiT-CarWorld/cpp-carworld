@@ -30,6 +30,7 @@ void World::loadFromFile(const std::string& filepath) {
     m_pathNodes.clear();
     m_paths.clear();
     m_routes.clear();
+    m_lineSegments.clear();
     m_nodes.reserve(num_nodes);
     m_pathNodes.reserve(num_path_nodes);
     m_paths.reserve(num_paths);
@@ -135,7 +136,7 @@ void World::createRoutes(unsigned long seed, size_t count) {
         Path* last_path = nullptr;
         Node* head_node = start_node;
         while (true) {
-            if (head_node->paths.size() <= 1) // We can't go on from here
+            if (last_path != nullptr && head_node->paths.size() <= 1) // We can't go on from here
                 break;
             std::uniform_int_distribution<size_t> path_choice(0, head_node->paths.size()-1);
             Path* next_path = head_node->paths[path_choice(gen)];

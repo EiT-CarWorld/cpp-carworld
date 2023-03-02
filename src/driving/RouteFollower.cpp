@@ -57,7 +57,7 @@ void RouteFollower::updateIfAtTarget(Vector3 position) {
             // We reached the Node at the end of the current path
             m_pathNodeIndex = 0;
             m_pathIndex++;
-            //
+            // If we loop, go back to start
             if (m_pathIndex >= m_route->paths.size() && m_route->loops)
                 m_pathIndex = 0;
         }

@@ -63,12 +63,10 @@ void CarMatrix::mixIn(const CarMatrix &other, std::mt19937 random) {
 }
 
 void CarMatrix::mutate(std::mt19937 random) {
-    std::uniform_int_distribution picker(0, 20);
+    std::uniform_int_distribution picker(0, 5);
     for(int i = 0; i < rows*cols; i++) {
-        switch( picker(random) ) {
-            case 0: values[i] += 0.2f; break;
-            case 1: values[i] -= 0.2f; break;
-            default: break;
+        if (picker(random) == 0) {
+            values[i] += (picker(random)-10)/40.f; break;
         }
     }
 }

@@ -4,7 +4,6 @@
 #include "entities/FloorGrid.h"
 #include "rendering/ModelRenderer.h"
 #include "entities/Node.h"
-#include "entities/World.h"
 #include "entities/Car.h"
 #include "rendering/CarZonesVisualizer.h"
 #include "rendering/Skybox.h"
@@ -44,7 +43,7 @@ void Window::mainloop() {
 
     // Create one initial brain
     std::vector<CarBrain> initial_brains;
-    initial_brains.emplace_back(CarBrain::initializeMatrices(123, {20, 20}));
+    initial_brains.emplace_back(CarBrain::initializeMatrices(1234, {20, 20}));
 
     GeneticSimulation simulations(std::move(initial_brains));
     simulations.setScoreOutputFile("out/scores.csv");

@@ -16,6 +16,13 @@ private:
     static Texture diffuseTexture, metalnessTexture;
     static Model carModels[NUM_CAR_MODELS];
     static const Color CAR_COLORS[NUM_CAR_COLORS];
+
+    static const float LIDAR_ANGLES[NUM_LIDAR_ANGLES];
+    static const float MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES];
+    static const float MAX_LIDAR_DIST;
+
+    static const float MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES];
+    static const float MAX_CAR_ZONE_DIST;
 public:
     static void loadStatic();
     static void unloadStatic();
@@ -26,10 +33,6 @@ private:
 
     RouteFollower m_routeFollower;
 
-    static const float LIDAR_ANGLES[NUM_LIDAR_ANGLES];
-    static const float MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES];
-    static const float MAX_LIDAR_DIST;
-    static const float MAX_CAR_ZONE_DIST;
     float m_lidarDistances[NUM_LIDAR_ANGLES]{};
     // Zone 0 is straight ahead, at angle -180/NUM_CAR_ZONE to 180/NUM_CAR_ZONE
     float m_carZoneDistances[NUM_CAR_ZONES]{};
@@ -51,7 +54,7 @@ private:
     float m_yaw_speed{};
 
     float m_score{SCORE_INITIAL_SCORE};
-    bool m_crashed{};
+    bool m_crashed{false};
 
 public:
     explicit Car(Route* route, CarBrain* brain);
