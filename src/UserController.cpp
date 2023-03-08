@@ -42,7 +42,7 @@ void UserController::updateRealtimeSimulation() {
     if (IsKeyPressed(KEY_F))
         m_freewheelAllCars = !m_freewheelAllCars;
     if (IsKeyPressed(KEY_N))
-        simulation->spawnCar(0); // Use route 0
+        simulation->spawnCar(0, 0.f); // Use route 0, no offset
 
     // If something has caused our selected car to be deselected, or it no longer exists
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)

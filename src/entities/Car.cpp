@@ -40,7 +40,7 @@ void Car::unloadStatic() {
     UnloadTexture(metalnessTexture);
 }
 
-Car::Car(Route* route, CarBrain* brain): m_routeFollower(route), m_brain(brain) {
+Car::Car(Route* route, float offset, CarBrain* brain): m_routeFollower(route), m_brain(brain) {
     m_color = CAR_COLORS[rand() % NUM_CAR_COLORS];
     m_modelNumber = rand() % NUM_CAR_MODELS;
 
@@ -49,6 +49,8 @@ Car::Car(Route* route, CarBrain* brain): m_routeFollower(route), m_brain(brain) 
 
     Vector3 startDirection =  m_routeFollower.getTarget()->position - m_position;
     m_yaw = atan2(-startDirection.z, startDirection.x);
+    m_position.x -= offset * sinf(m_yaw);
+    m_position.z += offset * cosf(m_yaw);
 }
 
 Vector3 Car::getPosition() {
@@ -116,7 +118,7 @@ void Car::calculateSensors(Simulation* simulation) {
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
         Vector2 dir = {cosf(angle), -sinf(angle)};
-        m_lidarDistances[i] = simulation->getWorld()->getRayDistance({m_position.x, m_position.z}, dir, MAX_LIDAR_DIST);
+        m_lidarDistances[i] = simulation->getWorld()->getRayDistance({m_position.x, -m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
     // Calculate distances to other cars. First set all distances to MAX
@@ -292,7 +294,7 @@ void Car::renderSensory() {
         }
     }
 
-    PathNode* target = m_routeFollower.getTarget();
+    Node* target = m_routeFollower.getTarget();
     if (target) {
         Vector3 pos = target->position;
         pos.y += 2;

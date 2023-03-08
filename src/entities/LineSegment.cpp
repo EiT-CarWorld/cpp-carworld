@@ -18,5 +18,5 @@ std::optional<float> LineSegment::getRayDistance(Vector2 pos, Vector2 dir) {
 }
 
 void LineSegment::render() {
-    DrawLine3D({a.x, .5, a.y}, {b.x, .5, b.y}, BLUE);
+    DrawLine3D({a.x, 0.5, -a.y}, {b.x, 0.5, -b.y}, BLUE);
 }

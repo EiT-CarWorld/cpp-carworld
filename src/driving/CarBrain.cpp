@@ -116,8 +116,8 @@ void CarBrain::mixIn(const CarBrain& other, std::mt19937& random) {
     }
 }
 
-void CarBrain::mutate(std::mt19937& random) {
+void CarBrain::mutate(std::mt19937& random, float mutateChance) {
     for (auto & matrix : m_matrices) {
-        matrix.mutate(random);
+        matrix.mutate(random, mutateChance);
     }
 }

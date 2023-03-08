@@ -31,15 +31,21 @@ void GeneticSimulation::loadParameterFile(const char* path) {
 
     std::string option;
     while(true) {
+        // If the file starts with #
+        if (file.peek() == '#') {
+            // Skip this line
+            while(file.get() != '\n' && file.good());
+            continue;
+        }
+
         file >> option;
         if (file.eof())
             break;
+
         if (option == "world") {
             std::string filepath;
             file >> filepath;
             m_world.loadFromFile(filepath);
-            assert(m_seed);
-            m_world.createRoutes(m_seed, 2);
         } else if(option == "spawnTimes") {
             m_carSpawnTimes.clear();
             size_t count;
@@ -58,6 +64,10 @@ void GeneticSimulation::loadParameterFile(const char* path) {
             file >> m_survivorsPerGeneration;
         else if (option == "framesPerSimulation")
             file >> m_framesPerSimulation;
+        else if (option == "mutationChance")
+            file >> m_mutationChance;
+        else if (option == "spawnRandomness")
+            file >> m_spawnRandomness;
         else {
             std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
             break;
@@ -112,7 +122,7 @@ void GeneticSimulation::fillGenePool() {
         if(parent1 != parent2)
             brain.mixIn(m_geneticPool[parent2], prng);
 
-        brain.mutate(prng);
+        brain.mutate(prng, m_mutationChance);
         m_geneticPool.emplace_back(std::move(brain));
     }
 }
@@ -145,7 +155,7 @@ void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
 
     // Creates one simulation per brain, with identical seed and world
     for (auto& brain:m_geneticPool)
-        m_simulations.emplace_back(&m_world, &brain, m_seed, false);
+        m_simulations.emplace_back(&m_world, &brain, m_seed+m_generation, false);
     assert(m_simulations.size() == m_poolSize);
     m_simulationsLeft.store(m_poolSize);
 
@@ -177,8 +187,9 @@ bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
         return false;
 
     for (auto it =  m_carSpawnTimes.find(frame);
-         it != m_carSpawnTimes.end() && it->first == frame; ++it)
-        simulation->spawnCar(it->second);
+         it != m_carSpawnTimes.end() && it->first == frame; ++it) {
+        simulation->spawnCar(it->second, m_spawnRandomness);
+    }
     return true;
 }
 

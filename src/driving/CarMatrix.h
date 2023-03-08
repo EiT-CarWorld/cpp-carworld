@@ -21,6 +21,6 @@ struct CarMatrix {
     void multiply(const float* input, float* output);
 
     void mixIn(const CarMatrix& other, std::mt19937 random);
-    void mutate(std::mt19937 random);
+    void mutate(std::mt19937 random, float mutationChance);
 };
 

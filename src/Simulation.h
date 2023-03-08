@@ -31,7 +31,7 @@ public:
 
     World* getWorld();
     size_t getFrameNumber();
-    void spawnCar(size_t route);
+    void spawnCar(size_t route, float spawnRandomness);
     std::vector<std::unique_ptr<Car>>& getCars();
     void takeCarActions();
     void updateCars();

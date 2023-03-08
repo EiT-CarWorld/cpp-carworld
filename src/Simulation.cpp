@@ -14,10 +14,11 @@ size_t Simulation::getFrameNumber() {
     return m_frameNumber;
 }
 
-void Simulation::spawnCar(size_t route) {
+void Simulation::spawnCar(size_t route, float spawnRandomness) {
     auto& routes = m_world->getRoutes();
     assert (route < routes.size());
-    m_cars.emplace_back(std::make_unique<Car>(&routes[route], m_carBrain));
+    std::normal_distribution<float> dist(0.f, spawnRandomness);
+    m_cars.emplace_back(std::make_unique<Car>(&routes[route], dist(m_random), m_carBrain));
 }
 
 std::vector<std::unique_ptr<Car>>& Simulation::getCars() {
@@ -36,7 +37,7 @@ void Simulation::takeCarActions() {
 void Simulation::updateCars() {
     // Updates all cars, using the actions they last decided on (See: takeCarActions())
     for (int i = 0; i < m_cars.size(); i++) {
-        if (m_cars[i]->hasFinishedRoute()) {
+        if (m_cars[i]->hasFinishedRoute() || m_cars[i]->hasCrashed() || m_cars[i]->getScore() <= 0) {
             m_finishedCarsScore += m_cars[i]->getScore();
 
             std::swap(m_cars[i--], m_cars.back());

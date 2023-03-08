@@ -49,7 +49,7 @@ public:
     float getEvaluationScore();
 
     void mixIn(const CarBrain& other, std::mt19937& random);
-    void mutate(std::mt19937& random);
+    void mutate(std::mt19937& random, float mutateChance);
 
     // Creates an array of matrices between the layers in a brain
     static std::vector<CarMatrix> initializeMatrices(

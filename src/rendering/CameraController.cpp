@@ -1,5 +1,6 @@
 #include "CameraController.h"
 #include "carMath.h"
+#include "carConfig.h"
 
 CameraController::CameraController() : m_camera({0}), m_pitch(0), m_yaw(0) {}
 
@@ -21,9 +22,17 @@ void CameraController::updateCamera() {
     m_pitch -= delta.y * mouseSensitivity;
     m_pitch = fmin(PI/2, fmax(-PI/2, m_pitch));
 
-    float cameraSpeed = IsKeyDown(KEY_LEFT_SHIFT) ? 25 : 10;
+    float cameraSpeed = 25 * SIM_DT;
+    if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        if(IsKeyPressed(KEY_UP))
+            m_cameraSpeedShiftFactor *= 1.5f;
+        if(IsKeyPressed(KEY_DOWN))
+            m_cameraSpeedShiftFactor *= 0.75f;
+        m_cameraSpeedShiftFactor = fmax(m_cameraSpeedShiftFactor, 0.2f);
 
-    cameraSpeed *= GetFrameTime();
+        cameraSpeed *= m_cameraSpeedShiftFactor;
+    }
+
     Vector3 forwards = {sin(m_yaw) * cos(m_pitch), sin(m_pitch), -cos(m_yaw) * cos(m_pitch)};
     Vector3 xz_forwards = {sin(m_yaw), 0, -cos(m_yaw)};
     Vector3 right = {cos(m_yaw), 0, sin(m_yaw)};

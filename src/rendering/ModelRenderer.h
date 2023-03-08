@@ -18,6 +18,8 @@ public:
     static Model loadModel(char const *name);
     static void unloadModel(Model model);
     static void setMode(ModelShaderMode mode);
+    static void uploadMatrices(Matrix transform);
+    static void uploadMaterial(Vector4 diffuse, unsigned int diffuseTexture, Vector4 specular, unsigned int specularTexture);
 
     ModelRenderer(Vector3 ambientLight, Vector3 directionalLight, Vector3 directionalLightDirection);
     ~ModelRenderer();

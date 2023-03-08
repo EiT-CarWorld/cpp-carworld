@@ -7,26 +7,19 @@ private:
     // The route we are following, from node 0 and up
     Route* m_route;
 
-    // Which path along the route we are on.
-    size_t m_pathIndex;
+    // The index of the next target node
+    size_t m_nextNode;
 
-    // Which PathNode along the given path we are on
-    // 0 means we target the 0th PathNode
-    // if this variable is equal to path_node_count, the Node ending the path is the target
-    // Remember that paths can be traversed both from a->b and b->a
-    size_t m_pathNodeIndex;
+    // The current target, updated whenever nextNode is updated
+    Node* m_target{nullptr};
 
-    // The current target, either a PathNode or a Node, based on the variables defined above
-    PathNode* m_target{};
-
-    // Performs the logic from above to calculate the target
+    // Calculates the target, and wraps nextNode to 0 if looping
     void calculateTarget();
-
 public:
     explicit RouteFollower(Route* route);
 
     Node* getStartNode();
-    PathNode* getTarget();
+    Node* getTarget();
     float getDistanceToTarget2D(Vector3 position);
 
     // Changes the target, if the car has reached it

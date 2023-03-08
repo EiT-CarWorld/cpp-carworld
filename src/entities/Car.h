@@ -57,7 +57,7 @@ private:
     bool m_crashed{false};
 
 public:
-    explicit Car(Route* route, CarBrain* brain);
+    explicit Car(Route* route, float offset, CarBrain* brain);
     ~Car() = default;
     Vector3 getPosition();
     float getScore();

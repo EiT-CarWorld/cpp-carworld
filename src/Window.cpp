@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "raylib.h"
 #include "entities/FloorGrid.h"
+#include "entities/AsphaltMesh.h"
 #include "rendering/ModelRenderer.h"
 #include "entities/Node.h"
 #include "entities/Car.h"
@@ -18,15 +19,17 @@ Window::Window(const char *title, int width, int height) {
     FloorGrid::loadStatic();
     Skybox::loadStatic();
     ModelRenderer::loadStatic();
-    Path::loadStatic();
+    Edge::loadStatic();
     Car::loadStatic();
     CarZonesVisualizer::loadStatic();
+    AsphaltMesh::loadStatic();
 }
 
 Window::~Window() {
+    AsphaltMesh::unloadStatic();
     CarZonesVisualizer::unloadStatic();
     Car::unloadStatic();
-    Path::unloadStatic();
+    Edge::unloadStatic();
     ModelRenderer::unloadStatic();
     Skybox::unloadStatic();
     FloorGrid::unloadStatic();
@@ -49,7 +52,7 @@ void Window::mainloop() {
     simulations.setScoreOutputFile("out/scores.csv");
 
     UserController controller(&simulations, "res/config/");
-    controller.resetFreeCamera({-10, 10, 40});
+    controller.resetFreeCamera({12266, 10, -28551});
 
     while (!WindowShouldClose()) {
         controller.update();

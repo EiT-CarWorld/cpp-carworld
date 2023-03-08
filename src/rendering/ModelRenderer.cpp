@@ -1,6 +1,7 @@
 #include "ModelRenderer.h"
 #include "config.h"
 #include "rlgl.h"
+#include "raymath.h"
 
 Shader ModelRenderer::shader;
 int ModelRenderer::ambientLightLoc;
@@ -40,6 +41,42 @@ void ModelRenderer::unloadModel(Model model) {
 
 void ModelRenderer::setMode(ModelShaderMode mode) {
     SetShaderValue(shader, shaderModeLoc, &mode, SHADER_UNIFORM_INT);
+}
+
+void ModelRenderer::uploadMatrices(Matrix transform) {
+    rlEnableShader(shader.id);
+
+    Matrix matView = rlGetMatrixModelview();
+    Matrix matProjection = rlGetMatrixProjection();
+
+    // Upload view and projection matrices (if locations available)
+    if (shader.locs[SHADER_LOC_MATRIX_VIEW] != -1) rlSetUniformMatrix(shader.locs[SHADER_LOC_MATRIX_VIEW], matView);
+    if (shader.locs[SHADER_LOC_MATRIX_PROJECTION] != -1) rlSetUniformMatrix(shader.locs[SHADER_LOC_MATRIX_PROJECTION], matProjection);
+
+    // Model transformation matrix is send to shader uniform location: SHADER_LOC_MATRIX_MODEL
+    if (shader.locs[SHADER_LOC_MATRIX_MODEL] != -1) rlSetUniformMatrix(shader.locs[SHADER_LOC_MATRIX_MODEL], transform);
+
+    // Accumulate several model transformations:
+    //    transform: model transformation provided (includes DrawModel() params combined with model.transform)
+    //    rlGetMatrixTransform(): rlgl internal transform matrix due to push/pop matrix stack
+    Matrix matModel = MatrixMultiply(transform, rlGetMatrixTransform());
+
+    // Get model-view matrix
+    Matrix matModelView = MatrixMultiply(matModel, matView);
+    if (shader.locs[SHADER_LOC_MATRIX_NORMAL] != -1) rlSetUniformMatrix(shader.locs[SHADER_LOC_MATRIX_NORMAL], MatrixTranspose(MatrixInvert(matModel)));
+
+    Matrix matModelViewProjection = MatrixMultiply(matModelView, matProjection);
+    rlSetUniformMatrix(shader.locs[SHADER_LOC_MATRIX_MVP], matModelViewProjection);
+}
+
+// Does material upload manually
+void ModelRenderer::uploadMaterial(Vector4 diffuse, unsigned int diffuseTexture, Vector4 specular, unsigned int specularTexture) {
+    SetShaderValue(shader, shader.locs[SHADER_LOC_COLOR_DIFFUSE], &diffuse, SHADER_UNIFORM_VEC4);
+    rlActiveTextureSlot(0);
+    rlEnableTexture(diffuseTexture);
+    SetShaderValue(shader, shader.locs[SHADER_LOC_COLOR_SPECULAR], &specular, SHADER_UNIFORM_VEC4);
+    rlActiveTextureSlot(1);
+    rlEnableTexture(specularTexture);
 }
 
 ModelRenderer::ModelRenderer(Vector3 ambientLight, Vector3 directionalLight, Vector3 directionalLightDirection)

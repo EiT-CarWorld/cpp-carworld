@@ -1,5 +1,7 @@
 #include "FloorGrid.h"
 #include "raymath.h"
+#include "rlgl.h"
+#include "carMath.h"
 
 Material FloorGrid::material;
 Mesh FloorGrid::planeMesh;
@@ -39,7 +41,11 @@ void FloorGrid::render(Camera3D camera) {
     Vector3 gridColorAsVec {m_color.r/255.f, m_color.g/255.f, m_color.b/255.f};
     SetShaderValue(material.shader, gridColorLoc, &gridColorAsVec, SHADER_UNIFORM_VEC3);
 
+    Vector2 size = (0.5f + powf(fabs(camera.position.y/5), .5)) * m_size;
+    Matrix scaleMatrix = MatrixScale(size.x, 1, size.y);
     Matrix transform = MatrixTranslate(camera.position.x, 0, camera.position.z);
-    transform = MatrixMultiply(MatrixScale(m_size.x, 1, m_size.y), transform);
+    transform = MatrixMultiply(scaleMatrix, transform);
+    rlDisableDepthMask();
     DrawMesh(planeMesh, material, transform);
+    rlEnableDepthMask();
 }

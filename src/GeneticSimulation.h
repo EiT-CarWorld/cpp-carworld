@@ -21,6 +21,10 @@ class GeneticSimulation {
     size_t m_survivorsPerGeneration{};
     // How long each simulation runs for before its score is evaluated
     size_t m_framesPerSimulation{};
+    // How likely any value in a matrix is to be replaced
+    float m_mutationChance{};
+    // To avoid overfitting, let cars spawn slightly different locations each generation
+    float m_spawnRandomness{};
 
     // How many generations have been simulated / are being simulated
     size_t m_generation{0};
