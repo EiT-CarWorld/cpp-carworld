@@ -1,5 +1,6 @@
 #include "RouteFollower.h"
 #include "carMath.h"
+#include <cmath>
 
 RouteFollower::RouteFollower(const Route *route): m_route(route), m_nextNode{1} {
     calculateTarget();
