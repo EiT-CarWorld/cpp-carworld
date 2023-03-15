@@ -59,7 +59,7 @@ public:
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
 
-    void loadParameterFile(const char* path);
+    bool loadParameterFile(const char* path);
 
     void setScoreOutputFile(const char* path);
 

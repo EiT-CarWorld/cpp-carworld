@@ -40,7 +40,7 @@ void Car::unloadStatic() {
     UnloadTexture(metalnessTexture);
 }
 
-Car::Car(Route* route, float offset, CarBrain* brain): m_routeFollower(route), m_brain(brain) {
+Car::Car(const Route* route, float offset, CarBrain* brain): m_routeFollower(route), m_brain(brain) {
     m_color = CAR_COLORS[rand() % NUM_CAR_COLORS];
     m_modelNumber = rand() % NUM_CAR_MODELS;
 
@@ -79,6 +79,7 @@ void Car::chooseAction() {
     input.own_speed = m_speed;
     input.target_angle = turn_offset;
     input.target_distance = Vector3Length(distance);
+    input.turn_in_target = m_routeFollower.getTurnInTarget();
     input.lidarData = &m_lidarDistances;
     input.carZoneDistances = &m_carZoneDistances;
     input.carZoneSpeeds = &m_carZoneSpeed;
@@ -295,12 +296,7 @@ void Car::renderSensory() {
         }
     }
 
-    Node* target = m_routeFollower.getTarget();
-    if (target) {
-        Vector3 pos = target->position;
-        pos.y += 2;
-        DrawCircle3D(pos, ROAD_WIDTH/2, {1,0,0}, 90.f, RED);
-    }
+    m_routeFollower.getTarget()->renderCircle(RED);
 
     CarZonesVisualizer::DrawCarZones(m_position, m_yaw, m_carZoneDistances);
 }

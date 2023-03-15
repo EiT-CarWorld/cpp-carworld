@@ -1,7 +1,7 @@
 #include "RouteFollower.h"
 #include "carMath.h"
 
-RouteFollower::RouteFollower(Route *route): m_route(route), m_nextNode{1} {
+RouteFollower::RouteFollower(const Route *route): m_route(route), m_nextNode{1} {
     calculateTarget();
 }
 
@@ -14,11 +14,11 @@ void RouteFollower::calculateTarget() {
     m_target = m_route->nodes[m_nextNode];
 }
 
-Node* RouteFollower::getStartNode() {
+const Node* RouteFollower::getStartNode() {
     return m_route->nodes[0];
 }
 
-Node* RouteFollower::getTarget() {
+const Node* RouteFollower::getTarget() {
     return m_target;
 }
 
@@ -28,6 +28,20 @@ float RouteFollower::getDistanceToTarget2D(Vector3 position) {
     Vector3 difference = m_target->position - position;
     difference.y = 0;
     return Vector3Length(difference);
+}
+
+float RouteFollower::getTurnInTarget() {
+    if (m_nextNode == 0 || m_nextNode == m_route->nodes.size()-1)
+        return 0.0f;
+    Vector3 prev = m_route->nodes[m_nextNode-1]->position;
+    Vector3 target = m_target->position;
+    Vector3 future = m_route->nodes[m_nextNode+1]->position;
+
+    Vector2 currentLine{target.x - prev.x, target.x - prev.x};
+    Vector2 nextLine{future.x - target.x, future.x - target.x};
+    currentLine = Vector2Normalize(currentLine);
+    nextLine = Vector2Normalize(nextLine);
+    return std::asin(currentLine.x * nextLine.y - nextLine.x * currentLine.y);
 }
 
 void RouteFollower::updateIfAtTarget(Vector3 position) {

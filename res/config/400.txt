@@ -1,4 +1,0 @@
-#world res/maps/circuit.map
-#spawnTimes 1
-#0 0
-framesPerSimulation 3600

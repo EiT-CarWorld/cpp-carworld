@@ -17,14 +17,20 @@ size_t GeneticSimulation::getFramesPerSimulation() {
     return m_framesPerSimulation;
 }
 
-void GeneticSimulation::loadParameterFile(const char* path) {
+#define OR_RETURN(action) if(!(action)) return false
+#define OR_COMPLAIN(conditional) do if(!(conditional)) {             \
+std::cerr << "error: " #conditional << std::endl; \
+return false;                                                        \
+} while(false)
+
+bool GeneticSimulation::loadParameterFile(const char* path) {
     assert(!hasGenerationRunning()); // We can't change parameters during execution
 
     std::ifstream file;
     file.open(path);
     if (file.fail()) {
         std::cerr << "error: opening parameter file '" << path << "'" << std::endl;
-        std::exit(EXIT_FAILURE);
+        return false;
     }
 
     std::cerr << "info: loading parameters from '" << path << "'" << std::endl;
@@ -45,15 +51,30 @@ void GeneticSimulation::loadParameterFile(const char* path) {
         if (option == "world") {
             std::string filepath;
             file >> filepath;
-            m_world.loadFromFile(filepath);
-        } else if(option == "spawnTimes") {
+            OR_RETURN( m_world.loadFromFile(filepath) );
+        } else if (option == "defineRoutes") {
+            m_carSpawnTimes.clear();
+            m_world.clearRoutes();
+            size_t count;
+            file >> count;
+            for (int i = 0; i < count; i++) {
+                OR_COMPLAIN(file.good() && file.get() == '\n');
+                size_t u, v;
+                file >> u >> v;
+                OR_COMPLAIN(u >= 0 && u < m_world.getNodes().size());
+                OR_COMPLAIN(v >= 0 && v < m_world.getNodes().size());
+                m_world.addRoute(u, v);
+            }
+        }
+        else if(option == "spawnTimes") {
             m_carSpawnTimes.clear();
             size_t count;
             file >> count;
             for (int i = 0; i < count; i++) {
-                assert (file.good() && file.get() == '\n');
+                OR_COMPLAIN (file.good() && file.get() == '\n');
                 size_t frame, route;
                 file >> frame >> route;
+                OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
                 m_carSpawnTimes.insert({frame, route});
             }
         } else if (option == "seed")
@@ -70,26 +91,28 @@ void GeneticSimulation::loadParameterFile(const char* path) {
             file >> m_spawnRandomness;
         else {
             std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
-            break;
+            return false;
         }
 
         if (file.get() != '\n') {
             std::cerr << "error: expected newline after option '" << option << "'" << std::endl;
-            break;
+            return false;
         }
         if (file.fail()) {
             std::cerr << "error: setting the parameter '" << option << "' failed" << std::endl;
-            break;
+            return false;
         }
     }
     file.close();
 
     // Do a bunch of asserts to make sure the state is legal
-    assert (m_world.isLoaded());
-    assert (m_seed);
-    assert (m_poolSize);
-    assert (m_survivorsPerGeneration);
-    assert (m_framesPerSimulation);
+    OR_COMPLAIN (m_world.isLoaded());
+    OR_COMPLAIN (m_seed);
+    OR_COMPLAIN (m_poolSize);
+    OR_COMPLAIN (m_survivorsPerGeneration);
+    OR_COMPLAIN (m_framesPerSimulation);
+
+    return true;
 }
 
 void GeneticSimulation::setScoreOutputFile(const char* path) {

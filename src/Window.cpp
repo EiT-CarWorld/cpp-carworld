@@ -19,7 +19,6 @@ Window::Window(const char *title, int width, int height) {
     FloorGrid::loadStatic();
     Skybox::loadStatic();
     ModelRenderer::loadStatic();
-    Edge::loadStatic();
     Car::loadStatic();
     CarZonesVisualizer::loadStatic();
     AsphaltMesh::loadStatic();
@@ -29,7 +28,6 @@ Window::~Window() {
     AsphaltMesh::unloadStatic();
     CarZonesVisualizer::unloadStatic();
     Car::unloadStatic();
-    Edge::unloadStatic();
     ModelRenderer::unloadStatic();
     Skybox::unloadStatic();
     FloorGrid::unloadStatic();

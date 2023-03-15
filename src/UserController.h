@@ -17,6 +17,10 @@ class UserController {
     Car* m_selectedCar{nullptr};
     CameraController m_cameraController;
 
+    // Allows us to get the index of nodes by looking at them
+    bool m_drawClosestNode{false};
+    int m_closestNode; // Or -1 if no close node
+
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};
@@ -26,6 +30,7 @@ class UserController {
     void unlockMouse();
     void updateRealtimeSimulation();
     void trySelectCar(Simulation* simulation);
+    void drawClosestNode(Simulation* simulation);
     void makeSureSelectedCarExists(Simulation* simulation);
 public:
     UserController(GeneticSimulation* simulations, std::string configDir);

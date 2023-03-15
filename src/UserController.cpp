@@ -41,6 +41,8 @@ void UserController::updateRealtimeSimulation() {
         m_drawCarSensors = !m_drawCarSensors;
     if (IsKeyPressed(KEY_F))
         m_freewheelAllCars = !m_freewheelAllCars;
+    if (IsKeyPressed(KEY_C))
+        m_drawClosestNode = !m_drawClosestNode;
     if (IsKeyPressed(KEY_N))
         simulation->spawnCar(0, 0.f); // Use route 0, no offset
 
@@ -134,6 +136,9 @@ void UserController::render() {
 
     simulation->render();
 
+    if (m_drawClosestNode)
+        drawClosestNode(simulation);
+
     if (m_drawRoadBorders)
         simulation->getWorld()->renderRoadBorders();
 
@@ -187,6 +192,10 @@ void UserController::renderHUD() {
     } else {
         DRAW_LINE("LMB - Select car");
     }
+    DRAW_TOGGLE("C - highlight closest node (%c)", m_drawClosestNode);
+    if (m_closestNode) {
+        DRAW_LINE(TextFormat("Closest node: %d", m_closestNode));
+    }
     DRAW_TOGGLE("F - freewheel (%c)", m_freewheelAllCars);
     float totalScore = simulation->getTotalSimulationScore();
     DRAW_LINE(TextFormat("Total score: %.0f", totalScore));
@@ -217,25 +226,50 @@ void UserController::trySelectCar(Simulation* simulation) {
 
     Camera3D camera = m_cameraController.getCamera();
     Vector3 lookingDirection = camera.target-camera.position;
-    if (lookingDirection.y < -0.1) {
-        // Only work if we are actually looking down
-        // We target the plane 0.6f above ground
-        float floorDist = (camera.position.y - 0.6f) / (-lookingDirection.y);
-        Vector3 floorHit = camera.position + floorDist * lookingDirection;
-        for (auto& car: simulation->getCars()) {
-            Vector3 difference = car->getPosition() - floorHit;
-            difference.y = 0; // Only care about distance in XZ plane
-            float distance = Vector3Length(difference);
-            if (distance < CAR_LENGTH) {
-                m_selectedCar = car.get();
-                break;
-            }
+    if (lookingDirection.y > -0.1)
+        return; // Only work if we are actually looking down
+
+    // We target the plane 0.6f above ground
+    float floorDist = (camera.position.y - 0.6f) / (-lookingDirection.y);
+    Vector3 floorHit = camera.position + floorDist * lookingDirection;
+    for (auto& car: simulation->getCars()) {
+        Vector3 difference = car->getPosition() - floorHit;
+        difference.y = 0; // Only care about distance in XZ plane
+        float distance = Vector3Length(difference);
+        if (distance < CAR_LENGTH) {
+            m_selectedCar = car.get();
+            break;
         }
     }
 }
 
-// The Simulation being passed to update can suddenly be replaced by a new simulation,
-// Or the selected car could have been removed for some reason.
+void UserController::drawClosestNode(Simulation* simulation) {
+    Camera3D camera = m_cameraController.getCamera();
+    Vector3 lookingDirection = camera.target-camera.position;
+    if (lookingDirection.y > -0.1)
+        return;
+    // We target the ground plane
+
+    float floorDist = camera.position.y / -lookingDirection.y;
+    Vector3 floorHit = camera.position + floorDist * lookingDirection;
+    auto& nodes = simulation->getWorld()->getNodes();
+
+    m_closestNode = -1;
+    float closest = 100.0f;
+    for (int i = 0; i < nodes.size(); i++) {
+        float dist = Vector3Length(floorHit - nodes[i].position);
+        if (dist < closest) {
+            closest = dist;
+            m_closestNode = i;
+        }
+    }
+
+    if (m_closestNode != -1) {
+        nodes[m_closestNode].renderCircle(ORANGE);
+    }
+}
+
+// The selected car could have been removed for some reason.
 // Therefore we need to check that the car we have selected, still exists
 void UserController::makeSureSelectedCarExists(Simulation* simulation) {
     for (auto& car:simulation->getCars())

@@ -38,6 +38,7 @@ CarBrainOutput CarBrain::takeAction(CarBrainInput input) {
     int i = 0;
     vectorIn[i++] = input.own_speed;
     vectorIn[i++] = input.target_angle;
+    vectorIn[i++] = input.turn_in_target;
     vectorIn[i++] = input.target_distance;
     for (int j = 0; j < NUM_LIDAR_ANGLES; j++)
         vectorIn[i++] = (*input.lidarData)[j];

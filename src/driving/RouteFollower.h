@@ -5,22 +5,24 @@
 class RouteFollower {
 private:
     // The route we are following, from node 0 and up
-    Route* m_route;
+    const Route* m_route;
 
     // The index of the next target node
     size_t m_nextNode;
 
     // The current target, updated whenever nextNode is updated
-    Node* m_target{nullptr};
+    const Node* m_target{nullptr};
 
     // Calculates the target, and wraps nextNode to 0 if looping
     void calculateTarget();
 public:
-    explicit RouteFollower(Route* route);
+    explicit RouteFollower(const Route* route);
 
-    Node* getStartNode();
-    Node* getTarget();
+    const Node* getStartNode();
+    const Node* getTarget();
     float getDistanceToTarget2D(Vector3 position);
+    // Gets the angle that must be turned in the next target, 0 is straight ahead
+    float getTurnInTarget();
 
     // Changes the target, if the car has reached it
     // Also awards the car score for reaching goals, depending on the distance to the last goal

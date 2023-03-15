@@ -21,6 +21,8 @@ struct CarBrainInput {
     float own_speed;
     // The relative angle to the center of the target
     float target_angle;
+    // How much the target
+    float turn_in_target;
     // The distance to the center of the target
     float target_distance;
 
@@ -29,7 +31,7 @@ struct CarBrainInput {
     float (*carZoneDistances)[NUM_CAR_ZONES];
     Vector2 (*carZoneSpeeds)[NUM_CAR_ZONES];
 };
-#define BRAIN_INPUT_LAYER_SIZE (3+NUM_LIDAR_ANGLES+NUM_CAR_ZONES*3)
+#define BRAIN_INPUT_LAYER_SIZE (4+NUM_LIDAR_ANGLES+NUM_CAR_ZONES*3)
 #define BRAIN_OUTPUT_LAYER_SIZE 4
 
 struct CarBrainOutput {

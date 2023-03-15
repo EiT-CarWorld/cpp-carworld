@@ -5,15 +5,17 @@
 #include <fstream>
 #include <memory>
 #include <random>
+#include <cassert>
+#include <queue>
+#include <unordered_map>
 
-World::World(): m_nodes(), m_edges(), m_lineSegments(), m_routes() {}
+World::World(): m_nodes(), m_lineSegments(), m_routes() {}
 
 static bool consumeNewline(std::ifstream& file) {
-    if (!file.good() || file.get() != '\n') {
-        std::cerr << "error: expected newline in world file" << std::endl;
-        return false;
-    }
-    return true;
+    if (file.get() == '\n')
+        return true;
+    std::cerr << "error: expected newline in world file" << std::endl;
+    return false;
 }
 
 #define OR_RETURN(action) if(!(action)) return false
@@ -27,7 +29,6 @@ bool World::loadFromFile(const std::string& filepath) {
     std::cerr << "info: loading world from '" << filepath << "'" << std::endl;
 
     m_nodes.clear();
-    m_edges.clear();
     m_routes.clear();
     m_lineSegments.clear();
 
@@ -56,7 +57,6 @@ bool World::loadFromFile(const std::string& filepath) {
         m_nodes.push_back(Node({x, 0, -y}));
     }
 
-    m_edges.reserve(num_edges);
     for (int i = 0; i < num_edges; i++) {
         char direction;
         int u, v;
@@ -65,8 +65,9 @@ bool World::loadFromFile(const std::string& filepath) {
         OR_COMPLAIN(0 <= u && u < num_nodes);
         OR_COMPLAIN(0 <= v && v < num_nodes);
         OR_RETURN(consumeNewline(file));
-        m_edges.push_back(Edge({&m_nodes[u], &m_nodes[v], direction=='O'}));
-        m_edges[i].attach(); // Edges never move, due to reserve
+        m_nodes[u].addNeighbour(&m_nodes[v]);
+        if (direction == 'T')
+            m_nodes[v].addNeighbour(&m_nodes[u]);
     }
 
     // We let lines stay in (x=east,y=north) space
@@ -101,18 +102,70 @@ bool World::loadFromFile(const std::string& filepath) {
         indices.push_back(c);
     }
 
-    m_routes.push_back(Route{.nodes{&m_nodes[7], &m_nodes[8]}, .loops{false}});
-
     m_asphaltMesh = std::make_unique<AsphaltMesh>(&vertices[0], num_vertices, &indices[0], num_triangles*3);
 
     return true;
+}
+
+void World::clearRoutes() {
+    m_routes.clear();
+}
+
+void World::addRoute(size_t from, size_t to) {
+    assert(from >= 0 && from <= m_nodes.size());
+    assert(to >= 0 && to <= m_nodes.size());
+
+    // -distance, {node, previous}
+    std::priority_queue<std::pair<float,std::pair<Node*, Node*>>> qu;
+    qu.push({0.0f, {&m_nodes[from], nullptr}});
+    // from node to the shortest prev to that node
+    std::unordered_map<Node*, Node*> backtrack;
+
+    while (true) {
+        if (qu.empty()) __builtin_trap();
+
+        float dist = -qu.top().first;
+        Node* node = qu.top().second.first;
+        Node* prev = qu.top().second.second;
+        qu.pop();
+
+        if (backtrack.count(node))
+            continue;
+        backtrack.insert({node, prev});
+
+        std::cerr << "looking at node " << (node - &m_nodes[0]) << std::endl;
+
+        if (node == &m_nodes[to])
+            break;
+
+        for (Node* neighbour:node->neighbours) {
+            if (backtrack.count(neighbour))
+                continue;
+            float extraDist = Vector3Length(neighbour->position - node->position);
+            float totalDist = dist + extraDist;
+            qu.push({-totalDist, {neighbour, node}});
+        }
+    }
+
+    std::vector<Node*> route_reverse;
+    Node* node = &m_nodes[to];
+    while(node != nullptr) {
+        route_reverse.push_back(node);
+        node = backtrack.find(node)->second;
+    }
+    Route route{std::vector(route_reverse.rbegin(), route_reverse.rend()), false};
+    m_routes.emplace_back(std::move(route));
 }
 
 bool World::isLoaded() {
     return !m_nodes.empty();
 }
 
-std::vector<Route>& World::getRoutes() {
+const std::vector<Node>& World::getNodes() {
+    return m_nodes;
+}
+
+const std::vector<Route>& World::getRoutes() {
     return m_routes;
 }
 

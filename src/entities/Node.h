@@ -1,14 +1,16 @@
 #pragma once
 #include <vector>
-#include "Edge.h"
+#include "raylib.h"
+#include "carConfig.h"
 
 class Node {
 public:
     Vector3 position{};
     float diameter = ROAD_WIDTH;
-    std::vector<Edge*> edges;
-    explicit Node(Vector3 position) : position(position), edges({}) {}
+    // We only include nodes we can drive to from this node
+    std::vector<Node*> neighbours;
+    explicit Node(Vector3 position) : position(position), neighbours() {}
     ~Node() = default;
-    void addedToEdge(Edge *edge);
-    void render();
+    void addNeighbour(Node* node);
+    void renderCircle(Color color) const;
 };
