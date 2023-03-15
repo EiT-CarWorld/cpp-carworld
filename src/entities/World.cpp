@@ -61,8 +61,6 @@ bool World::loadFromFile(const std::string& filepath) {
         char direction;
         int u, v;
         file >> direction >> u >> v;
-        u--;
-        v--;
         OR_COMPLAIN(direction == 'O' || direction == 'T');
         OR_COMPLAIN(0 <= u && u < num_nodes);
         OR_COMPLAIN(0 <= v && v < num_nodes);
@@ -88,7 +86,7 @@ bool World::loadFromFile(const std::string& filepath) {
         OR_RETURN(consumeNewline(file));
         // Convert from (x=east,y=north) to (x=east,y=up,z=south)
         vertices.push_back(x);
-        vertices.push_back(0.5f);
+        vertices.push_back(0.f);
         vertices.push_back(-y);
     }
 
@@ -103,7 +101,7 @@ bool World::loadFromFile(const std::string& filepath) {
         indices.push_back(c);
     }
 
-    m_routes.push_back(Route{.nodes{&m_nodes[0], &m_nodes[1]}, .loops{false}});
+    m_routes.push_back(Route{.nodes{&m_nodes[7], &m_nodes[8]}, .loops{false}});
 
     m_asphaltMesh = std::make_unique<AsphaltMesh>(&vertices[0], num_vertices, &indices[0], num_triangles*3);
 

@@ -1,3 +1,8 @@
 [submodule "vendored/raylib"]
 	path = vendored/raylib
 	url = https://github.com/raysan5/raylib.git
+[submodule "map_generation"]
+	path = map_generation
+	url = git@github.com:EiT-CarWorld/map_generation.git
+[submodule "raylib"]
+	url = git@github.com:haved/raylib.git

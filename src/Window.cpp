@@ -52,7 +52,7 @@ void Window::mainloop() {
     simulations.setScoreOutputFile("out/scores.csv");
 
     UserController controller(&simulations, "res/config/");
-    controller.resetFreeCamera({12266, 10, -28551});
+    controller.resetFreeCamera({0, 10, 0});
 
     while (!WindowShouldClose()) {
         controller.update();

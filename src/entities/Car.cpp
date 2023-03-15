@@ -117,7 +117,7 @@ void Car::calculateSensors(Simulation* simulation) {
     // Calculate distances to the road edge
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         float angle = m_yaw + LIDAR_ANGLES[i];
-        Vector2 dir = {cosf(angle), -sinf(angle)};
+        Vector2 dir = {cosf(angle), sinf(angle)};
         m_lidarDistances[i] = simulation->getWorld()->getRayDistance({m_position.x, -m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
@@ -263,7 +263,7 @@ void Car::update() {
 
 Camera3D Car::get3rdPersonCamera() {
     return Camera3D{
-        .position = m_position + Vector3{-cosf(m_yaw)*10, 5, sinf(m_yaw)*10},
+        .position = m_position + Vector3{-cosf(m_yaw)*20, 15, sinf(m_yaw)*20},
         .target = m_position,
         .up{0,1,0},
         .fovy = 80.0f,
@@ -290,7 +290,8 @@ void Car::renderSensory() {
         if(m_lidarDistances[i] < MAX_LIDAR_DIST) {
             float dist = m_lidarDistances[i];
             float angle = m_yaw + LIDAR_ANGLES[i];
-            DrawLine3D(m_position, {m_position.x + cosf(angle)*dist, m_position.y, m_position.z-sinf(angle)*dist}, RED);
+            Vector3 pos = m_position + Vector3{0.f ,0.4f, 0.f};
+            DrawLine3D(pos, {pos.x + cosf(angle)*dist, pos.y, pos.z-sinf(angle)*dist}, RED);
         }
     }
 
