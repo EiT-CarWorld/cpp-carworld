@@ -36,16 +36,16 @@ CarBrainOutput CarBrain::takeAction(CarBrainInput input) {
 
     // First we load up the input vector with sensor data
     int i = 0;
-    vectorIn[i++] = input.own_speed;
+    vectorIn[i++] = input.own_speed / 100.f;
     vectorIn[i++] = input.target_angle;
     vectorIn[i++] = input.turn_in_target;
-    vectorIn[i++] = input.target_distance;
+    vectorIn[i++] = input.target_distance / 100.f;
     for (int j = 0; j < NUM_LIDAR_ANGLES; j++)
-        vectorIn[i++] = (*input.lidarData)[j];
+        vectorIn[i++] = (*input.lidarData)[j] / 100.f;
     for (int j = 0; j < NUM_CAR_ZONES; j++) {
-        vectorIn[i++] = (*input.carZoneDistances)[j];
-        vectorIn[i++] = (*input.carZoneSpeeds)[j].x;
-        vectorIn[i++] = (*input.carZoneSpeeds)[j].y;
+        vectorIn[i++] = (*input.carZoneDistances)[j] / 100.f;
+        vectorIn[i++] = (*input.carZoneSpeeds)[j].x / 100.f;
+        vectorIn[i++] = (*input.carZoneSpeeds)[j].y / 100.f;
     }
     assert(i == BRAIN_INPUT_LAYER_SIZE);
 
