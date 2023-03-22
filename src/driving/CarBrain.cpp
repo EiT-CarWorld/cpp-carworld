@@ -28,6 +28,14 @@ static float last_activation_function(float in) {
     return 1.f / (1.f + expf(-in));
 }
 
+static float sigmoidPlus(float x, float scale) {
+    return 2.f / (1 + exp(-x/scale)) - 1.f;
+}
+
+static float sigmoid(float x, float scale) {
+    return 1.f / (1 + exp(-x/scale));
+}
+
 static_assert(BRAIN_INPUT_LAYER_SIZE <= MAX_LAYER_SIZE);
 static thread_local float tmpVectorA[MAX_LAYER_SIZE+1], tmpVectorB[MAX_LAYER_SIZE+1];
 

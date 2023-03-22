@@ -1,6 +1,6 @@
-seed 1234
+seed 123
 world res/maps/simple_intersection.txt
-#loadGeneration res/brains/1180.gen
+#loadGeneration res/brains/200.gen
 defineRoutes 6
 106 95
 106 118

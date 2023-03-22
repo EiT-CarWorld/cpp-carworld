@@ -3,6 +3,7 @@
 #include "rlgl.h"
 #include <cassert>
 #include "util.h"
+#include "tinyfiledialogs.h"
 
 UserController::UserController(GeneticSimulation* simulations, std::string configDir)
         : m_simulations(simulations), m_configDir(std::move(configDir)) {}
@@ -92,12 +93,30 @@ void UserController::update() {
         }
         else if (IsKeyPressed(KEY_BACKSPACE)) {
             m_simulations->abortGeneration();
+            m_autoNextGeneration = false;
             m_selectedCar = nullptr;
         }
     }
 
     // If no generation is running, we can make changes and start next generation
     if (!m_simulations->hasGenerationRunning()) {
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
+            unlockMouse();
+            const char* filetypes[] = {"*.gen"};
+            char const *dest = tinyfd_saveFileDialog(
+                    "Save gene pool","res/brains/",1,filetypes,"Gene pool file");
+            if (dest != NULL)
+                m_simulations->saveGenePool(dest);
+        }
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_O)) {
+            unlockMouse();
+            const char* filetypes[] = {"*.gen"};
+            char const *dest = tinyfd_openFileDialog(
+                    "Load gene pool","res/brains/",1,filetypes,"Gene pool file", false);
+            if (dest != NULL)
+                m_simulations->saveGenePool(dest);
+        }
+
         if (IsKeyPressed(KEY_R) || m_autoNextGeneration) {
 
             // If there exists a config file for this generation, run it first

@@ -71,7 +71,7 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
             size_t count;
             file >> count;
             for (int i = 0; i < count; i++) {
-                OR_COMPLAIN (file.good() && file.get() == '\n');
+                OR_COMPLAIN(file.good() && file.get() == '\n');
                 size_t frame, route;
                 file >> frame >> route;
                 OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
@@ -80,34 +80,11 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
         } else if (option == "saveGeneration") {
             std::string dest;
             file >> dest;
-            TraceLog(LOG_INFO, "Saving generation to file '%s'", dest.c_str());
-
-            std::ofstream brainSave;
-            brainSave.open(dest);
-            OR_COMPLAIN(brainSave.good());
-
-            brainSave << m_generation << std::endl;
-            brainSave << m_geneticPool.size() << std::endl;
-            for ( CarBrain& brain : m_geneticPool )
-                brain.saveToFile(brainSave);
+            OR_COMPLAIN(saveGenePool(dest.c_str()));
         } else if (option == "loadGeneration") {
             std::string src;
             file >> src;
-            TraceLog(LOG_INFO, "Loading generation from file '%s'", src.c_str());
-
-            std::ifstream brainLoad;
-            brainLoad.open(src);
-            OR_COMPLAIN(brainLoad.good());
-
-            brainLoad >> m_generation;
-            OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
-
-            size_t num_brains;
-            brainLoad >> num_brains;
-            OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
-            m_geneticPool.clear();
-            for (size_t i = 0; i < num_brains; i++)
-                m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
+            OR_COMPLAIN(loadGenePool(src.c_str()));
         } else if (option == "seed")
             file >> m_seed;
         else if (option == "poolSize")
@@ -144,6 +121,39 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
     OR_COMPLAIN (m_framesPerSimulation);
 
     return true;
+}
+
+bool GeneticSimulation::saveGenePool(const char *path) {
+    assert(!hasGenerationRunning());
+    TraceLog(LOG_INFO, "Saving generation to file '%s'", path);
+
+    std::ofstream brainSave;
+    brainSave.open(path);
+    OR_COMPLAIN(brainSave.good());
+
+    brainSave << m_generation << std::endl;
+    brainSave << m_geneticPool.size() << std::endl;
+    for ( CarBrain& brain : m_geneticPool )
+        brain.saveToFile(brainSave);
+}
+
+bool GeneticSimulation::loadGenePool(const char *path) {
+    assert(!hasGenerationRunning());
+    TraceLog(LOG_INFO, "Loading generation from file '%s'", path);
+
+    std::ifstream brainLoad;
+    brainLoad.open(path);
+    OR_COMPLAIN(brainLoad.good());
+
+    brainLoad >> m_generation;
+    OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+
+    size_t num_brains;
+    brainLoad >> num_brains;
+    OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+    m_geneticPool.clear();
+    for (size_t i = 0; i < num_brains; i++)
+        m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
 }
 
 void GeneticSimulation::setScoreOutputFile(const char* path) {

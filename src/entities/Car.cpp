@@ -173,7 +173,7 @@ void Car::calculateSensors(Simulation* simulation) {
 #define FRICTION 0.0035f
 #define QUADRATIC_FRICTION 0.0045f
 // Used when the current speed is opposite direction of desired. Applied linearly
-#define BREAKING_FRICTION 1.f //0.2f
+#define BREAKING_FRICTION 8.f //0.2f
 // Friction applied to the car's speed due to turning. Quadratic
 #define TURNING_SPEED_FRICTION 0.1f
 
@@ -242,6 +242,7 @@ void Car::update() {
     // so the lidar distances are updated
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
+            m_score -= SCORE_ROADSIDE_CRASH_PENALTY;
             m_crashed = true; break;
         }
     }

@@ -60,6 +60,8 @@ public:
     size_t getFramesPerSimulation();
 
     bool loadParameterFile(const char* path);
+    bool loadGenePool(const char *path);
+    bool saveGenePool(const char* path);
 
     void setScoreOutputFile(const char* path);
 

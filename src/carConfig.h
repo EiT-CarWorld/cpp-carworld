@@ -22,6 +22,7 @@
 
 // Score tuning
 #define SCORE_CRASH_PENALTY 100
+#define SCORE_ROADSIDE_CRASH_PENALTY 200
 // Extra penalty for crashing, multiplied with speed
 #define SCORE_CRASH_SPEED_PENALTY 0
 #define SCORE_GAIN_DISTANCE_COVER 2
