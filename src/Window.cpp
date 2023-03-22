@@ -44,7 +44,7 @@ void Window::mainloop() {
 
     // Create one initial brain
     std::vector<CarBrain> initial_brains;
-    initial_brains.emplace_back(CarBrain::initializeMatrices(1234, {20, 20}));
+    initial_brains.emplace_back(CarBrain::initializeMatrices(1234, {40, 20, 20}));
 
     GeneticSimulation simulations(std::move(initial_brains));
     simulations.setScoreOutputFile("out/scores.csv");

@@ -33,7 +33,7 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
         return false;
     }
 
-    std::cerr << "info: loading parameters from '" << path << "'" << std::endl;
+    TraceLog(LOG_INFO, "loading parameters from %s", path);
 
     std::string option;
     while(true) {
@@ -77,6 +77,37 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
                 OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
                 m_carSpawnTimes.insert({frame, route});
             }
+        } else if (option == "saveGeneration") {
+            std::string dest;
+            file >> dest;
+            TraceLog(LOG_INFO, "Saving generation to file '%s'", dest.c_str());
+
+            std::ofstream brainSave;
+            brainSave.open(dest);
+            OR_COMPLAIN(brainSave.good());
+
+            brainSave << m_generation << std::endl;
+            brainSave << m_geneticPool.size() << std::endl;
+            for ( CarBrain& brain : m_geneticPool )
+                brain.saveToFile(brainSave);
+        } else if (option == "loadGeneration") {
+            std::string src;
+            file >> src;
+            TraceLog(LOG_INFO, "Loading generation from file '%s'", src.c_str());
+
+            std::ifstream brainLoad;
+            brainLoad.open(src);
+            OR_COMPLAIN(brainLoad.good());
+
+            brainLoad >> m_generation;
+            OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+
+            size_t num_brains;
+            brainLoad >> num_brains;
+            OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+            m_geneticPool.clear();
+            for (size_t i = 0; i < num_brains; i++)
+                m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
         } else if (option == "seed")
             file >> m_seed;
         else if (option == "poolSize")
@@ -223,35 +254,32 @@ size_t GeneticSimulation::getSimulationsRunning() {
 
 void GeneticSimulation::pruneGenePool() {
     // Only keep the best brains. Sort their scores to find the cutoff
-    std::vector<float> scores;
+    std::vector<std::pair<float, int>> scores;
     scores.reserve(m_poolSize);
-    for (auto& brain:m_geneticPool)
-        scores.push_back(brain.getEvaluationScore());
+    for (size_t i = 0; i < m_geneticPool.size(); i++)
+        scores.emplace_back(m_geneticPool[i].getEvaluationScore(), i);
     // Put the largest scores first
     std::sort(scores.rbegin(), scores.rend());
 
     // If we have a file for printing brain scores open, print them all there
     if (m_brainScoreOutput.is_open()) {
         m_brainScoreOutput << m_generation;
-        for(float score : scores) {
-            m_brainScoreOutput << "," << score;
-        }
+        for(auto score : scores)
+            m_brainScoreOutput << "," << score.first;
         m_brainScoreOutput << std::endl;
     }
 
     if (m_survivorsPerGeneration == m_poolSize)
         return;
 
-    // Keep all brains above, and one equal to this score
-    float removal_limit = scores[m_survivorsPerGeneration];
-    bool keptOne = false;
-    m_geneticPool.erase(std::remove_if(m_geneticPool.begin(), m_geneticPool.end(), [&](CarBrain& it) {
-        if (it.getEvaluationScore() == removal_limit && !keptOne) {
-            keptOne = true;
-            return false;
-        }
-        return it.getEvaluationScore() <= removal_limit;
-    }), m_geneticPool.end());
+    // Only keep the top performers, in the new gene pool
+    std::vector<CarBrain> newGenePool;
+    for (size_t i = 0; i < m_survivorsPerGeneration; i++) {
+        CarBrain&& brain = std::move(m_geneticPool[scores[i].second]);
+        newGenePool.emplace_back(brain);
+    }
+
+    m_geneticPool.swap(newGenePool);
 }
 
 void GeneticSimulation::finishGeneration() {

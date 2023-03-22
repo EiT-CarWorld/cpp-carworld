@@ -18,10 +18,12 @@
 #define CAR_LENGTH 4.f
 
 // Used to scale roads and node sizes
-#define ROAD_WIDTH 12.f
+#define ROAD_WIDTH 14.f
 
 // Score tuning
 #define SCORE_CRASH_PENALTY 100
-#define SCORE_GAIN_DISTANCE_COVER 1
+// Extra penalty for crashing, multiplied with speed
+#define SCORE_CRASH_SPEED_PENALTY 0
+#define SCORE_GAIN_DISTANCE_COVER 2
 #define SCORE_TIME_PENALTY 1
 #define SCORE_INITIAL_SCORE 100

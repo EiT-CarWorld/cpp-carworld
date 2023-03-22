@@ -22,5 +22,8 @@ struct CarMatrix {
 
     void mixIn(const CarMatrix& other, std::mt19937 random);
     void mutate(std::mt19937 random, float mutationChance);
+
+    void saveToFile(std::ofstream& file);
+    static CarMatrix loadFromFile(std::ifstream& file);
 };
 

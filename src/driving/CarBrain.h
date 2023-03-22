@@ -53,6 +53,10 @@ public:
     void mixIn(const CarBrain& other, std::mt19937& random);
     void mutate(std::mt19937& random, float mutateChance);
 
+    void saveToFile(std::ofstream& file);
+
+    static CarBrain loadFromFile(std::ifstream& file);
+
     // Creates an array of matrices between the layers in a brain
     static std::vector<CarMatrix> initializeMatrices(
             unsigned long seed,

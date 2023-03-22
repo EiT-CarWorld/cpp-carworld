@@ -26,7 +26,7 @@ return false;                                                        \
 
 // Important: loading a new file will invalidate all references to the current world data
 bool World::loadFromFile(const std::string& filepath) {
-    std::cerr << "info: loading world from '" << filepath << "'" << std::endl;
+    TraceLog(LOG_INFO, "loading world file from %s", filepath.c_str());
 
     m_nodes.clear();
     m_routes.clear();
@@ -34,10 +34,7 @@ bool World::loadFromFile(const std::string& filepath) {
 
     std::ifstream file;
     file.open(filepath);
-    if (!file.good()) {
-        std::cerr << "error: opening world file '" << filepath << "' failed" << std::endl;
-        return false;
-    }
+    OR_COMPLAIN(file.good());
 
     int num_nodes, num_edges;
     file >> num_nodes >> num_edges;
@@ -132,8 +129,6 @@ void World::addRoute(size_t from, size_t to) {
         if (backtrack.count(node))
             continue;
         backtrack.insert({node, prev});
-
-        std::cerr << "looking at node " << (node - &m_nodes[0]) << std::endl;
 
         if (node == &m_nodes[to])
             break;

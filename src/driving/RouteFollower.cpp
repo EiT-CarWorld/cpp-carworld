@@ -38,8 +38,8 @@ float RouteFollower::getTurnInTarget() {
     Vector3 target = m_target->position;
     Vector3 future = m_route->nodes[m_nextNode+1]->position;
 
-    Vector2 currentLine{target.x - prev.x, target.x - prev.x};
-    Vector2 nextLine{future.x - target.x, future.x - target.x};
+    Vector2 currentLine{target.x - prev.x, target.y - prev.y};
+    Vector2 nextLine{future.x - target.x, future.y - target.y};
     currentLine = Vector2Normalize(currentLine);
     nextLine = Vector2Normalize(nextLine);
     return std::asin(currentLine.x * nextLine.y - nextLine.x * currentLine.y);

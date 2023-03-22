@@ -104,8 +104,13 @@ void UserController::update() {
             char configFileName[100];
             snprintf(configFileName, sizeof(configFileName),
                      "%s/%ld.txt", m_configDir.c_str(), m_simulations->getGenerationNumber());
-            if ( fileExists(configFileName) )
-                m_simulations->loadParameterFile(configFileName);
+            if ( fileExists(configFileName) ) {
+                bool loadResult = m_simulations->loadParameterFile(configFileName);
+                if (!loadResult) { // If something in the file fails, wait here for a human to fix it
+                    m_autoNextGeneration = false;
+                    return;
+                }
+            }
 
             m_simulations->startParallelGeneration(!m_autoNextGeneration);
         }
@@ -193,7 +198,7 @@ void UserController::renderHUD() {
         DRAW_LINE("LMB - Select car");
     }
     DRAW_TOGGLE("C - highlight closest node (%c)", m_drawClosestNode);
-    if (m_closestNode) {
+    if (m_drawClosestNode) {
         DRAW_LINE(TextFormat("Closest node: %d", m_closestNode));
     }
     DRAW_TOGGLE("F - freewheel (%c)", m_freewheelAllCars);

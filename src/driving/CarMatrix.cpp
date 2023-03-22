@@ -1,6 +1,7 @@
 #include "CarMatrix.h"
 #include <cassert>
 #include <algorithm>
+#include <fstream>
 
 CarMatrix::CarMatrix(size_t rows, size_t cols): rows(rows), cols(cols) {
     assert(rows > 0 && cols > 0);
@@ -64,11 +65,31 @@ void CarMatrix::mixIn(const CarMatrix &other, std::mt19937 random) {
 
 void CarMatrix::mutate(std::mt19937 random, float mutationChance) {
     std::uniform_real_distribution<float> chanceSample(0.f, 1.f);
-    std::normal_distribution<float> mutationVal(0.f, 1.f);
+    std::normal_distribution<float> mutationVal(0.f, 0.3f);
     for(int i = 0; i < rows*cols; i++) {
         if (chanceSample(random) < mutationChance)
-            values[i] = mutationVal(random);
+            values[i] += mutationVal(random);
     }
+}
+
+void CarMatrix::saveToFile(std::ofstream& file) {
+    file << rows << " " << cols;
+    file.precision(15);
+    for (int i = 0; i < rows*cols; i++)
+        file << " " << values[i];
+    file << std::endl;
+}
+
+CarMatrix CarMatrix::loadFromFile(std::ifstream& file) {
+    size_t rows, cols;
+    file >> rows >> cols;
+    assert(file.good());
+    CarMatrix result(rows, cols);
+    for (int i = 0; i < rows*cols; i++) {
+        file >> result.values[i];
+    }
+    assert(file.good());
+    return result;
 }
 
 

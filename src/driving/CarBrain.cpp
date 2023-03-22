@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <random>
+#include <fstream>
 
 CarBrain::CarBrain(std::vector<CarMatrix> matrices) : m_matrices(std::move(matrices)) {
     // Now we verify that the sizes of the matrices fit each other,
@@ -18,9 +19,8 @@ CarBrain::CarBrain(std::vector<CarMatrix> matrices) : m_matrices(std::move(matri
 }
 
 static float activation_function(float in) {
-    //return fmaxf(0.f, in);
     if(in < 0)
-        return in * 0.5f;
+        return in * 0.0f; // Change softness of ReLU
     return in;
 }
 
@@ -81,6 +81,40 @@ float CarBrain::getEvaluationScore() {
     return m_evaluationScore;
 }
 
+void CarBrain::mixIn(const CarBrain& other, std::mt19937& random) {
+    assert(m_matrices.size() == other.m_matrices.size());
+    for (int i = 0; i < m_matrices.size(); i++) {
+        auto& matrix = m_matrices[i];
+        auto& matrix2 = other.m_matrices[i];
+        matrix.mixIn(matrix2, random);
+    }
+}
+
+void CarBrain::mutate(std::mt19937& random, float mutateChance) {
+    for (auto & matrix : m_matrices) {
+        matrix.mutate(random, mutateChance);
+    }
+}
+
+void CarBrain::saveToFile(std::ofstream &file) {
+    file << m_matrices.size() << std::endl;
+    // Each matrix is printed as its own line
+    for (auto& m : m_matrices)
+        m.saveToFile(file);
+}
+
+CarBrain CarBrain::loadFromFile(std::ifstream &file) {
+    size_t N;
+    file >> N;
+    assert(file.good() && N > 0);
+    std::vector<CarMatrix> matrices;
+    for (size_t i = 0; i < N; i++) {
+        assert (file.get() == '\n');
+        matrices.emplace_back(CarMatrix::loadFromFile(file));
+    }
+    return CarBrain(std::move(matrices));
+}
+
 static CarMatrix initializeMatrix(std::mt19937& mt, size_t rows, size_t columns) {
     // Using He Weight Initialization
     float std = sqrtf(2.f / columns);
@@ -106,19 +140,4 @@ std::vector<CarMatrix> CarBrain::initializeMatrices(
         inputs = outputs;
     }
     return matrices;
-}
-
-void CarBrain::mixIn(const CarBrain& other, std::mt19937& random) {
-    assert(m_matrices.size() == other.m_matrices.size());
-    for (int i = 0; i < m_matrices.size(); i++) {
-        auto& matrix = m_matrices[i];
-        auto& matrix2 = other.m_matrices[i];
-        matrix.mixIn(matrix2, random);
-    }
-}
-
-void CarBrain::mutate(std::mt19937& random, float mutateChance) {
-    for (auto & matrix : m_matrices) {
-        matrix.mutate(random, mutateChance);
-    }
 }

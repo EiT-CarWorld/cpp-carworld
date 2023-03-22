@@ -173,14 +173,14 @@ void Car::calculateSensors(Simulation* simulation) {
 #define FRICTION 0.0035f
 #define QUADRATIC_FRICTION 0.0045f
 // Used when the current speed is opposite direction of desired. Applied linearly
-#define BREAKING_FRICTION 0.2f
+#define BREAKING_FRICTION 1.f //0.2f
 // Friction applied to the car's speed due to turning. Quadratic
 #define TURNING_SPEED_FRICTION 0.1f
 
-#define TURN_SPEED 0.5f
+#define TURN_SPEED 0.75f
 // How quickly the wheels move when turning
 #define TURN_FRICTION 0.006f
-#define MAX_TURN 0.3f
+#define MAX_TURN 0.4f
 // How much the max turning angle decreases per m/s speed
 #define SPEED_MAX_TURN_PENALTY .009f
 
@@ -239,20 +239,21 @@ void Car::update() {
         return;
 
     // We can assume that chooseAction has been called before the call to update
+    // so the lidar distances are updated
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
-            m_crashed = true;
-            m_score -= SCORE_CRASH_PENALTY;
-            return;
+            m_crashed = true; break;
+        }
+    }
+    for (int i = 0; i < NUM_CAR_ZONES; i++) {
+        if (m_carZoneDistances[i] < MIN_CAR_ZONE_DISTANCE[i]) {
+            m_crashed = true; break;
         }
     }
 
-    for (int i = 0; i < NUM_CAR_ZONES; i++) {
-        if (m_carZoneDistances[i] < MIN_CAR_ZONE_DISTANCE[i]) {
-            m_crashed = true;
-            m_score -= SCORE_CRASH_PENALTY;
-            return;
-        }
+    if (m_crashed) {
+        m_score -= SCORE_CRASH_PENALTY + SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
+        return;
     }
 
     float distanceToTarget = m_routeFollower.getDistanceToTarget2D(m_position);
