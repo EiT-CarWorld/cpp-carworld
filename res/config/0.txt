@@ -13,7 +13,7 @@ defineRoutes 12
 130 106
 130 95
 130 118
-pickRandomRoutes 200 200 250 2000
+pickRandomRoutes 200 100 300 350 2000
 poolSize 100
 survivorsPerGeneration 10
 framesPerSimulation 3000

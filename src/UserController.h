@@ -10,7 +10,7 @@ enum class UserControllerMode {
 
 class UserController {
     GeneticSimulation* m_simulations;
-    std::string m_configDir;
+    std::string m_configBasePath;
 
     bool m_mouseLock{false};
     UserControllerMode m_mode{UserControllerMode::FREECAM};
@@ -19,7 +19,7 @@ class UserController {
 
     // Allows us to get the index of nodes by looking at them
     bool m_drawClosestNode{false};
-    int m_closestNode; // Or -1 if no close node
+    int m_closestNode{-1}; // Or -1 if no close node
 
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
@@ -29,11 +29,12 @@ class UserController {
     void lockMouse();
     void unlockMouse();
     void updateRealtimeSimulation();
+    const char* configFileForGen(size_t generation);
     void trySelectCar(Simulation* simulation);
     void drawClosestNode(Simulation* simulation);
     void makeSureSelectedCarExists(Simulation* simulation);
 public:
-    UserController(GeneticSimulation* simulations, std::string configDir);
+    UserController(GeneticSimulation* simulations, std::string configBasePath);
     void resetFreeCamera(Vector3 position);
     void update();
     Camera3D getCamera();

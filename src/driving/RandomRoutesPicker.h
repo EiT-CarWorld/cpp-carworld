@@ -11,6 +11,8 @@ class RandomRoutesPicker {
     // How long each period lasts before new spawn times are picked
     int m_newPicksPeriod{0};
 
+    // How long between each frame where we attempt to spawn a car
+    int m_spawnableFramePeriod{};
     // When picking spawn times, how long should it at least be between two cars spawn at the same node
     int m_minDelayBetweenSpawns{};
     // Not an actual max, but the restriction placed on a start node can at most last for this long
@@ -19,7 +21,7 @@ class RandomRoutesPicker {
     int m_lastSpawnableFrame{};
 
 public:
-    void startRandomRoutePicking(int period, int minDelayBetweenSpawns, int maxDelayBetweenSpawns, int lastSpawnableFrame);
+    void startRandomRoutePicking(int period, int spawnableFramePeriod, int minDelayBetweenSpawns, int maxDelayBetweenSpawns, int lastSpawnableFrame);
     void stopRandomRoutePicking();
 
     // The seed is combined with generation, so can stay constant

@@ -81,9 +81,9 @@ bool GeneticSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad)
             }
         }
         else if (option == "pickRandomRoutes") {
-            int period, minDelay, maxDelay, lastSpawnableFrame;
-            file >> period >> minDelay >> maxDelay >> lastSpawnableFrame;
-            m_routesPicker.startRandomRoutePicking(period, minDelay, maxDelay, lastSpawnableFrame);
+            int period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame;
+            file >> period >> spawnFramePeriod >> minDelay >> maxDelay >> lastSpawnableFrame;
+            m_routesPicker.startRandomRoutePicking(period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame);
         }
         else if (option == "saveGeneration") {
             std::string dest;
@@ -168,23 +168,10 @@ bool GeneticSimulation::loadGenePool(const char *path) {
     return true;
 }
 
-bool GeneticSimulation::loadParameterFileIfExists(const char *path_base, bool ignoreSaveLoad) {
-    // If there exists a config file for this generation, run it first
-    char configFileName[100];
-    snprintf(configFileName, sizeof(configFileName), path_base, m_generation);
-    if ( fileExists(configFileName) ) {
-        if (!loadParameterFile(configFileName, ignoreSaveLoad))
-            return false;
-    }
-    return true;
-}
-
-bool GeneticSimulation::loadAllPreviousParameterFiles(const char *path_base) {
-    for (size_t i = 0; i < m_generation; i++) {
-        if (!loadParameterFileIfExists(path_base, true))
-            return false;
-    }
-    return true;
+bool GeneticSimulation::loadParameterFileIfExists(const char *path, bool ignoreSaveLoad) {
+    if ( !fileExists(path) )
+        return true;
+    return loadParameterFile(path, ignoreSaveLoad);
 }
 
 void GeneticSimulation::setScoreOutputFile(const char* path) {

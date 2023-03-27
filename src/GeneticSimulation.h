@@ -58,7 +58,7 @@ class GeneticSimulation {
     // Spawns a thread to run the simulations in the half-open interval [begin, end)
     void runSimulationsInThread(size_t begin, size_t end);
 public:
-    GeneticSimulation(std::vector<CarBrain> initial_brains);
+    explicit GeneticSimulation(std::vector<CarBrain> initial_brains);
 
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
@@ -66,8 +66,7 @@ public:
     bool loadParameterFile(const char* path, bool ignoreSaveLoad);
     bool loadGenePool(const char *path);
     bool saveGenePool(const char* path);
-    bool loadParameterFileIfExists(const char* path_base, bool ignoreSaveLoad);
-    bool loadAllPreviousParameterFiles(const char *path_base);
+    bool loadParameterFileIfExists(const char* path, bool ignoreSaveLoad);
 
     void setScoreOutputFile(const char* path);
 

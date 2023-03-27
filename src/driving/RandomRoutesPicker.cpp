@@ -1,10 +1,11 @@
 #include "RandomRoutesPicker.h"
 #include <random>
 
-void RandomRoutesPicker::startRandomRoutePicking(int period, int minDelayBetweenSpawns, int maxDelaybetweenSpawns, int lastSpawnableFrame) {
+void RandomRoutesPicker::startRandomRoutePicking(int period, int spawnableFramePeriod, int minDelayBetweenSpawns, int maxDelaybetweenSpawns, int lastSpawnableFrame) {
     m_lastGenerationGenerated = -1;
     m_newPicksPeriod = period;
 
+    m_spawnableFramePeriod = spawnableFramePeriod;
     m_minDelayBetweenSpawns = minDelayBetweenSpawns;
     m_maxDelayBetweenSpawns = maxDelaybetweenSpawns;
     m_lastSpawnableFrame = lastSpawnableFrame;
@@ -38,7 +39,7 @@ void RandomRoutesPicker::updateRoutePicks(size_t generation, size_t seed, std::v
     std::uniform_int_distribution<size_t> spawnLockTime(m_minDelayBetweenSpawns, m_maxDelayBetweenSpawns);
 
     std::map<Node*, size_t> spawnLocks;
-    for (int i = 0; i < m_lastSpawnableFrame; i++) {
+    for (int i = 0; i < m_lastSpawnableFrame; i+=m_spawnableFramePeriod) {
         size_t route_idx = routePicker(rand);
         Route const& route = routes[route_idx];
         Node* startNode = route.nodes.front();

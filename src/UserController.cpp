@@ -4,8 +4,8 @@
 #include <cassert>
 #include "tinyfiledialogs.h"
 
-UserController::UserController(GeneticSimulation* simulations, std::string configDir)
-        : m_simulations(simulations), m_configDir(std::move(configDir)) {}
+UserController::UserController(GeneticSimulation* simulations, std::string configBasePath)
+        : m_simulations(simulations), m_configBasePath(std::move(configBasePath)) {}
 
 void UserController::resetFreeCamera(Vector3 position) {
     m_cameraController.resetCamera(position);
@@ -104,7 +104,7 @@ void UserController::update() {
             const char* filetypes[] = {"*.gen"};
             char const *dest = tinyfd_saveFileDialog(
                     "Save gene pool","res/brains/",1,filetypes,"Gene pool file");
-            if (dest != NULL)
+            if (dest != nullptr)
                 m_simulations->saveGenePool(dest);
         }
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_O)) {
@@ -112,14 +112,18 @@ void UserController::update() {
             const char* filetypes[] = {"*.gen"};
             char const *dest = tinyfd_openFileDialog(
                     "Load gene pool","res/brains/",1,filetypes,"Gene pool file", false);
-            if (dest != NULL) {
+            if (dest != nullptr) {
                 bool result = m_simulations->loadGenePool(dest);
-                if (result) m_simulations->loadAllPreviousParameterFiles(m_configDir.c_str());
+                for (size_t i = 0; result && i < m_simulations->getGenerationNumber(); i++) {
+                    result = m_simulations->loadParameterFileIfExists(configFileForGen(i), true);
+                }
             }
         }
 
         if (IsKeyPressed(KEY_R) || m_autoNextGeneration) {
-            if (!m_simulations->loadParameterFileIfExists(m_configDir.c_str(), false)) {
+            // If we have a parameter file corresponding to the generation we are about to run, load it from disk
+            if (!m_simulations->loadParameterFileIfExists(configFileForGen(m_simulations->getGenerationNumber()), false)) {
+                // If something causes the file loading to fail, we don't start the generation after all
                 m_autoNextGeneration = false;
                 return;
             }
@@ -236,6 +240,12 @@ void UserController::unlockMouse() {
         return;
     EnableCursor();
     m_mouseLock = false;
+}
+
+const char* UserController::configFileForGen(size_t generation) {
+    static char filename[256];
+    snprintf(filename, sizeof(filename), m_configBasePath.c_str(), generation);
+    return filename;
 }
 
 // Uses the center of the camera, and camera direction, to shoot a ray at the ground, and select the car there, if any
