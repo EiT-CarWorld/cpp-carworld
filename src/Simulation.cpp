@@ -4,7 +4,8 @@
 #include "Simulation.h"
 
 Simulation::Simulation(World *world, CarBrain* carBrain, unsigned long seed, bool store_history)
-        : m_world(world), m_carBrain(carBrain), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
+        : m_world(world), m_carBrain(carBrain),
+        m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
 
 World* Simulation::getWorld() {
     return m_world;
@@ -37,7 +38,9 @@ void Simulation::takeCarActions() {
 void Simulation::updateCars() {
     // Updates all cars, using the actions they last decided on (See: takeCarActions())
     for (int i = 0; i < m_cars.size(); i++) {
-        if (m_cars[i]->hasFinishedRoute() || m_cars[i]->hasCrashed() || m_cars[i]->getScore() <= 0) {
+        if (m_cars[i]->hasFinishedRoute() || m_cars[i]->hasCrashed() || m_cars[i]->getScore() <= SCORE_MINIMUM) {
+            m_carHasDied = m_carHasDied || m_cars[i]->hasCrashed() || m_cars[i]->getScore() <= SCORE_MINIMUM;
+
             m_finishedCarsScore += m_cars[i]->getScore();
 
             std::swap(m_cars[i--], m_cars.back());
@@ -67,16 +70,26 @@ void Simulation::render() {
         car->render();
 }
 
+bool Simulation::hasCarDied() {
+    return m_carHasDied;
+}
+
 // Add up the scores of all finished cars, as well as the ones still alive
 float Simulation::getTotalSimulationScore() {
     double sum = m_finishedCarsScore;
     for(auto& car:m_cars)
-        sum += car->getScore();
+        if (car->getBrain() == m_carBrain)
+            sum += car->getScore();
     return (float) sum;
 }
 
-void Simulation::storeTotalScoreInBrain() {
+void Simulation::markAsFinished() {
     m_carBrain->setEvaluationScore(getTotalSimulationScore());
+    m_markedAsFinished = true;
+}
+
+bool Simulation::isMarkedAsFinished() {
+    return m_markedAsFinished;
 }
 
 void Simulation::printHistoryToFile(const std::string& filename) {

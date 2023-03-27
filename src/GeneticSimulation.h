@@ -5,6 +5,7 @@
 #include <thread>
 #include <fstream>
 #include "Simulation.h"
+#include "driving/RandomRoutesPicker.h"
 
 // A class for running multiple simulations with different brains, and using their scores to create new brains.
 // Multithreading is used internally, but all public functions must be called from the same thread
@@ -14,6 +15,9 @@ class GeneticSimulation {
     unsigned long m_seed{};
     // For each frame number, contains what route should have a car spawned
     std::multimap<size_t, size_t> m_carSpawnTimes{};
+
+    // To get added learning, the set of car spawn times can be randomized every Nth frame
+    RandomRoutesPicker m_routesPicker;
 
     // How many brains to simulate per generations
     size_t m_poolSize{};
@@ -59,9 +63,11 @@ public:
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
 
-    bool loadParameterFile(const char* path);
+    bool loadParameterFile(const char* path, bool ignoreSaveLoad);
     bool loadGenePool(const char *path);
     bool saveGenePool(const char* path);
+    bool loadParameterFileIfExists(const char* path_base, bool ignoreSaveLoad);
+    bool loadAllPreviousParameterFiles(const char *path_base);
 
     void setScoreOutputFile(const char* path);
 

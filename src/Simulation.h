@@ -10,16 +10,20 @@
 class Simulation {
     World* m_world;
     CarBrain* m_carBrain;
+
     std::vector<std::unique_ptr<Car>> m_cars{};
 
     // How many steps of simulation have been performed?
     size_t m_frameNumber;
 
+    // True if any car has been deleted due to crashing
+    bool m_carHasDied{false};
+
+    // The sum of scores of cars that have been removed
     float m_finishedCarsScore{};
 
-    // We have the option of freezing the score.
-    // This lets us continue to drive and have fun, without affecting the learning
-    std::optional<float> m_frozenScore{};
+    // Once marked as finished, simulation can continue, but the score is final
+    bool m_markedAsFinished{};
 
     // Optional functionality for storing a bunch of data from the simulation
     bool m_store_history;
@@ -36,8 +40,10 @@ public:
     void takeCarActions();
     void updateCars();
     void render();
+    bool hasCarDied();
     float getTotalSimulationScore();
-    void storeTotalScoreInBrain();
+    void markAsFinished();
+    bool isMarkedAsFinished();
     void printHistoryToFile(const std::string& filename);
 };
 

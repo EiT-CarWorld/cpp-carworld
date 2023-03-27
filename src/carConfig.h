@@ -9,7 +9,7 @@
 #define THREAD_COUNT 8
 
 // Updating this also requires updating the angles defined in Car.cpp
-#define NUM_LIDAR_ANGLES 5
+#define NUM_LIDAR_ANGLES 9
 // Updating this also requires updating carZones.fs
 #define NUM_CAR_ZONES 16
 
@@ -22,9 +22,10 @@
 
 // Score tuning
 #define SCORE_CRASH_PENALTY 100
-#define SCORE_ROADSIDE_CRASH_PENALTY 200
 // Extra penalty for crashing, multiplied with speed
 #define SCORE_CRASH_SPEED_PENALTY 0
-#define SCORE_GAIN_DISTANCE_COVER 2
-#define SCORE_TIME_PENALTY 1
-#define SCORE_INITIAL_SCORE 100
+#define SCORE_GAIN_DISTANCE_COVER 1
+#define SCORE_TIME_PENALTY 4
+#define SCORE_INITIAL_SCORE 0
+// The score at which it dies
+#define SCORE_MINIMUM -100

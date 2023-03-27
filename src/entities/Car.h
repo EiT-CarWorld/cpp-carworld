@@ -61,6 +61,7 @@ public:
     ~Car() = default;
     Vector3 getPosition();
     float getScore();
+    CarBrain* getBrain();
 
     void chooseAction();
     void takePlayerInput();

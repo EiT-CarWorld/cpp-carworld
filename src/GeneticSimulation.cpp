@@ -4,6 +4,7 @@
 #include <iostream>
 #include "entities/World.h"
 #include "carConfig.h"
+#include "util.h"
 
 GeneticSimulation::GeneticSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
     assert(!m_geneticPool.empty());
@@ -23,7 +24,7 @@ std::cerr << "error: " #conditional << std::endl; \
 return false;                                                        \
 } while(false)
 
-bool GeneticSimulation::loadParameterFile(const char* path) {
+bool GeneticSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
     assert(!hasGenerationRunning()); // We can't change parameters during execution
 
     std::ifstream file;
@@ -66,7 +67,8 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
                 m_world.addRoute(u, v);
             }
         }
-        else if(option == "spawnTimes") {
+        else if (option == "spawnTimes") {
+            m_routesPicker.stopRandomRoutePicking();
             m_carSpawnTimes.clear();
             size_t count;
             file >> count;
@@ -77,14 +79,22 @@ bool GeneticSimulation::loadParameterFile(const char* path) {
                 OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
                 m_carSpawnTimes.insert({frame, route});
             }
-        } else if (option == "saveGeneration") {
+        }
+        else if (option == "pickRandomRoutes") {
+            int period, minDelay, maxDelay, lastSpawnableFrame;
+            file >> period >> minDelay >> maxDelay >> lastSpawnableFrame;
+            m_routesPicker.startRandomRoutePicking(period, minDelay, maxDelay, lastSpawnableFrame);
+        }
+        else if (option == "saveGeneration") {
             std::string dest;
             file >> dest;
-            OR_COMPLAIN(saveGenePool(dest.c_str()));
+            if (!ignoreSaveLoad)
+                OR_COMPLAIN(saveGenePool(dest.c_str()));
         } else if (option == "loadGeneration") {
             std::string src;
             file >> src;
-            OR_COMPLAIN(loadGenePool(src.c_str()));
+            if (!ignoreSaveLoad)
+                OR_COMPLAIN(loadGenePool(src.c_str()));
         } else if (option == "seed")
             file >> m_seed;
         else if (option == "poolSize")
@@ -135,6 +145,7 @@ bool GeneticSimulation::saveGenePool(const char *path) {
     brainSave << m_geneticPool.size() << std::endl;
     for ( CarBrain& brain : m_geneticPool )
         brain.saveToFile(brainSave);
+    return true;
 }
 
 bool GeneticSimulation::loadGenePool(const char *path) {
@@ -154,6 +165,26 @@ bool GeneticSimulation::loadGenePool(const char *path) {
     m_geneticPool.clear();
     for (size_t i = 0; i < num_brains; i++)
         m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
+    return true;
+}
+
+bool GeneticSimulation::loadParameterFileIfExists(const char *path_base, bool ignoreSaveLoad) {
+    // If there exists a config file for this generation, run it first
+    char configFileName[100];
+    snprintf(configFileName, sizeof(configFileName), path_base, m_generation);
+    if ( fileExists(configFileName) ) {
+        if (!loadParameterFile(configFileName, ignoreSaveLoad))
+            return false;
+    }
+    return true;
+}
+
+bool GeneticSimulation::loadAllPreviousParameterFiles(const char *path_base) {
+    for (size_t i = 0; i < m_generation; i++) {
+        if (!loadParameterFileIfExists(path_base, true))
+            return false;
+    }
+    return true;
 }
 
 void GeneticSimulation::setScoreOutputFile(const char* path) {
@@ -214,6 +245,9 @@ void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
     // Having a world serves as a sentinel for being initialized
     assert (m_world.isLoaded());
 
+    // In case randomized route picking is enabled, calculate them now
+    m_routesPicker.updateRoutePicks(m_generation, m_seed, m_world.getRoutes(), m_carSpawnTimes);
+
     m_hasRealtimeSimulation = oneRealtime;
     fillGenePool(); // Creates enough brains to do poolSize simulations
 
@@ -240,15 +274,15 @@ Simulation* GeneticSimulation::getRealtimeSimulation() {
 }
 
 bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
-    size_t frame = simulation->getFrameNumber();
+    if (simulation->isMarkedAsFinished())
+        return false;
 
-    if (frame == m_framesPerSimulation) { // The simulation is now done
-        simulation->storeTotalScoreInBrain(); // Assign the score it has, to the brain, for later sorting
+    size_t frame = simulation->getFrameNumber();
+    if (frame == m_framesPerSimulation || simulation->hasCarDied()) { // The simulation is now done
+        simulation->markAsFinished(); // Stores the current score into the brain
         m_simulationsLeft.fetch_sub(1, std::memory_order::memory_order_release);
         return false;
     }
-    if (frame > m_framesPerSimulation)
-        return false;
 
     for (auto it =  m_carSpawnTimes.find(frame);
          it != m_carSpawnTimes.end() && it->first == frame; ++it) {

@@ -2,7 +2,6 @@
 #include "raylib.h"
 #include "rlgl.h"
 #include <cassert>
-#include "util.h"
 #include "tinyfiledialogs.h"
 
 UserController::UserController(GeneticSimulation* simulations, std::string configDir)
@@ -113,24 +112,17 @@ void UserController::update() {
             const char* filetypes[] = {"*.gen"};
             char const *dest = tinyfd_openFileDialog(
                     "Load gene pool","res/brains/",1,filetypes,"Gene pool file", false);
-            if (dest != NULL)
-                m_simulations->saveGenePool(dest);
+            if (dest != NULL) {
+                bool result = m_simulations->loadGenePool(dest);
+                if (result) m_simulations->loadAllPreviousParameterFiles(m_configDir.c_str());
+            }
         }
 
         if (IsKeyPressed(KEY_R) || m_autoNextGeneration) {
-
-            // If there exists a config file for this generation, run it first
-            char configFileName[100];
-            snprintf(configFileName, sizeof(configFileName),
-                     "%s/%ld.txt", m_configDir.c_str(), m_simulations->getGenerationNumber());
-            if ( fileExists(configFileName) ) {
-                bool loadResult = m_simulations->loadParameterFile(configFileName);
-                if (!loadResult) { // If something in the file fails, wait here for a human to fix it
-                    m_autoNextGeneration = false;
-                    return;
-                }
+            if (!m_simulations->loadParameterFileIfExists(m_configDir.c_str(), false)) {
+                m_autoNextGeneration = false;
+                return;
             }
-
             m_simulations->startParallelGeneration(!m_autoNextGeneration);
         }
     }
@@ -197,6 +189,8 @@ void UserController::renderHUD() {
         DRAW_LINE(TextFormat("Backspace - Cancel Generation"));
     } else {
         DRAW_LINE(TextFormat("R - Start generation"));
+        DRAW_LINE(TextFormat("Ctrl-S - Save gene pool"));
+        DRAW_LINE(TextFormat("Ctrl-O - Load gene pool"));
     }
 
     // The rest of this function is only run when a simulation is being run in realtime

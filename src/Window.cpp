@@ -49,7 +49,7 @@ void Window::mainloop() {
     GeneticSimulation simulations(std::move(initial_brains));
     simulations.setScoreOutputFile("out/scores.csv");
 
-    UserController controller(&simulations, "res/config/");
+    UserController controller(&simulations, "res/config/%ld.txt");
     controller.resetFreeCamera({0, 10, 0});
 
     while (!WindowShouldClose()) {

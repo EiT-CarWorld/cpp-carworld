@@ -11,7 +11,7 @@ Texture Car::diffuseTexture, Car::metalnessTexture;
 Model Car::carModels[NUM_CAR_MODELS];
 const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, YELLOW};
 
-const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-PI/2, -PI/4, 0, PI/4, PI/2};
+const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-4*PI/8, -3*PI/8, -2*PI/8, -PI/8, 0, PI/8, 2*PI/8, 3*PI/8, 4*PI/8};
 // If we are closer than this to the road edge, we have crashed / driven off the road
 const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
 const float Car::MAX_LIDAR_DIST = 100.f;
@@ -59,6 +59,10 @@ Vector3 Car::getPosition() {
 
 float Car::getScore() {
     return m_score;
+}
+
+CarBrain* Car::getBrain() {
+    return m_brain;
 }
 
 void Car::chooseAction() {
@@ -165,6 +169,13 @@ void Car::calculateSensors(Simulation* simulation) {
         m_carZoneSpeed[zone] = {cosf(relative_angle) * other->m_speed - m_speed,
                                 sinf(relative_angle) * other->m_speed}; //no need to add or sub, since orthogonal
     }
+
+    // use car distances to shorten LIDAR rays
+    //for ( int i = 0; i < NUM_LIDAR_ANGLES; i++ ) {
+    //    int zone = -NUM_LIDAR_ANGLES/2 + i;
+    //    zone = (zone+NUM_CAR_ZONES) % NUM_CAR_ZONES;
+    //    m_lidarDistances[i] = std::min(m_lidarDistances[i], m_carZoneDistances[zone]);
+    //}
 }
 
 #define ACCELERATION 5.f
@@ -242,7 +253,6 @@ void Car::update() {
     // so the lidar distances are updated
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
         if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
-            m_score -= SCORE_ROADSIDE_CRASH_PENALTY;
             m_crashed = true; break;
         }
     }
@@ -298,7 +308,8 @@ void Car::renderSensory() {
         }
     }
 
-    m_routeFollower.getTarget()->renderCircle(RED);
+    if (!m_routeFollower.hasFinishedRoute())
+        m_routeFollower.getTarget()->renderCircle(RED);
 
     CarZonesVisualizer::DrawCarZones(m_position, m_yaw, m_carZoneDistances);
 }
