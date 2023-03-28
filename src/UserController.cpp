@@ -4,7 +4,7 @@
 #include <cassert>
 #include "tinyfiledialogs.h"
 
-UserController::UserController(GeneticSimulation* simulations, std::string configBasePath)
+UserController::UserController(BaseSimulation* simulations, std::string configBasePath)
         : m_simulations(simulations), m_configBasePath(std::move(configBasePath)) {}
 
 void UserController::resetFreeCamera(Vector3 position) {

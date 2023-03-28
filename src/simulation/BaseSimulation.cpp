@@ -1,31 +1,81 @@
-#include "GeneticSimulation.h"
+#include "BaseSimulation.h"
 #include <cassert>
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include "entities/World.h"
 #include "carConfig.h"
 #include "util.h"
 
-GeneticSimulation::GeneticSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
+BaseSimulation::BaseSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
     assert(!m_geneticPool.empty());
 }
 
-size_t GeneticSimulation::getGenerationNumber() {
+size_t BaseSimulation::getGenerationNumber() {
     return m_generation;
 }
 
-size_t GeneticSimulation::getFramesPerSimulation() {
+size_t BaseSimulation::getFramesPerSimulation() {
     return m_framesPerSimulation;
 }
 
-#define OR_RETURN(action) if(!(action)) return false
-#define OR_COMPLAIN(conditional) do if(!(conditional)) {             \
-std::cerr << "error: " #conditional << std::endl; \
-return false;                                                        \
-} while(false)
+bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool ignoreSaveLoad) {
+    if (option == "world") {
+        std::string filepath;
+        file >> filepath;
+        return m_world.loadFromFile(filepath );
+    }
 
-bool GeneticSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
+    if (option == "saveGeneration") {
+        std::string dest;
+        file >> dest;
+        if (!ignoreSaveLoad)
+            OR_COMPLAIN(saveGenePool(dest.c_str()));
+        return true;
+    }
+
+    if (option == "loadGeneration") {
+        std::string src;
+        file >> src;
+        if (!ignoreSaveLoad)
+            OR_COMPLAIN(loadGenePool(src.c_str()));
+        return true;
+    }
+
+    if (option == "seed") {
+        file >> m_seed;
+        return true;
+    }
+
+    if (option == "poolSize") {
+        file >> m_poolSize;
+        return true;
+    }
+
+    if (option == "survivorsPerGeneration") {
+        file >> m_survivorsPerGeneration;
+        return true;
+    }
+
+    if (option == "framesPerSimulation") {
+        file >> m_framesPerSimulation;
+        return true;
+    }
+
+    if (option == "mutationChance") {
+        file >> m_mutationChance;
+        return true;
+    }
+
+    if (option == "spawnRandomness") {
+        file >> m_spawnRandomness;
+        return true;
+    }
+
+    std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
+    return false;
+}
+
+bool BaseSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
     assert(!hasGenerationRunning()); // We can't change parameters during execution
 
     std::ifstream file;
@@ -50,68 +100,8 @@ bool GeneticSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad)
         if (file.eof())
             break;
 
-        if (option == "world") {
-            std::string filepath;
-            file >> filepath;
-            OR_RETURN( m_world.loadFromFile(filepath) );
-        } else if (option == "defineRoutes") {
-            m_carSpawnTimes.clear();
-            m_world.clearRoutes();
-            size_t count;
-            file >> count;
-            for (int i = 0; i < count; i++) {
-                OR_COMPLAIN(file.good() && file.get() == '\n');
-                size_t u, v;
-                file >> u >> v;
-                OR_COMPLAIN(u >= 0 && u < m_world.getNodes().size());
-                OR_COMPLAIN(v >= 0 && v < m_world.getNodes().size());
-                m_world.addRoute(u, v);
-            }
-        }
-        else if (option == "spawnTimes") {
-            m_routesPicker.stopRandomRoutePicking();
-            m_carSpawnTimes.clear();
-            size_t count;
-            file >> count;
-            for (int i = 0; i < count; i++) {
-                OR_COMPLAIN(file.good() && file.get() == '\n');
-                size_t frame, route;
-                file >> frame >> route;
-                OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
-                m_carSpawnTimes.insert({frame, route});
-            }
-        }
-        else if (option == "pickRandomRoutes") {
-            int period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame;
-            file >> period >> spawnFramePeriod >> minDelay >> maxDelay >> lastSpawnableFrame;
-            m_routesPicker.startRandomRoutePicking(period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame);
-        }
-        else if (option == "saveGeneration") {
-            std::string dest;
-            file >> dest;
-            if (!ignoreSaveLoad)
-                OR_COMPLAIN(saveGenePool(dest.c_str()));
-        } else if (option == "loadGeneration") {
-            std::string src;
-            file >> src;
-            if (!ignoreSaveLoad)
-                OR_COMPLAIN(loadGenePool(src.c_str()));
-        } else if (option == "seed")
-            file >> m_seed;
-        else if (option == "poolSize")
-            file >> m_poolSize;
-        else if (option == "survivorsPerGeneration")
-            file >> m_survivorsPerGeneration;
-        else if (option == "framesPerSimulation")
-            file >> m_framesPerSimulation;
-        else if (option == "mutationChance")
-            file >> m_mutationChance;
-        else if (option == "spawnRandomness")
-            file >> m_spawnRandomness;
-        else {
-            std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
-            return false;
-        }
+        if (!handleOption(option, file, ignoreSaveLoad))
+            break;
 
         if (file.get() != '\n') {
             std::cerr << "error: expected newline after option '" << option << "'" << std::endl;
@@ -134,7 +124,7 @@ bool GeneticSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad)
     return true;
 }
 
-bool GeneticSimulation::saveGenePool(const char *path) {
+bool BaseSimulation::saveGenePool(const char *path) {
     assert(!hasGenerationRunning());
     TraceLog(LOG_INFO, "Saving generation to file '%s'", path);
 
@@ -149,7 +139,7 @@ bool GeneticSimulation::saveGenePool(const char *path) {
     return true;
 }
 
-bool GeneticSimulation::loadGenePool(const char *path) {
+bool BaseSimulation::loadGenePool(const char *path) {
     assert(!hasGenerationRunning());
     TraceLog(LOG_INFO, "Loading generation from file '%s'", path);
 
@@ -169,13 +159,13 @@ bool GeneticSimulation::loadGenePool(const char *path) {
     return true;
 }
 
-bool GeneticSimulation::loadParameterFileIfExists(const char *path, bool ignoreSaveLoad) {
+bool BaseSimulation::loadParameterFileIfExists(const char *path, bool ignoreSaveLoad) {
     if ( !fileExists(path) )
         return true;
     return loadParameterFile(path, ignoreSaveLoad);
 }
 
-void GeneticSimulation::setScoreOutputFile(const char* path) {
+void BaseSimulation::setScoreOutputFile(const char* path) {
     if (path) {
         if (m_brainScoreOutput.is_open())
             m_brainScoreOutput.close();
@@ -189,7 +179,7 @@ void GeneticSimulation::setScoreOutputFile(const char* path) {
     }
 }
 
-void GeneticSimulation::fillGenePool() {
+void BaseSimulation::fillGenePool() {
     assert(!m_geneticPool.empty());
     m_parentsThisGeneration = m_geneticPool.size();
     assert(m_parentsThisGeneration <= m_poolSize);
@@ -210,7 +200,7 @@ void GeneticSimulation::fillGenePool() {
     }
 }
 
-void GeneticSimulation::runSimulationsInThread(size_t begin, size_t end) {
+void BaseSimulation::runSimulationsInThread(size_t begin, size_t end) {
     m_threads.emplace_back([=]() {
         for (size_t i = begin; i < end && !m_isGenerationAborted.load(std::memory_order_relaxed); i++) {
             auto &simulation = m_simulations[i];
@@ -222,19 +212,16 @@ void GeneticSimulation::runSimulationsInThread(size_t begin, size_t end) {
     });
 }
 
-bool GeneticSimulation::hasGenerationRunning() {
+bool BaseSimulation::hasGenerationRunning() {
     return !m_simulations.empty();
 }
 
-void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
+void BaseSimulation::startParallelGeneration(bool oneRealtime) {
     // The last generation must be done
     assert (!hasGenerationRunning());
     assert (m_threads.empty());
     // Having a world serves as a sentinel for being initialized
     assert (m_world.isLoaded());
-
-    // In case randomized route picking is enabled, calculate them now
-    m_routesPicker.updateRoutePicks(m_generation, m_seed, m_world.getRoutes(), m_carSpawnTimes);
 
     m_hasRealtimeSimulation = oneRealtime;
     fillGenePool(); // Creates enough brains to do poolSize simulations
@@ -255,36 +242,18 @@ void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
     }
 }
 
-Simulation* GeneticSimulation::getRealtimeSimulation() {
+Simulation* BaseSimulation::getRealtimeSimulation() {
     if (!m_hasRealtimeSimulation)
         return nullptr;
     return &m_simulations.front();
 }
 
-bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
-    if (simulation->isMarkedAsFinished())
-        return false;
-
-    size_t frame = simulation->getFrameNumber();
-    if (frame == m_framesPerSimulation || simulation->hasCarDied()) { // The simulation is now done
-        simulation->markAsFinished(); // Stores the current score into the brain
-        m_simulationsLeft.fetch_sub(1, std::memory_order::memory_order_release);
-        return false;
-    }
-
-    for (auto it =  m_carSpawnTimes.find(frame);
-         it != m_carSpawnTimes.end() && it->first == frame; ++it) {
-        simulation->spawnCar(it->second, m_spawnRandomness);
-    }
-    return true;
-}
-
 // Gives the number of simulations that have yet to finish in the generation
-size_t GeneticSimulation::getSimulationsRunning() {
+size_t BaseSimulation::getSimulationsRunning() {
     return m_simulationsLeft.load(std::memory_order_acquire);
 }
 
-void GeneticSimulation::pruneGenePool() {
+void BaseSimulation::pruneGenePool() {
     // Only keep the best brains. Sort their scores to find the cutoff
     std::vector<std::pair<float, int>> scores;
     scores.reserve(m_poolSize);
@@ -320,7 +289,7 @@ void GeneticSimulation::pruneGenePool() {
     m_geneticPool.swap(newGenePool);
 }
 
-void GeneticSimulation::finishGeneration() {
+void BaseSimulation::finishGeneration() {
     assert (hasGenerationRunning() && getSimulationsRunning() == 0);
 
     // All threads should be done by now, but join up for good measure
@@ -336,7 +305,7 @@ void GeneticSimulation::finishGeneration() {
     m_hasRealtimeSimulation = false;
 }
 
-void GeneticSimulation::abortGeneration() {
+void BaseSimulation::abortGeneration() {
     if (!hasGenerationRunning())
         return;
 
@@ -355,4 +324,3 @@ void GeneticSimulation::abortGeneration() {
 
     m_isGenerationAborted.store(false, std::memory_order_release);
 }
-

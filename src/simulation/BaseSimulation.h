@@ -7,17 +7,11 @@
 #include "Simulation.h"
 #include "driving/RandomRoutesPicker.h"
 
-// A class for running multiple simulations with different brains, and using their scores to create new brains.
-// Multithreading is used internally, but all public functions must be called from the same thread
-class GeneticSimulation {
+class BaseSimulation {
+protected:
     World m_world{};
     // The seed used for every simulation
     unsigned long m_seed{};
-    // For each frame number, contains what route should have a car spawned
-    std::multimap<size_t, size_t> m_carSpawnTimes{};
-
-    // To get added learning, the set of car spawn times can be randomized every Nth frame
-    RandomRoutesPicker m_routesPicker;
 
     // How many brains to simulate per generations
     size_t m_poolSize{};
@@ -40,6 +34,7 @@ class GeneticSimulation {
     // The rest of the member variables only apply during a generation
     // To allow aborting of generations, we remember how many parents to keep in the gene pool
     size_t m_parentsThisGeneration{};
+
     // All simulations of this generation. A 1:1-mapping between this list and the geneticPool
     std::vector<Simulation> m_simulations{};
     // If true, simulation number 0 is not executed by the threads
@@ -51,14 +46,17 @@ class GeneticSimulation {
     // To allow the eventual shutoff of the program
     std::atomic<bool> m_isGenerationAborted{false};
 
-    // Uses the existing brains in the pool, to create new ones
-    void fillGenePool();
-    // Keeps only the best brains, run after a complete generation
-    void pruneGenePool();
     // Spawns a thread to run the simulations in the half-open interval [begin, end)
     void runSimulationsInThread(size_t begin, size_t end);
+
+    // Keeps only the best brains, run after a complete generation
+    virtual void pruneGenePool();
+    // Uses the existing brains in the pool, to create new ones
+    virtual void fillGenePool();
+
+    virtual bool handleOption(std::string& opt, std::ifstream& file, bool ignoreSaveLoad);
 public:
-    explicit GeneticSimulation(std::vector<CarBrain> initial_brains);
+    explicit BaseSimulation(std::vector<CarBrain> initial_brains);
 
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
@@ -74,17 +72,21 @@ public:
     // Becomes true with startParallelGeneration()
     // Becomes false with finishGeneration() or abortGeneration()
     bool hasGenerationRunning();
+
     // Starts an entire generation worth of simulations
     // They run in one or more threads.
     // If oneRealtime is true, simulation #0 is are not executed by any of the threads.
     // Instead, it is left up to the driver to update it until enough frames have been simulated.
     // If all methods on this class are called from the same thread, everything is safe
-    void startParallelGeneration(bool oneRealtime);
+    virtual void startParallelGeneration(bool oneRealtime);
+
     // Returns a simulation if the currently running generation has a realtime simulation
     Simulation* getRealtimeSimulation();
+
     // Called on each simulation frame before updating, to e.g. spawn cars,
     // If the simulation has been run for enough frames, it will save the score, and start returning false
-    bool preSimulationFrame(Simulation* simulation);
+    virtual bool preSimulationFrame(Simulation* simulation) = 0;
+
     // How many simulations are running currently.
     // Will be 0 if no generation is currently running
     // Background simulations stop once they reach the frame count.
@@ -97,3 +99,9 @@ public:
     // Also decreases the generation number, to make it clear
     void abortGeneration();
 };
+
+#define OR_RETURN(action) if(!(action)) return false
+#define OR_COMPLAIN(conditional) do if(!(conditional)) {             \
+std::cerr << "error: " #conditional << std::endl; \
+return false;                                                        \
+} while(false)
