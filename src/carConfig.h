@@ -20,12 +20,23 @@
 // Used to scale roads and node sizes
 #define ROAD_WIDTH 14.f
 
-// Score tuning
+// =============== Score tuning ==================
+// Penalty for crashing
 #define SCORE_CRASH_PENALTY 100
 // Extra penalty for crashing, multiplied with speed
 #define SCORE_CRASH_SPEED_PENALTY 0
-#define SCORE_GAIN_DISTANCE_COVER 1
+// Penalty for crashing by driving of the road
+#define SCORE_CRASH_ROADSIDE_PENALTY 0
+// Penalty for crashing with another car, being the faster of the two
+#define SCORE_CRASH_FASTEST_PENALTY 200
+// Penalty for crashing with another car, and being the slower of the two
+#define SCORE_CRASH_SLOWEST_PENALTY 0
+
+// Punishment for living, in score / second
 #define SCORE_TIME_PENALTY 4
+
+// Score gained for each meter closer to next target
+#define SCORE_GAIN_DISTANCE_COVER 1
 #define SCORE_INITIAL_SCORE 0
 // The score at which it dies
-#define SCORE_MINIMUM -100
+#define SCORE_MINIMUM (-100)

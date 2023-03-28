@@ -126,6 +126,12 @@ void Car::calculateSensors(Simulation* simulation) {
         m_lidarDistances[i] = simulation->getWorld()->getRayDistance({m_position.x, -m_position.z}, dir, MAX_LIDAR_DIST);
     }
 
+    // Check if any of the distances are so small that we have crashed
+    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i])
+            reportCrash(nullptr); // We crashed, but not into anything
+    }
+
     // Calculate distances to other cars. First set all distances to MAX
     for (int i = 0; i < NUM_CAR_ZONES; i++) {
         m_carZoneDistances[i] = MAX_CAR_ZONE_DIST;
@@ -163,6 +169,12 @@ void Car::calculateSensors(Simulation* simulation) {
 
         // We found a closer car!
         m_carZoneDistances[zone] = distance;
+
+        if (distance < MIN_CAR_ZONE_DISTANCE[zone]) {
+            reportCrash(other.get());
+            other->reportCrash(this);
+        }
+
         // The relative speed difference, with positive x being speed directly away from us
         // And positive y means we speed towards the next zone
         float relative_angle = other->m_yaw - m_yaw;
@@ -170,12 +182,25 @@ void Car::calculateSensors(Simulation* simulation) {
                                 sinf(relative_angle) * other->m_speed}; //no need to add or sub, since orthogonal
     }
 
-    // use car distances to shorten LIDAR rays
+    // Optional: use car distances to shorten LIDAR rays
     //for ( int i = 0; i < NUM_LIDAR_ANGLES; i++ ) {
     //    int zone = -NUM_LIDAR_ANGLES/2 + i;
     //    zone = (zone+NUM_CAR_ZONES) % NUM_CAR_ZONES;
     //    m_lidarDistances[i] = std::min(m_lidarDistances[i], m_carZoneDistances[zone]);
     //}
+}
+
+void Car::reportCrash(Car *otherCar) {
+    if (m_crashed)
+        return;
+    m_score -= SCORE_CRASH_PENALTY + SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
+    if (otherCar == nullptr)
+        m_score -= SCORE_CRASH_ROADSIDE_PENALTY;
+    else if(m_speed > otherCar->m_speed)
+        m_score -= SCORE_CRASH_FASTEST_PENALTY;
+    else
+        m_score -= SCORE_CRASH_SLOWEST_PENALTY;
+    m_crashed = true;
 }
 
 #define ACCELERATION 5.f
@@ -244,28 +269,11 @@ void Car::updatePhysics() {
 }
 
 void Car::update() {
-    m_score -= SCORE_TIME_PENALTY * SIM_DT;
-
     if (m_crashed)
         return;
 
-    // We can assume that chooseAction has been called before the call to update
-    // so the lidar distances are updated
-    for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
-        if (m_lidarDistances[i] < MIN_LIDAR_DISTANCE[i]) {
-            m_crashed = true; break;
-        }
-    }
-    for (int i = 0; i < NUM_CAR_ZONES; i++) {
-        if (m_carZoneDistances[i] < MIN_CAR_ZONE_DISTANCE[i]) {
-            m_crashed = true; break;
-        }
-    }
-
-    if (m_crashed) {
-        m_score -= SCORE_CRASH_PENALTY + SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
-        return;
-    }
+    // We penalize the car for even existing
+    m_score -= SCORE_TIME_PENALTY * SIM_DT;
 
     float distanceToTarget = m_routeFollower.getDistanceToTarget2D(m_position);
     updatePhysics();

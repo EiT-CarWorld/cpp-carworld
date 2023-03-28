@@ -77,4 +77,5 @@ public:
 
 private:
     void updatePhysics();
+    void reportCrash(Car* otherCar);
 };
