@@ -45,8 +45,6 @@ class CarBrain {
 public:
     explicit CarBrain(std::vector<CarMatrix> matrices);
     CarBrainOutput takeAction(CarBrainInput input);
-    void setEvaluationScore(float score);
-    float getEvaluationScore();
 
     void mixIn(const CarBrain& other, std::mt19937& random);
     void mutate(std::mt19937& random, float mutateChance);

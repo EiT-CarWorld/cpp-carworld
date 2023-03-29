@@ -3,8 +3,8 @@
 #include <algorithm>
 #include "Simulation.h"
 
-Simulation::Simulation(World *world, CarBrain* carBrain, unsigned long seed, bool store_history)
-        : m_world(world), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
+Simulation::Simulation(World *world, size_t index_in_generation, unsigned long seed, bool store_history)
+        : m_world(world), m_index_in_generation(index_in_generation), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
 
 World* Simulation::getWorld() {
     return m_world;
@@ -12,6 +12,10 @@ World* Simulation::getWorld() {
 
 size_t Simulation::getFrameNumber() {
     return m_frameNumber;
+}
+
+size_t Simulation::getIndexInGeneration() {
+    return m_index_in_generation;
 }
 
 void Simulation::spawnCar(size_t route, CarBrain* brain, float spawnRandomness) {

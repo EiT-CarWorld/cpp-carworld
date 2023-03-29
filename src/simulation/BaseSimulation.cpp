@@ -2,9 +2,9 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
-#include <iomanip>
 #include "carConfig.h"
 #include "util.h"
+#include <iomanip>
 
 BaseSimulation::BaseSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
     assert(!m_geneticPool.empty());
@@ -16,6 +16,11 @@ size_t BaseSimulation::getGenerationNumber() {
 
 size_t BaseSimulation::getFramesPerSimulation() {
     return m_framesPerSimulation;
+}
+
+CarBrain* BaseSimulation::getBestBrain() {
+    assert(!m_geneticPool.empty());
+    return &m_geneticPool[0];
 }
 
 bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool ignoreSaveLoad) {
@@ -217,6 +222,22 @@ void BaseSimulation::setScoreOutputFile(const char* path) {
     }
 }
 
+void BaseSimulation::printBrainScores(const std::vector<std::pair<float, int>> &scores) {
+    // If we have a file for printing brain scores open, print them all there
+    if (m_brainScoreOutput.is_open()) {
+        if (m_generation == 0) {
+            m_brainScoreOutput << "gen";
+            for ( size_t i = 0; i < scores.size(); i++ )
+                m_brainScoreOutput << ",brain" << (i+1);
+            m_brainScoreOutput << std::endl;
+        }
+        m_brainScoreOutput << m_generation;
+        for(auto score : scores)
+            m_brainScoreOutput << "," << std::fixed << std::setprecision(3) << score.first;
+        m_brainScoreOutput << std::endl;
+    }
+}
+
 void BaseSimulation::fillGenePool() {
     assert(!m_geneticPool.empty());
     m_parentsThisGeneration = m_geneticPool.size();
@@ -265,8 +286,8 @@ void BaseSimulation::startParallelGeneration(bool oneRealtime) {
     fillGenePool(); // Creates enough brains to do poolSize simulations
 
     // Creates one simulation per brain, with identical seed and world
-    for (auto& brain:m_geneticPool)
-        m_simulations.emplace_back(&m_world, &brain, m_seed+m_generation, false);
+    for ( size_t i = 0; i < m_geneticPool.size(); i++ )
+        m_simulations.emplace_back(&m_world, i, m_seed+m_generation, false);
     assert(m_simulations.size() == m_poolSize);
     m_simulationsLeft.store(m_poolSize);
 
@@ -291,42 +312,6 @@ size_t BaseSimulation::getSimulationsRunning() {
     return m_simulationsLeft.load(std::memory_order_acquire);
 }
 
-void BaseSimulation::pruneGenePool() {
-    // Only keep the best brains. Sort their scores to find the cutoff
-    std::vector<std::pair<float, int>> scores;
-    scores.reserve(m_poolSize);
-    for (size_t i = 0; i < m_geneticPool.size(); i++)
-        scores.emplace_back(m_geneticPool[i].getEvaluationScore(), i);
-    // Put the largest scores first
-    std::sort(scores.rbegin(), scores.rend());
-
-    // If we have a file for printing brain scores open, print them all there
-    if (m_brainScoreOutput.is_open()) {
-        if (m_generation == 0) {
-            m_brainScoreOutput << "gen";
-            for ( size_t i = 0; i < scores.size(); i++ )
-                m_brainScoreOutput << ",brain" << (i+1);
-            m_brainScoreOutput << std::endl;
-        }
-        m_brainScoreOutput << m_generation;
-        for(auto score : scores)
-            m_brainScoreOutput << "," << std::fixed << std::setprecision(3) << score.first;
-        m_brainScoreOutput << std::endl;
-    }
-
-    if (m_survivorsPerGeneration == m_poolSize)
-        return;
-
-    // Only keep the top performers, in the new gene pool
-    std::vector<CarBrain> newGenePool;
-    for (size_t i = 0; i < m_survivorsPerGeneration; i++) {
-        CarBrain&& brain = std::move(m_geneticPool[scores[i].second]);
-        newGenePool.emplace_back(brain);
-    }
-
-    m_geneticPool.swap(newGenePool);
-}
-
 void BaseSimulation::finishGeneration() {
     assert (hasGenerationRunning() && getSimulationsRunning() == 0);
 
@@ -335,9 +320,8 @@ void BaseSimulation::finishGeneration() {
         thread.join();
     m_threads.clear();
 
-    m_simulations.clear(); // The scores are stored in the brains, so the simulations are longer needed
-
     pruneGenePool();
+    m_simulations.clear(); // The scores are stored in the brains, so the simulations are longer needed
 
     m_generation++;
     m_hasRealtimeSimulation = false;

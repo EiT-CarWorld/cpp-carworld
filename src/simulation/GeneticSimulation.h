@@ -8,6 +8,8 @@ class GeneticSimulation : public BaseSimulation {
 protected:
     // Handle options passed in from a config file
     virtual bool handleOption(std::string& opt, std::ifstream& file, bool ignoreSaveLoad) override;
+
+    virtual void pruneGenePool() override;
 public:
     explicit GeneticSimulation(std::vector<CarBrain> initial_brains);
 

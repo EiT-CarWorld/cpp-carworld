@@ -55,7 +55,9 @@ protected:
     void runSimulationsInThread(size_t begin, size_t end);
 
     // Keeps only the best brains, run after a complete generation
-    virtual void pruneGenePool();
+    virtual void pruneGenePool() = 0;
+    // outputs a list of scores to the brain score file
+    void printBrainScores(std::vector<std::pair<float, int>> const& scores);
     // Uses the existing brains in the pool, to create new ones
     virtual void fillGenePool();
 
@@ -65,6 +67,7 @@ public:
 
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
+    CarBrain* getBestBrain();
 
     bool loadParameterFile(const char* path, bool ignoreSaveLoad);
     bool loadGenePool(const char *path);
