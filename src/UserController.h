@@ -1,15 +1,15 @@
 #pragma once
-#include "Simulation.h"
+#include "simulation/Simulation.h"
 #include "entities/Car.h"
 #include "rendering/CameraController.h"
-#include "GeneticSimulation.h"
+#include "simulation/GeneticSimulation.h"
 
 enum class UserControllerMode {
     FREECAM, DRIVING
 };
 
 class UserController {
-    GeneticSimulation* m_simulations;
+    BaseSimulation* m_simulations;
     std::string m_configBasePath;
 
     bool m_mouseLock{false};
@@ -34,7 +34,7 @@ class UserController {
     void drawClosestNode(Simulation* simulation);
     void makeSureSelectedCarExists(Simulation* simulation);
 public:
-    UserController(GeneticSimulation* simulations, std::string configBasePath);
+    UserController(BaseSimulation* simulations, std::string configBasePath);
     void resetFreeCamera(Vector3 position);
     void update();
     Camera3D getCamera();

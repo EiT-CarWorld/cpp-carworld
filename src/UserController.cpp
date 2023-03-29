@@ -4,7 +4,7 @@
 #include <cassert>
 #include "tinyfiledialogs.h"
 
-UserController::UserController(GeneticSimulation* simulations, std::string configBasePath)
+UserController::UserController(BaseSimulation* simulations, std::string configBasePath)
         : m_simulations(simulations), m_configBasePath(std::move(configBasePath)) {}
 
 void UserController::resetFreeCamera(Vector3 position) {
@@ -44,7 +44,7 @@ void UserController::updateRealtimeSimulation() {
     if (IsKeyPressed(KEY_C))
         m_drawClosestNode = !m_drawClosestNode;
     if (IsKeyPressed(KEY_N))
-        simulation->spawnCar(0, 0.f); // Use route 0, no offset
+        simulation->spawnCar(0, m_simulations->getBestBrain(), 0.f); // Use route 0, no offset
 
     // If something has caused our selected car to be deselected, or it no longer exists
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
