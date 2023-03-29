@@ -2,6 +2,7 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include "entities/World.h"
 #include "carConfig.h"
 #include "util.h"
@@ -294,9 +295,15 @@ void GeneticSimulation::pruneGenePool() {
 
     // If we have a file for printing brain scores open, print them all there
     if (m_brainScoreOutput.is_open()) {
+        if (m_generation == 0) {
+            m_brainScoreOutput << "gen";
+            for ( size_t i = 0; i < scores.size(); i++ )
+                m_brainScoreOutput << ",brain" << (i+1);
+            m_brainScoreOutput << std::endl;
+        }
         m_brainScoreOutput << m_generation;
         for(auto score : scores)
-            m_brainScoreOutput << "," << score.first;
+            m_brainScoreOutput << "," << std::fixed << std::setprecision(3) << score.first;
         m_brainScoreOutput << std::endl;
     }
 
