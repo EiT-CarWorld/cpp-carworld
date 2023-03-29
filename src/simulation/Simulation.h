@@ -9,7 +9,8 @@
 // Represents one simulation, on a given map
 class Simulation {
     World* m_world;
-    CarBrain* m_carBrain;
+
+    std::mt19937 m_random;
 
     std::vector<std::unique_ptr<Car>> m_cars{};
 
@@ -19,28 +20,27 @@ class Simulation {
     // True if any car has been deleted due to crashing
     bool m_carHasDied{false};
 
-    // The sum of scores of cars that have been removed
-    float m_finishedCarsScore{};
+    // The scores of all cars, either when they have died, or when marked as finished
+    std::vector<std::pair<CarBrain*, float>> m_finalCarScores;
 
-    // Once marked as finished, simulation can continue, but the score is final
+    // Once marked as finished, simulation can continue, but the scores are final
     bool m_markedAsFinished{};
 
     // Optional functionality for storing a bunch of data from the simulation
     bool m_store_history;
     std::unordered_map<Car*, std::pair<size_t, std::vector<float>>> m_score_history{};
-
-    std::mt19937 m_random;
 public:
     Simulation(World* world, CarBrain* carBrain, unsigned long seed, bool store_history);
 
     World* getWorld();
     size_t getFrameNumber();
-    void spawnCar(size_t route, float spawnRandomness);
+    void spawnCar(size_t route, CarBrain* brain, float spawnRandomness);
     std::vector<std::unique_ptr<Car>>& getCars();
     void takeCarActions();
     void updateCars();
     void render();
     bool hasCarDied();
+    std::vector<std::pair<CarBrain*, float>>& getFinalCarScores();
     float getTotalSimulationScore();
     void markAsFinished();
     bool isMarkedAsFinished();

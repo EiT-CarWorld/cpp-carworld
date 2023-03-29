@@ -13,6 +13,11 @@ protected:
     // The seed used for every simulation
     unsigned long m_seed{};
 
+    // For each frame number, contains what route should have a car spawned
+    std::multimap<size_t, size_t> m_carSpawnTimes{};
+    // To get added learning, the set of car spawn times can be randomized every Nth frame
+    RandomRoutesPicker m_routesPicker;
+
     // How many brains to simulate per generations
     size_t m_poolSize{};
     // How many brains are kept to the next generation

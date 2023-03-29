@@ -42,8 +42,6 @@ struct CarBrainOutput {
 #define MAX_LAYER_SIZE 128
 class CarBrain {
     std::vector<CarMatrix> m_matrices;
-    // The score given to this brain, by a simulation running it
-    float m_evaluationScore{};
 public:
     explicit CarBrain(std::vector<CarMatrix> matrices);
     CarBrainOutput takeAction(CarBrainInput input);

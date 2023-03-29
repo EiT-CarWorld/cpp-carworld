@@ -71,6 +71,44 @@ bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool
         return true;
     }
 
+    if (option == "defineRoutes") {
+        m_carSpawnTimes.clear();
+        m_world.clearRoutes();
+        size_t count;
+        file >> count;
+        for (int i = 0; i < count; i++) {
+            OR_COMPLAIN(file.good() && file.get() == '\n');
+            size_t u, v;
+            file >> u >> v;
+            OR_COMPLAIN(u >= 0 && u < m_world.getNodes().size());
+            OR_COMPLAIN(v >= 0 && v < m_world.getNodes().size());
+            m_world.addRoute(u, v);
+        }
+        return true;
+    }
+
+    if (option == "spawnTimes") {
+        m_routesPicker.stopRandomRoutePicking();
+        m_carSpawnTimes.clear();
+        size_t count;
+        file >> count;
+        for (int i = 0; i < count; i++) {
+            OR_COMPLAIN(file.good() && file.get() == '\n');
+            size_t frame, route;
+            file >> frame >> route;
+            OR_COMPLAIN(route >= 0 && route < m_world.getRoutes().size());
+            m_carSpawnTimes.insert({frame, route});
+        }
+        return true;
+    }
+
+    if (option == "pickRandomRoutes") {
+        int period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame;
+        file >> period >> spawnFramePeriod >> minDelay >> maxDelay >> lastSpawnableFrame;
+        m_routesPicker.startRandomRoutePicking(period, spawnFramePeriod, minDelay, maxDelay, lastSpawnableFrame);
+        return true;
+    }
+
     std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
     return false;
 }
