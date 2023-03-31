@@ -22,13 +22,13 @@
 
 // =============== Score tuning ==================
 // Penalty for crashing
-#define SCORE_CRASH_PENALTY 100
+#define SCORE_CRASH_PENALTY 200
 // Extra penalty for crashing, multiplied with speed
-#define SCORE_CRASH_SPEED_PENALTY 1
+#define SCORE_CRASH_SPEED_PENALTY 5
 // Penalty for crashing by driving of the road
 #define SCORE_CRASH_ROADSIDE_PENALTY 0
 // Penalty for crashing with another car, being the faster of the two
-#define SCORE_CRASH_FASTEST_PENALTY 200
+#define SCORE_CRASH_FASTEST_PENALTY 300
 // Penalty for crashing with another car, and being the slower of the two
 #define SCORE_CRASH_SLOWEST_PENALTY 0
 
@@ -38,6 +38,6 @@
 #define SCORE_GAIN_DISTANCE_COVER 1
 
 // How much score a new car spawns with
-#define SCORE_INITIAL_SCORE 200
+#define SCORE_INITIAL_SCORE 100
 // The score at which a car gets mercy killed
-#define SCORE_MINIMUM 100
+#define SCORE_MINIMUM 0
