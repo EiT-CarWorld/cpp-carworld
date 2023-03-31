@@ -1,4 +1,9 @@
 seed 123
+
+# define the hidden layers of the brain
+brainLayers 3
+40 20 20
+
 world res/maps/simple_intersection.txt
 defineRoutes 12
 106 95
@@ -13,9 +18,10 @@ defineRoutes 12
 130 106
 130 95
 130 118
-pickRandomRoutes 200 100 300 350 2000
+pickRandomRoutes 200 100 350 500 4000
+
 poolSize 100
-survivorsPerGeneration 10
-framesPerSimulation 3000
+survivorsPerGeneration 20
+framesPerSimulation 5000
 mutationChance 0.05
 spawnRandomness 0.1

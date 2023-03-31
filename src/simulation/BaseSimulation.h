@@ -18,6 +18,8 @@ protected:
     // To get added learning, the set of car spawn times can be randomized every Nth frame
     RandomRoutesPicker m_routesPicker;
 
+    // The size of each hidden layer in the brain
+    std::vector<size_t> m_brain_layers{};
     // How many brains to simulate per generations
     size_t m_poolSize{};
     // How many brains are kept to the next generation
@@ -36,11 +38,7 @@ protected:
     // The file output for printing brain scores every round
     std::ofstream m_brainScoreOutput{};
 
-    // The rest of the member variables only apply during a generation
-    // To allow aborting of generations, we remember how many parents to keep in the gene pool
-    size_t m_parentsThisGeneration{};
-
-    // All simulations of this generation. A 1:1-mapping between this list and the geneticPool
+    // All simulations of this generation
     std::vector<Simulation> m_simulations{};
     // If true, simulation number 0 is not executed by the threads
     bool m_hasRealtimeSimulation{};
@@ -51,19 +49,25 @@ protected:
     // To allow the eventual shutoff of the program
     std::atomic<bool> m_isGenerationAborted{false};
 
-    // Spawns a thread to run the simulations in the half-open interval [begin, end)
-    void runSimulationsInThread(size_t begin, size_t end);
+    // Adds or removes brains until gene pool is the correct size
+    // Uses m_seed and m_brain_layers to make new brains, if needed
+    void fitGenePoolToSize();
 
-    // Keeps only the best brains, run after a complete generation
-    virtual void pruneGenePool() = 0;
-    // outputs a list of scores to the brain score file
+    void startParallelGeneration(bool oneRealtime, size_t simulation_count);
+
+    // Spawns a thread for each offset + (i*stride) up to, but not including end
+    void runSimulationsInThread(size_t offset, size_t stride, size_t end);
+
+    // Gets called at the end of a generation, before the simulations are cleared.
+    virtual void evolveGenePool()=0;
+    // Uses the set of (score, brain), to evolve the brains. Should be sorted highest first.
+    void geneticEvolveGenePool(std::vector<std::pair<float, int>> const& scores);
+    // Prints out each score, the scores should have been sorted
     void printBrainScores(std::vector<std::pair<float, int>> const& scores);
-    // Uses the existing brains in the pool, to create new ones
-    virtual void fillGenePool();
 
-    virtual bool handleOption(std::string& opt, std::ifstream& file, bool ignoreSaveLoad);
+    virtual bool handleOption(std::string& opt, std::ifstream& file, bool ignore_gene_pool);
 public:
-    explicit BaseSimulation(std::vector<CarBrain> initial_brains);
+    explicit BaseSimulation();
 
     size_t getGenerationNumber();
     size_t getFramesPerSimulation();
@@ -86,7 +90,7 @@ public:
     // If oneRealtime is true, simulation #0 is are not executed by any of the threads.
     // Instead, it is left up to the driver to update it until enough frames have been simulated.
     // If all methods on this class are called from the same thread, everything is safe
-    virtual void startParallelGeneration(bool oneRealtime);
+    virtual void startParallelGeneration(bool oneRealtime)=0;
 
     // Returns a simulation if the currently running generation has a realtime simulation
     Simulation* getRealtimeSimulation();
@@ -101,10 +105,9 @@ public:
     // A potential realtime simulation can still run after enough frames, but the score is frozen
     size_t getSimulationsRunning();
     // Once no more simulations are running, we can finish the generation
-    // This prepares the brains for the next generation
+    // This uses the results to evolve brains for the next generation
     void finishGeneration();
     // Shuts down all threads, and aborts the generation without learning anything
-    // Also decreases the generation number, to make it clear
     void abortGeneration();
 };
 

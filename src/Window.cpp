@@ -4,12 +4,12 @@
 #include "entities/FloorGrid.h"
 #include "entities/AsphaltMesh.h"
 #include "rendering/ModelRenderer.h"
-#include "entities/Node.h"
 #include "entities/Car.h"
 #include "rendering/CarZonesVisualizer.h"
 #include "rendering/Skybox.h"
 #include "UserController.h"
 #include "carConfig.h"
+#include "simulation/AdversarialSimulation.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -42,11 +42,7 @@ void Window::mainloop() {
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
-    // Create one initial brain
-    std::vector<CarBrain> initial_brains;
-    initial_brains.emplace_back(CarBrain::initializeMatrices(1234, {40, 20, 20}));
-
-    GeneticSimulation simulations(std::move(initial_brains));
+    AdversarialSimulation simulations;
     simulations.setScoreOutputFile("out/scores.csv");
 
     UserController controller(&simulations, "res/config/%ld.txt");

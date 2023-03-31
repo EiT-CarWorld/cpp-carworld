@@ -6,9 +6,7 @@
 #include "util.h"
 #include <iomanip>
 
-BaseSimulation::BaseSimulation(std::vector<CarBrain> initial_brains) : m_geneticPool(std::move(initial_brains)) {
-    assert(!m_geneticPool.empty());
-}
+BaseSimulation::BaseSimulation() {}
 
 size_t BaseSimulation::getGenerationNumber() {
     return m_generation;
@@ -23,17 +21,11 @@ CarBrain* BaseSimulation::getBestBrain() {
     return &m_geneticPool[0];
 }
 
-bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool ignoreSaveLoad) {
-    if (option == "world") {
-        std::string filepath;
-        file >> filepath;
-        return m_world.loadFromFile(filepath );
-    }
-
+bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool ignore_gene_pool) {
     if (option == "saveGeneration") {
         std::string dest;
         file >> dest;
-        if (!ignoreSaveLoad)
+        if (!ignore_gene_pool)
             OR_COMPLAIN(saveGenePool(dest.c_str()));
         return true;
     }
@@ -41,38 +33,39 @@ bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool
     if (option == "loadGeneration") {
         std::string src;
         file >> src;
-        if (!ignoreSaveLoad)
+        if (!ignore_gene_pool)
             OR_COMPLAIN(loadGenePool(src.c_str()));
         return true;
     }
 
-    if (option == "seed") {
-        file >> m_seed;
+    if (option == "brainLayers") {
+        size_t layers;
+        file >> layers;
+        // We can not change the layers in the brain once set
+        OR_COMPLAIN(ignore_gene_pool || m_brain_layers.empty());
+        for (size_t i = 0; i < layers; i++) {
+            size_t layer_size;
+            file >> layer_size;
+            if (!ignore_gene_pool)
+                m_brain_layers.push_back(layer_size);
+        }
+
         return true;
     }
 
     if (option == "poolSize") {
-        file >> m_poolSize;
+        size_t new_pool_size;
+        file >> new_pool_size;
+        if (!ignore_gene_pool)
+            m_poolSize = new_pool_size;
         return true;
     }
 
-    if (option == "survivorsPerGeneration") {
-        file >> m_survivorsPerGeneration;
-        return true;
-    }
-
-    if (option == "framesPerSimulation") {
-        file >> m_framesPerSimulation;
-        return true;
-    }
-
-    if (option == "mutationChance") {
-        file >> m_mutationChance;
-        return true;
-    }
-
-    if (option == "spawnRandomness") {
-        file >> m_spawnRandomness;
+    if (option == "world") {
+        std::string filepath;
+        file >> filepath;
+        OR_RETURN(m_world.loadFromFile(filepath ));
+        m_carSpawnTimes.clear();
         return true;
     }
 
@@ -114,6 +107,31 @@ bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool
         return true;
     }
 
+    if (option == "seed") {
+        file >> m_seed;
+        return true;
+    }
+
+    if (option == "survivorsPerGeneration") {
+        file >> m_survivorsPerGeneration;
+        return true;
+    }
+
+    if (option == "framesPerSimulation") {
+        file >> m_framesPerSimulation;
+        return true;
+    }
+
+    if (option == "mutationChance") {
+        file >> m_mutationChance;
+        return true;
+    }
+
+    if (option == "spawnRandomness") {
+        file >> m_spawnRandomness;
+        return true;
+    }
+
     std::cerr << "error: unknown parameter '" << option << "'" << std::endl;
     return false;
 }
@@ -132,8 +150,8 @@ bool BaseSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
 
     std::string option;
     while(true) {
-        // If the file starts with #
-        if (file.peek() == '#') {
+        // If the file starts with #, or is blank
+        if (file.peek() == '#' || file.peek() == '\n') {
             // Skip this line
             while(file.get() != '\n' && file.good());
             continue;
@@ -158,11 +176,11 @@ bool BaseSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
     file.close();
 
     // Do a bunch of asserts to make sure the state is legal
-    OR_COMPLAIN (m_world.isLoaded());
-    OR_COMPLAIN (m_seed);
-    OR_COMPLAIN (m_poolSize);
-    OR_COMPLAIN (m_survivorsPerGeneration);
-    OR_COMPLAIN (m_framesPerSimulation);
+    OR_COMPLAIN(m_world.isLoaded());
+    OR_COMPLAIN(!m_brain_layers.empty());
+    OR_COMPLAIN(m_seed);
+    OR_COMPLAIN(m_poolSize >= 1);
+    OR_COMPLAIN(m_framesPerSimulation >= 1);
 
     return true;
 }
@@ -199,6 +217,8 @@ bool BaseSimulation::loadGenePool(const char *path) {
     m_geneticPool.clear();
     for (size_t i = 0; i < num_brains; i++)
         m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
+    m_poolSize = m_geneticPool.size();
+    // TODO: Set brain_layers based on loaded file
     return true;
 }
 
@@ -222,6 +242,19 @@ void BaseSimulation::setScoreOutputFile(const char* path) {
     }
 }
 
+void BaseSimulation::fitGenePoolToSize() {
+    assert(!m_brain_layers.empty());
+    assert(m_poolSize >= 1);
+
+    while (m_geneticPool.size() < m_poolSize) {
+        auto matrices = CarBrain::initializeMatrices(m_seed + m_geneticPool.size(),  m_brain_layers);
+        m_geneticPool.emplace_back(std::move(matrices));
+    }
+
+    if (m_geneticPool.size() > m_poolSize)
+        m_geneticPool.erase(m_geneticPool.begin() + m_poolSize, m_geneticPool.end());
+}
+
 void BaseSimulation::printBrainScores(const std::vector<std::pair<float, int>> &scores) {
     // If we have a file for printing brain scores open, print them all there
     if (m_brainScoreOutput.is_open()) {
@@ -238,34 +271,86 @@ void BaseSimulation::printBrainScores(const std::vector<std::pair<float, int>> &
     }
 }
 
-void BaseSimulation::fillGenePool() {
-    assert(!m_geneticPool.empty());
-    m_parentsThisGeneration = m_geneticPool.size();
-    assert(m_parentsThisGeneration <= m_poolSize);
-    std::uniform_int_distribution<size_t> parentSelect(0, m_parentsThisGeneration-1);
+#define NUM_PARENTS 20
+// Uses the provided (score, brain) pairs to create a new generation
+void BaseSimulation::geneticEvolveGenePool(std::vector<std::pair<float, int>> const& scores) {
+    assert(m_geneticPool.size() == m_poolSize);
+    assert(scores.size() == m_poolSize);
 
-    std::mt19937 prng (m_seed + m_generation);
+    std::vector<CarBrain> newPool;
 
-    while (m_geneticPool.size() < m_poolSize) {
-        size_t parent1 = parentSelect(prng);
-        size_t parent2 = parentSelect(prng);
-
-        CarBrain brain = m_geneticPool[parent1];
-        if(parent1 != parent2)
-            brain.mixIn(m_geneticPool[parent2], prng);
-
-        brain.mutate(prng, m_mutationChance);
-        m_geneticPool.emplace_back(std::move(brain));
+    // First of all, save the brain with the best score ever seen
+    float best_ever_score = 0.0f;
+    size_t best_ever_brain = 0;
+    for (size_t i = 0; i < m_poolSize; i++) {
+        m_geneticPool[scores[i].second].informAboutScoreAchieved(scores[i].first);
+        float brains_best = m_geneticPool[scores[i].second].getBestScoreAchieved();
+        if (brains_best > best_ever_score) {
+            best_ever_score = brains_best;
+            best_ever_brain = scores[i].second;
+        }
     }
+    newPool.push_back(m_geneticPool[best_ever_brain]);
+
+    // Save the elite
+    for (size_t i = 0; i < m_survivorsPerGeneration; i++) {
+        if (scores[i].second == best_ever_brain)
+            continue;
+        newPool.emplace_back(m_geneticPool[scores[i].second]);
+    }
+
+    // Make a PRNG to perform evolution
+    std::mt19937 rand(m_seed + m_generation);
+
+    // for the rest, pick k parents at random, weighted by score
+    float scoreSum = 0.f;
+    for (auto& it : scores)
+        scoreSum += std::fmaxf(it.first, 0.f);
+    std::uniform_real_distribution<float> parentChoiceDist(0.f, scoreSum);
+
+    std::vector<CarBrain*> parents;
+    for (size_t i = 0; i < NUM_PARENTS; i++) {
+        float choiceScore = parentChoiceDist(rand);
+        size_t parent = 0;
+        while (parent < m_poolSize && choiceScore > 0) {
+            choiceScore -= std::fmaxf(scores[parent].first, 0.f);
+            parent++;
+        }
+        parent--; // Go back one step
+        parents.push_back(&m_geneticPool[scores[parent].second]);
+    }
+
+    // Now go through and mix parents pairwise, in a loop
+    for (size_t i = 0; newPool.size() < m_poolSize; i++) {
+        CarBrain* p1 = parents[i % parents.size()];
+        CarBrain* p2 = parents[(i+1) % parents.size()];
+
+        // Each child is given exactly the opposite selection
+        CarBrain child1 = *p1, child2 = *p2;
+        std::mt19937 rand1(m_seed+m_generation+i), rand2(m_seed+m_generation+i);
+        child1.mixIn(*p2, rand1);
+        child2.mixIn(*p1, rand2);
+        child1.mutate(rand1, m_mutationChance);
+        child2.mutate(rand2, m_mutationChance);
+
+        newPool.emplace_back(std::move(child1));
+        newPool.emplace_back(std::move(child2));
+    }
+
+    // In case we added too many
+    while (newPool.size() > m_poolSize)
+        newPool.pop_back();
+
+    // Insert the new pool in place of the old
+    std::swap(m_geneticPool, newPool);
 }
 
-void BaseSimulation::runSimulationsInThread(size_t begin, size_t end) {
+void BaseSimulation::runSimulationsInThread(size_t offset, size_t stride, size_t end) {
     m_threads.emplace_back([=]() {
-        for (size_t i = begin; i < end && !m_isGenerationAborted.load(std::memory_order_relaxed); i++) {
-            auto &simulation = m_simulations[i];
-            while (preSimulationFrame(&simulation)) {
-                simulation.takeCarActions();
-                simulation.updateCars();
+        for (size_t i = offset; i < end && !m_isGenerationAborted.load(std::memory_order_relaxed); i+=stride) {
+            while (preSimulationFrame(&m_simulations[i])) {
+                m_simulations[i].takeCarActions();
+                m_simulations[i].updateCars();
             }
         }
     });
@@ -275,7 +360,7 @@ bool BaseSimulation::hasGenerationRunning() {
     return !m_simulations.empty();
 }
 
-void BaseSimulation::startParallelGeneration(bool oneRealtime) {
+void BaseSimulation::startParallelGeneration(bool oneRealtime, size_t simulation_count) {
     // The last generation must be done
     assert (!hasGenerationRunning());
     assert (m_threads.empty());
@@ -283,22 +368,20 @@ void BaseSimulation::startParallelGeneration(bool oneRealtime) {
     assert (m_world.isLoaded());
 
     m_hasRealtimeSimulation = oneRealtime;
-    fillGenePool(); // Creates enough brains to do poolSize simulations
+
+    m_routesPicker.updateRoutePicks(m_generation, m_seed, m_world.getRoutes(), m_carSpawnTimes);
+
+    // In case the gene pool is not currently the correct size
+    fitGenePoolToSize();
 
     // Creates one simulation per brain, with identical seed and world
-    for ( size_t i = 0; i < m_geneticPool.size(); i++ )
+    for ( size_t i = 0; i < simulation_count; i++ )
         m_simulations.emplace_back(&m_world, i, m_seed+m_generation, false);
-    assert(m_simulations.size() == m_poolSize);
-    m_simulationsLeft.store(m_poolSize);
+    m_simulationsLeft.store(simulation_count);
 
     // Partition up the simulations among the threads
-    size_t start = oneRealtime ? 1 : 0;
-    size_t count = m_poolSize - start;
-    for(int i = 0; i < THREAD_COUNT; i++) {
-        size_t begin = start+(count*i/THREAD_COUNT);
-        size_t end = start+(count*(i+1)/THREAD_COUNT);
-        runSimulationsInThread(begin, end);
-    }
+    for(int i = 0; i < THREAD_COUNT; i++)
+        runSimulationsInThread(oneRealtime ? i+1 : i, THREAD_COUNT, simulation_count);
 }
 
 Simulation* BaseSimulation::getRealtimeSimulation() {
@@ -320,7 +403,7 @@ void BaseSimulation::finishGeneration() {
         thread.join();
     m_threads.clear();
 
-    pruneGenePool();
+    evolveGenePool();
     m_simulations.clear(); // The scores are stored in the brains, so the simulations are longer needed
 
     m_generation++;
@@ -335,9 +418,6 @@ void BaseSimulation::abortGeneration() {
     for (auto& thread:m_threads)
         thread.join();
     m_threads.clear();
-
-    // Remove all brains except those who were survivors from the previous finished generation
-    m_geneticPool.erase(m_geneticPool.begin() + m_parentsThisGeneration, m_geneticPool.end());
 
     // Remove all signs of the generation running, or having ever ran
     m_simulations.clear();

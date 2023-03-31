@@ -6,12 +6,9 @@
 // Multithreading is used internally, but all public functions must be called from the same thread
 class GeneticSimulation : public BaseSimulation {
 protected:
-    // Handle options passed in from a config file
-    virtual bool handleOption(std::string& opt, std::ifstream& file, bool ignoreSaveLoad) override;
-
-    virtual void pruneGenePool() override;
+    virtual void evolveGenePool() override;
 public:
-    explicit GeneticSimulation(std::vector<CarBrain> initial_brains);
+    GeneticSimulation();
 
     virtual void startParallelGeneration(bool oneRealtime) override;
 

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "Simulation.h"
 
-Simulation::Simulation(World *world, size_t index_in_generation, unsigned long seed, bool store_history)
+Simulation::Simulation(World *world, size_t index_in_generation, size_t seed, bool store_history)
         : m_world(world), m_index_in_generation(index_in_generation), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
 
 World* Simulation::getWorld() {
@@ -18,11 +18,16 @@ size_t Simulation::getIndexInGeneration() {
     return m_index_in_generation;
 }
 
+size_t Simulation::getNumberOfSpawnedCars() {
+    return m_num_spawned_cars;
+}
+
 void Simulation::spawnCar(size_t route, CarBrain* brain, float spawnRandomness) {
     auto& routes = m_world->getRoutes();
     assert (route < routes.size());
     std::normal_distribution<float> dist(0.f, spawnRandomness);
     m_cars.emplace_back(std::make_unique<Car>(&routes[route], dist(m_random), brain));
+    m_num_spawned_cars++;
 }
 
 std::vector<std::unique_ptr<Car>>& Simulation::getCars() {
@@ -108,7 +113,7 @@ void Simulation::markAsFinished() {
     m_markedAsFinished = true;
 
     for (auto& car : m_cars)
-        m_finalCarScores.push_back({car->getBrain(), car->getScore()});
+        m_finalCarScores.emplace_back(car->getBrain(), car->getScore());
 }
 
 bool Simulation::isMarkedAsFinished() {

@@ -17,6 +17,9 @@ class Simulation {
     // Which simulation within the generation we belong to
     size_t m_index_in_generation;
 
+    // How many cars have been spawned in this world in total
+    size_t m_num_spawned_cars{};
+
     // How many steps of simulation have been performed?
     size_t m_frameNumber;
 
@@ -33,11 +36,12 @@ class Simulation {
     bool m_store_history;
     std::unordered_map<Car*, std::pair<size_t, std::vector<float>>> m_score_history{};
 public:
-    Simulation(World* world, size_t index_in_generation, unsigned long seed, bool store_history);
+    Simulation(World* world, size_t index_in_generation, size_t seed, bool store_history);
 
     World* getWorld();
     size_t getFrameNumber();
     size_t getIndexInGeneration();
+    size_t getNumberOfSpawnedCars();
 
     void spawnCar(size_t route, CarBrain* brain, float spawnRandomness);
     std::vector<std::unique_ptr<Car>>& getCars();

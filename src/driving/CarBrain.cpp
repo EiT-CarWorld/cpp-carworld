@@ -81,6 +81,15 @@ CarBrainOutput CarBrain::takeAction(CarBrainInput input) {
     };
 }
 
+void CarBrain::informAboutScoreAchieved(float score) {
+    if (score > m_best_score_achieved)
+        m_best_score_achieved = score;
+}
+
+float CarBrain::getBestScoreAchieved() {
+    return m_best_score_achieved;
+}
+
 void CarBrain::mixIn(const CarBrain& other, std::mt19937& random) {
     assert(m_matrices.size() == other.m_matrices.size());
     for (int i = 0; i < m_matrices.size(); i++) {

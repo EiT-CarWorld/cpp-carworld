@@ -1,8 +1,7 @@
 #pragma once
-#include "simulation/Simulation.h"
 #include "entities/Car.h"
 #include "rendering/CameraController.h"
-#include "simulation/GeneticSimulation.h"
+#include "simulation/BaseSimulation.h"
 
 enum class UserControllerMode {
     FREECAM, DRIVING

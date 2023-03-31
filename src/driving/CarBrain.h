@@ -42,9 +42,16 @@ struct CarBrainOutput {
 #define MAX_LAYER_SIZE 128
 class CarBrain {
     std::vector<CarMatrix> m_matrices;
+
+    // To avoid throwing away a really great brain, due to a mishap
+    // We will forever remember the best score this brain ever got
+    float m_best_score_achieved{};
 public:
     explicit CarBrain(std::vector<CarMatrix> matrices);
     CarBrainOutput takeAction(CarBrainInput input);
+
+    void informAboutScoreAchieved(float score);
+    float getBestScoreAchieved();
 
     void mixIn(const CarBrain& other, std::mt19937& random);
     void mutate(std::mt19937& random, float mutateChance);
