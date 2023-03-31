@@ -17,7 +17,8 @@ bool AdversarialSimulation::preSimulationFrame(Simulation* simulation) {
 
     for (auto it =  m_carSpawnTimes.find(frame);
          it != m_carSpawnTimes.end() && it->first == frame; ++it) {
-        size_t index = simulation->getIndexInGeneration() + simulation->getNumberOfSpawnedCars();
+        //size_t index = simulation->getIndexInGeneration() + simulation->getNumberOfSpawnedCars();
+        size_t index = (simulation->getNumberOfSpawnedCars() % 5 == 0) ? 0 : simulation->getIndexInGeneration();
         simulation->spawnCar(it->second, &m_geneticPool[index % m_poolSize], m_spawnRandomness);
     }
 
