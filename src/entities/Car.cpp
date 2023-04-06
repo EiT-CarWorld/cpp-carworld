@@ -196,7 +196,7 @@ void Car::reportCrash(Car *otherCar) {
     m_score -= SCORE_CRASH_PENALTY + SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
     if (otherCar == nullptr)
         m_score -= SCORE_CRASH_ROADSIDE_PENALTY;
-    else if(m_speed > otherCar->m_speed)
+    else if(m_speed >= otherCar->m_speed)
         m_score -= SCORE_CRASH_FASTEST_PENALTY;
     else
         m_score -= SCORE_CRASH_SLOWEST_PENALTY;
