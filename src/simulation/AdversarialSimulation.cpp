@@ -31,12 +31,11 @@ void AdversarialSimulation::evolveGenePool() {
         CarBrain* brain = &m_geneticPool[i];
         float scoreSum = 0.f;
         size_t count = 0;
-        for (auto& sim : m_simulations)
-            for (auto& car_score : sim.getFinalCarScores())
-                if (car_score.first == brain) {
-                    scoreSum += car_score.second;
-                    count++;
-                }
+        for (auto& car_score : m_simulations[i].getFinalCarScores())
+            if (car_score.first == brain) {
+                scoreSum += car_score.second;
+                count++;
+            }
         scores.emplace_back(scoreSum / count, i);
     }
 

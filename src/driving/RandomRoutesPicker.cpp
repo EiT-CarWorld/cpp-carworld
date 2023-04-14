@@ -52,6 +52,6 @@ void RandomRoutesPicker::updateRoutePicks(size_t generation, size_t seed, std::v
         // It's ok to spawn a car at frame i using this route
         carSpawnTimes.insert({i, route_idx});
         size_t lockUntil = i + spawnLockTime(rand);
-        spawnLocks.insert({startNode, lockUntil});
+        spawnLocks[startNode] = lockUntil;
     }
 }

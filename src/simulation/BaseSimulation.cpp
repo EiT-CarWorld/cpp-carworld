@@ -299,13 +299,19 @@ void BaseSimulation::geneticEvolveGenePool(std::vector<std::pair<float, int>> co
         newPool.emplace_back(m_geneticPool[scores[i].second]);
     }
 
+    // Calculate average score to compare all scores against
+    float average_score = 0.f;
+    for (auto s:scores) {
+        average_score += s.first / scores.size();
+    }
+
     // Make a PRNG to perform evolution
     std::mt19937 rand(m_seed + m_generation);
 
-    // for the rest, pick k parents at random, weighted by score
+    // for the rest, pick k parents at random, weighted by distance to average score
     float scoreSum = 0.f;
     for (auto& it : scores)
-        scoreSum += std::fmaxf(it.first, 0.f);
+        scoreSum += std::fmaxf(it.first - average_score, 0.f);
     std::uniform_real_distribution<float> parentChoiceDist(0.f, scoreSum);
 
     std::vector<CarBrain*> parents;
@@ -313,7 +319,7 @@ void BaseSimulation::geneticEvolveGenePool(std::vector<std::pair<float, int>> co
         float choiceScore = parentChoiceDist(rand);
         size_t parent = 0;
         while (parent < m_poolSize && choiceScore > 0) {
-            choiceScore -= std::fmaxf(scores[parent].first, 0.f);
+            choiceScore -= std::fmaxf(scores[parent].first - average_score, 0.f);
             parent++;
         }
         parent--; // Go back one step
