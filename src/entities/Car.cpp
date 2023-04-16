@@ -193,6 +193,14 @@ void Car::calculateSensors(Simulation* simulation) {
 void Car::reportCrash(Car *otherCar) {
     if (m_crashed)
         return;
+
+    // Higher speed at the time of crashing gives a worse multiplier to the score
+    float mult = (1 - fmaxf(0,abs(m_speed)-2.f) / CRASH_SPEED_MULTIPLIER_MAX);
+    m_score *= mult;
+
+    m_crashed = true;
+
+    /*
     m_score -= SCORE_CRASH_PENALTY + SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
     if (otherCar == nullptr)
         m_score -= SCORE_CRASH_ROADSIDE_PENALTY;
@@ -201,6 +209,7 @@ void Car::reportCrash(Car *otherCar) {
     else
         m_score -= SCORE_CRASH_SLOWEST_PENALTY;
     m_crashed = true;
+    */
 }
 
 #define ACCELERATION 5.f

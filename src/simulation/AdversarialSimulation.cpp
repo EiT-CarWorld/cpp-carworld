@@ -18,8 +18,11 @@ bool AdversarialSimulation::preSimulationFrame(Simulation* simulation) {
     for (auto it =  m_carSpawnTimes.find(frame);
          it != m_carSpawnTimes.end() && it->first == frame; ++it) {
         //size_t index = simulation->getIndexInGeneration() + simulation->getNumberOfSpawnedCars();
-        size_t index = (simulation->getNumberOfSpawnedCars() % 5 == 0) ? 0 : simulation->getIndexInGeneration();
-        simulation->spawnCar(it->second, &m_geneticPool[index % m_poolSize], m_spawnRandomness);
+        //size_t index = (simulation->getNumberOfSpawnedCars() % 5 == 0) ? 0 : simulation->getIndexInGeneration();
+
+        // We have removed the "adversarial" part of the simulation, all cars get the same brain again
+        size_t index = simulation->getIndexInGeneration();
+        simulation->spawnCar(it->second, &m_geneticPool[index], m_spawnRandomness);
     }
 
     return !simulation->isMarkedAsFinished();
