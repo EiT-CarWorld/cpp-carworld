@@ -23,6 +23,9 @@ void main() {
     float angle = atan(-difference.y, difference.x);
     int zone = int( mod((angle-carYaw) / (2*3.1415926) * zoneCount + 0.5, zoneCount) );
 
+    //if (zone != 12)
+    //    return;
+
     float closestInZone = zoneLengths[zone];
 
     if (closestInZone > maxDistanceBother)

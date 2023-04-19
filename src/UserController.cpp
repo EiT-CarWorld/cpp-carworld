@@ -45,6 +45,13 @@ void UserController::updateRealtimeSimulation() {
         m_drawClosestNode = !m_drawClosestNode;
     if (IsKeyPressed(KEY_N))
         simulation->spawnCar(0, m_simulations->getBestBrain(), 0.f); // Use route 0, no offset
+    if (IsKeyPressed(KEY_P)) {
+        m_pause = !m_pause;
+        simulation->pause = m_pause;
+    }
+    if (IsKeyDown(KEY_O)) {
+        simulation->next_frame = true;
+    }
 
     // If something has caused our selected car to be deselected, or it no longer exists
     if (m_selectedCar == nullptr && m_mode == UserControllerMode::DRIVING)
@@ -221,6 +228,8 @@ void UserController::renderHUD() {
     DRAW_TOGGLE("F - freewheel (%c)", m_freewheelAllCars);
     float totalScore = simulation->getTotalSimulationScore();
     DRAW_LINE(TextFormat("Total score: %.0f", totalScore));
+    DRAW_TOGGLE("P - pause (%c)", m_pause);
+    DRAW_TOGGLE("O - next frame (%c)", m_next_frame);
 #undef DRAW_LINE
 #undef DRAW_TOGGLE
 

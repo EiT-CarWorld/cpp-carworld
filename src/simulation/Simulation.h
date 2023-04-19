@@ -54,5 +54,7 @@ public:
     void markAsFinished();
     bool isMarkedAsFinished();
     void printHistoryToFile(const std::string& filename);
+    bool pause;
+    bool next_frame;
 };
 

@@ -11,14 +11,14 @@ Texture Car::diffuseTexture, Car::metalnessTexture;
 Model Car::carModels[NUM_CAR_MODELS];
 const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, YELLOW};
 
-const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-4*PI/8, -3*PI/8, -2*PI/8, -PI/8, 0, PI/8, 2*PI/8, 3*PI/8, 4*PI/8};
+const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {0.f , 0.39269908f, 0.78539816f, 1.17809725f, 1.57079633f, -1.57079633f, -1.17809725f, -0.78539816f, -0.39269908f
+};
 // If we are closer than this to the road edge, we have crashed / driven off the road
-const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
+const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f};
 const float Car::MAX_LIDAR_DIST = 100.f;
 
 const float Car::MAX_CAR_ZONE_DIST = 100.0f;
-const float Car::MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES] = {2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f,
-                                                         2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f};
+const float Car::MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES] = {1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f};
 
 #include "rlgl.h"
 void Car::loadStatic() {
@@ -308,8 +308,16 @@ void Car::render() {
 
 void Car::renderSensory() {
     for (int i = 0; i < NUM_LIDAR_ANGLES; i++) {
+        //if (i != 5)
+        //    continue;
         if(m_lidarDistances[i] < MAX_LIDAR_DIST) {
             float dist = m_lidarDistances[i];
+            int k = i;
+            if (i > 4) {
+                k += 7;
+            }
+            if (dist > m_carZoneDistances[k])
+                dist = m_carZoneDistances[k];
             float angle = m_yaw + LIDAR_ANGLES[i];
             Vector3 pos = m_position + Vector3{0.f ,0.4f, 0.f};
             DrawLine3D(pos, {pos.x + cosf(angle)*dist, pos.y, pos.z-sinf(angle)*dist}, RED);

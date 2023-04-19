@@ -24,6 +24,8 @@ class UserController {
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};
     bool m_autoNextGeneration{false};
+    bool m_pause{false};
+    bool m_next_frame{false};
 
     void lockMouse();
     void unlockMouse();

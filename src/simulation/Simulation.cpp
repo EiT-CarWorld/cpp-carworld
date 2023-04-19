@@ -4,7 +4,7 @@
 #include "Simulation.h"
 
 Simulation::Simulation(World *world, size_t index_in_generation, size_t seed, bool store_history)
-        : m_world(world), m_index_in_generation(index_in_generation), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
+        : m_world(world), m_index_in_generation(index_in_generation), m_random(seed), m_store_history(store_history), m_frameNumber(0), pause(false), next_frame(false) {}
 
 World* Simulation::getWorld() {
     return m_world;
@@ -46,6 +46,10 @@ void Simulation::takeCarActions() {
 }
 
 void Simulation::updateCars() {
+    if (pause && next_frame)
+        next_frame = false;
+    else if (pause && !next_frame)
+        return;
     // Updates all cars, using the actions they last decided on (See: takeCarActions())
     for (int i = 0; i < m_cars.size(); i++) {
         Car* car = m_cars[i].get();

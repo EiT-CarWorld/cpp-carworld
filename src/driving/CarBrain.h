@@ -31,7 +31,7 @@ struct CarBrainInput {
     float (*carZoneDistances)[NUM_CAR_ZONES];
     Vector2 (*carZoneSpeeds)[NUM_CAR_ZONES];
 };
-#define BRAIN_INPUT_LAYER_SIZE (4+NUM_LIDAR_ANGLES+NUM_CAR_ZONES*3)
+#define BRAIN_INPUT_LAYER_SIZE (4+NUM_LIDAR_ANGLES)
 #define BRAIN_OUTPUT_LAYER_SIZE 4
 
 struct CarBrainOutput {

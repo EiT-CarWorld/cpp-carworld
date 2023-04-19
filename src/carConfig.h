@@ -35,9 +35,9 @@
 // Punishment for living, in score / second
 #define SCORE_TIME_PENALTY 4
 // Score gained for each meter closer to next target
-#define SCORE_GAIN_DISTANCE_COVER 1
+#define SCORE_GAIN_DISTANCE_COVER 30
 
 // How much score a new car spawns with
-#define SCORE_INITIAL_SCORE 400
+#define SCORE_INITIAL_SCORE 200
 // The score at which a car gets mercy killed
-#define SCORE_MINIMUM 300
+#define SCORE_MINIMUM 0

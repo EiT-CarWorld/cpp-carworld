@@ -48,13 +48,20 @@ CarBrainOutput CarBrain::takeAction(CarBrainInput input) {
     vectorIn[i++] = input.target_angle;
     vectorIn[i++] = input.turn_in_target;
     vectorIn[i++] = input.target_distance / 100.f;
-    for (int j = 0; j < NUM_LIDAR_ANGLES; j++)
-        vectorIn[i++] = (*input.lidarData)[j] / 100.f;
-    for (int j = 0; j < NUM_CAR_ZONES; j++) {
-        vectorIn[i++] = (*input.carZoneDistances)[j] / 100.f;
-        vectorIn[i++] = (*input.carZoneSpeeds)[j].x / 100.f;
-        vectorIn[i++] = (*input.carZoneSpeeds)[j].y / 100.f;
+    for (int j = 0; j < NUM_LIDAR_ANGLES; j++) {
+        float lidar = (*input.lidarData)[j] / 100.f;
+        int k = j;
+        if (j > 4) {
+            k += 7;
+        }
+        float car_sector = (*input.carZoneDistances)[k] / 100.f;
+        vectorIn[i++] = (lidar < car_sector && lidar > 0) ? lidar : car_sector;
     }
+    //for (int j = 0; j < NUM_CAR_ZONES; j++) {
+    //    vectorIn[i++] = (*input.carZoneDistances)[j] / 100.f;
+    //    vectorIn[i++] = (*input.carZoneSpeeds)[j].x / 100.f;
+    //    vectorIn[i++] = (*input.carZoneSpeeds)[j].y / 100.f;
+    //}
     assert(i == BRAIN_INPUT_LAYER_SIZE);
 
     // Then we do matrix multiplication and activation functions all the way
