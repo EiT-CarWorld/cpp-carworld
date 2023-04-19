@@ -21,7 +21,7 @@ defineRoutes 12
 pickRandomRoutes 20 50 100 120 5000
 
 poolSize 100
-survivorsPerGeneration 10
+survivorsPerGeneration 20
 framesPerSimulation 6000
 mutationChance 0.05
 spawnRandomness 0.1

@@ -32,13 +32,19 @@
 // Penalty for crashing with another car, and being the slower of the two
 //#define SCORE_CRASH_SLOWEST_PENALTY 0
 
-// New idea: multiply the score when crashing, larger penalty for higher speed
-#define CRASH_SPEED_MULTIPLIER_MAX 50
-
-// Punishment for living, in score / second
-#define SCORE_TIME_PENALTY 1
 // Score gained for each meter closer to next target
 #define SCORE_GAIN_DISTANCE_COVER 5
+
+// Score bonus for reaching the goal
+#define SCORE_GOAL_REACHED_BONUS 1000
+// When reaching the goal, give a bonus multiplied by its average speed towards the goal
+// In score * seconds/meter
+#define SCORE_GOAL_REACHED_SPEED_BONUS 5
+// Punishment for living, in score / second
+#define SCORE_TIME_PENALTY 1
+
+// Multiply the score when crashing, larger penalty for higher speed
+#define CRASH_SPEED_MULTIPLIER_MAX 50
 
 // How much score a new car spawns with
 #define SCORE_INITIAL_SCORE 0

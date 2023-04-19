@@ -66,11 +66,17 @@ CarBrain* Car::getBrain() {
 }
 
 void Car::chooseAction() {
+    if (hasFinishedRoute())
+        return;
+
     m_routeFollower.updateIfAtTarget(m_position);
 
     if (hasFinishedRoute()) {
         m_gasInput = GAS_FREE;
         m_turnInput = TURN_NO_TURN;
+
+        // We have finished our route now, so modify our score to reflect it
+        m_score += SCORE_GOAL_REACHED_BONUS + SCORE_GOAL_REACHED_SPEED_BONUS * (m_distanceGained/m_timeLived);
         return;
     }
 
@@ -195,7 +201,7 @@ void Car::reportCrash(Car *otherCar) {
         return;
 
     // Higher speed at the time of crashing gives a worse multiplier to the score
-    float mult = (1 - fmaxf(0,abs(m_speed)-2.f) / CRASH_SPEED_MULTIPLIER_MAX);
+    float mult = (1 - (1.0f + abs(m_speed)) / CRASH_SPEED_MULTIPLIER_MAX);
     m_score *= mult;
 
     m_crashed = true;
@@ -281,14 +287,15 @@ void Car::update() {
     if (m_crashed)
         return;
 
-    // We penalize the car for even existing
-    m_score -= SCORE_TIME_PENALTY * SIM_DT;
-
     float distanceToTarget = m_routeFollower.getDistanceToTarget2D(m_position);
-    updatePhysics();
+    updatePhysics(); // Updating physics will not calculate a new target, that is done by carActions
     float distanceImprovement = distanceToTarget - m_routeFollower.getDistanceToTarget2D(m_position);
 
+    m_distanceGained += distanceImprovement;
+    m_timeLived += SIM_DT;
     m_score += distanceImprovement * SCORE_GAIN_DISTANCE_COVER;
+    // We penalize the car for even existing
+    m_score -= SCORE_TIME_PENALTY * SIM_DT;
 }
 
 Camera3D Car::get3rdPersonCamera() {

@@ -53,6 +53,11 @@ private:
     // The angle of the front tires, multiplied by speed and applied every frame
     float m_yaw_speed{};
 
+    // The total distance traveled /towards its goal/
+    float m_distanceGained{};
+    // How many seconds the car has been alive for
+    float m_timeLived{};
+
     float m_score{SCORE_INITIAL_SCORE};
     bool m_crashed{false};
 
