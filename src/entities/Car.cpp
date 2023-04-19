@@ -201,7 +201,7 @@ void Car::reportCrash(Car *otherCar) {
         return;
 
     // Higher speed at the time of crashing gives a worse multiplier to the score
-    float mult = (1 - (1.0f + abs(m_speed)) / CRASH_SPEED_MULTIPLIER_MAX);
+    float mult = (1 - fmaxf(0.0f, abs(m_speed) - 2.0f) / CRASH_SPEED_MULTIPLIER_MAX);
     m_score *= mult;
 
     m_crashed = true;

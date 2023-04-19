@@ -22,6 +22,10 @@ size_t Simulation::getNumberOfSpawnedCars() {
     return m_num_spawned_cars;
 }
 
+size_t Simulation::getNumberOfDeadCars() {
+    return m_num_dead_cars;
+}
+
 void Simulation::spawnCar(size_t route, CarBrain* brain, float spawnRandomness) {
     auto& routes = m_world->getRoutes();
     assert (route < routes.size());
@@ -49,8 +53,13 @@ void Simulation::updateCars() {
     // Updates all cars, using the actions they last decided on (See: takeCarActions())
     for (int i = 0; i < m_cars.size(); i++) {
         Car* car = m_cars[i].get();
-        if (car->hasFinishedRoute() || car->hasCrashed() || car->getScore() <= SCORE_MINIMUM) {
-            m_carHasDied = m_carHasDied || car->hasCrashed() || car->getScore() <= SCORE_MINIMUM;
+        bool crashed = car->hasCrashed() || car->getScore() <= SCORE_MINIMUM;
+        if (car->hasFinishedRoute() || crashed) {
+            m_carHasDied = m_carHasDied || crashed;
+
+            // Count one more crashed car
+            if (crashed)
+                m_num_dead_cars++;
 
             if (!m_markedAsFinished)
                 m_finalCarScores.emplace_back(car->getBrain(), car->getScore());

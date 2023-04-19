@@ -5,19 +5,19 @@ brainLayers 3
 30 30 10
 
 world res/maps/simple_intersection.txt
-defineRoutes 12
-106 95
+defineRoutes 8
 106 118
 106 130
 95 118
 95 130
-95 106
-118 130
 118 106
 118 95
 130 106
 130 95
-130 118
+#118 130
+#130 118
+#106 95
+#95 106
 pickRandomRoutes 20 50 100 120 5000
 
 poolSize 100

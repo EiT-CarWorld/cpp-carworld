@@ -9,7 +9,7 @@
 #include "rendering/Skybox.h"
 #include "UserController.h"
 #include "carConfig.h"
-#include "simulation/AdversarialSimulation.h"
+#include "simulation/AverageScoreSimulations.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -42,7 +42,7 @@ void Window::mainloop() {
             {0.7, 0.7, 0.7},
             {1, -2, 1});
 
-    AdversarialSimulation simulations;
+    AverageScoreSimulations simulations;
     simulations.setScoreOutputFile("out/scores.csv");
 
     UserController controller(&simulations, "res/config/%ld.txt");

@@ -18,7 +18,7 @@
 #define CAR_LENGTH 4.f
 
 // Used to scale node sizes
-#define ROAD_WIDTH 14.f
+#define ROAD_WIDTH 20.f
 
 // =============== Score tuning ==================
 // Penalty for crashing
@@ -36,10 +36,11 @@
 #define SCORE_GAIN_DISTANCE_COVER 5
 
 // Score bonus for reaching the goal
-#define SCORE_GOAL_REACHED_BONUS 1000
+#define SCORE_GOAL_REACHED_BONUS 0
 // When reaching the goal, give a bonus multiplied by its average speed towards the goal
 // In score * seconds/meter
-#define SCORE_GOAL_REACHED_SPEED_BONUS 5
+#define SCORE_GOAL_REACHED_SPEED_BONUS 0
+
 // Punishment for living, in score / second
 #define SCORE_TIME_PENALTY 1
 

@@ -19,6 +19,8 @@ class Simulation {
 
     // How many cars have been spawned in this world in total
     size_t m_num_spawned_cars{};
+    // How many cars have crashed (either into each other or into the ditch)
+    size_t m_num_dead_cars{};
 
     // How many steps of simulation have been performed?
     size_t m_frameNumber;
@@ -42,6 +44,7 @@ public:
     size_t getFrameNumber();
     size_t getIndexInGeneration();
     size_t getNumberOfSpawnedCars();
+    size_t getNumberOfDeadCars();
 
     void spawnCar(size_t route, CarBrain* brain, float spawnRandomness);
     std::vector<std::unique_ptr<Car>>& getCars();
