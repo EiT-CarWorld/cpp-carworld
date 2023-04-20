@@ -19,10 +19,8 @@ private:
 
     static const float LIDAR_ANGLES[NUM_LIDAR_ANGLES];
     static const float MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES];
-    static const float MAX_LIDAR_DIST;
 
     static const float MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES];
-    static const float MAX_CAR_ZONE_DIST;
 public:
     static void loadStatic();
     static void unloadStatic();

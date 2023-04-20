@@ -14,6 +14,7 @@
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(width, height, title);
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(TARGET_FRAMERATE);
     SetExitKey(0); // Disable single key exit
     FloorGrid::loadStatic();

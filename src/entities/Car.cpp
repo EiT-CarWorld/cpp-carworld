@@ -14,9 +14,6 @@ const Color Car::CAR_COLORS[NUM_CAR_COLORS] = {RED, GREEN, BLUE, WHITE, BLACK, Y
 const float Car::LIDAR_ANGLES[NUM_LIDAR_ANGLES] = {-4*PI/8, -3*PI/8, -2*PI/8, -PI/8, 0, PI/8, 2*PI/8, 3*PI/8, 4*PI/8};
 // If we are closer than this to the road edge, we have crashed / driven off the road
 const float Car::MIN_LIDAR_DISTANCE[NUM_LIDAR_ANGLES] = {0.9f, 1.3f, 1.6f, 1.3f, 0.9f};
-const float Car::MAX_LIDAR_DIST = 100.f;
-
-const float Car::MAX_CAR_ZONE_DIST = 100.0f;
 const float Car::MIN_CAR_ZONE_DISTANCE[NUM_CAR_ZONES] = {2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f,
                                                          2.f, 2.1f, 1.7f, 1.f, 1.f, 1.f, 1.7f, 2.1f};
 
