@@ -2,9 +2,11 @@
 #include <cassert>
 #include <algorithm>
 #include "Simulation.h"
+#include "rlgl.h"
 
-Simulation::Simulation(World *world, size_t index_in_generation, size_t seed, bool store_history)
-        : m_world(world), m_index_in_generation(index_in_generation), m_random(seed), m_store_history(store_history), m_frameNumber(0) {}
+Simulation::Simulation(World *world, size_t index_in_generation, size_t seed, bool draw_particle_effects, bool store_history)
+        : m_world(world), m_index_in_generation(index_in_generation), m_random(seed),
+        m_draw_particle_effects(draw_particle_effects), m_store_history(store_history) {}
 
 World* Simulation::getWorld() {
     return m_world;
@@ -61,6 +63,13 @@ void Simulation::updateCars() {
             if (crashed)
                 m_num_dead_cars++;
 
+            if (m_draw_particle_effects)
+                m_particleEffects.emplace_back(car->getPosition(),
+                                               crashed ? RED : GREEN,
+                                               crashed ? 60 : 40,
+                                               crashed ? 8.f : 6.f);
+
+            // Only note the car's score if we have not already frozen our scores.
             if (!m_markedAsFinished)
                 m_finalCarScores.emplace_back(car->getBrain(), car->getScore());
 
@@ -82,13 +91,28 @@ void Simulation::updateCars() {
         }
     }
 
+    // Update all particle effects, and possibly remove them if finished
+    for (size_t i = 0; i < m_particleEffects.size(); i++) {
+        if (!m_particleEffects[i].update()) {
+            std::swap(m_particleEffects[i--], m_particleEffects.back());
+            m_particleEffects.pop_back();
+        }
+    }
+
+
     m_frameNumber++;
 }
 
 void Simulation::render() {
     m_world->render();
-    for(auto& car: m_cars)
+    for (auto& car: m_cars)
         car->render();
+    if (m_draw_particle_effects) {
+        rlDisableDepthMask();
+        for (auto &particle: m_particleEffects)
+            particle.render();
+        rlEnableDepthMask();
+    }
 }
 
 // Returns true if any car has died

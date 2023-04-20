@@ -204,6 +204,8 @@ void Car::reportCrash(Car *otherCar) {
     float mult = (1 - fmaxf(0.0f, abs(m_speed) - 2.0f) / CRASH_SPEED_MULTIPLIER_MAX);
     m_score *= mult;
 
+    m_score -= SCORE_CRASH_SPEED_PENALTY * abs(m_speed);
+
     m_crashed = true;
 
     /*

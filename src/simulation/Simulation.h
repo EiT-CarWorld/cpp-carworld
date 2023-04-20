@@ -5,25 +5,25 @@
 #include <unordered_map>
 #include "entities/World.h"
 #include "entities/Car.h"
+#include "rendering/ParticleEffect.h"
 
 // Represents one simulation, on a given map
 class Simulation {
     World* m_world;
-
-    std::mt19937 m_random;
-
-    std::vector<std::unique_ptr<Car>> m_cars{};
-
     // Which simulation within the generation we belong to
     size_t m_index_in_generation;
+    // Deterministic source of randomness for this Simulation
+    std::mt19937 m_random;
+
+    // How many steps of simulation have been performed?
+    size_t m_frameNumber{0};
+
+    std::vector<std::unique_ptr<Car>> m_cars{};
 
     // How many cars have been spawned in this world in total
     size_t m_num_spawned_cars{};
     // How many cars have crashed (either into each other or into the ditch)
     size_t m_num_dead_cars{};
-
-    // How many steps of simulation have been performed?
-    size_t m_frameNumber;
 
     // True if any car has been deleted due to crashing
     bool m_carHasDied{false};
@@ -37,8 +37,11 @@ class Simulation {
     // Optional functionality for storing a bunch of data from the simulation
     bool m_store_history;
     std::unordered_map<Car*, std::pair<size_t, std::vector<float>>> m_score_history{};
+
+    bool m_draw_particle_effects;
+    std::vector<ParticleEffect> m_particleEffects;
 public:
-    Simulation(World* world, size_t index_in_generation, size_t seed, bool store_history);
+    Simulation(World* world, size_t index_in_generation, size_t seed, bool draw_particle_effects, bool store_history);
 
     World* getWorld();
     size_t getFrameNumber();

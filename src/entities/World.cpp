@@ -38,11 +38,11 @@ bool World::loadFromFile(const std::string& filepath) {
 
     int num_nodes, num_edges;
     file >> num_nodes >> num_edges;
-    OR_RETURN(consumeNewline(file));
+    OR_COMPLAIN(consumeNewline(file));
 
     int num_lines, num_vertices, num_triangles;
     file >> num_lines >> num_vertices >> num_triangles;
-    OR_RETURN(consumeNewline(file));
+    OR_COMPLAIN(consumeNewline(file));
 
     // In the map positions are (x=east, y=north)
     // We change this to 3D coords (x=east,y=up,z=south)
@@ -50,7 +50,7 @@ bool World::loadFromFile(const std::string& filepath) {
     for (int i = 0; i < num_nodes; i++) {
         float x, y;
         file >> x >> y;
-        OR_RETURN(consumeNewline(file));
+        OR_COMPLAIN(consumeNewline(file));
         m_nodes.push_back(Node({x, 0, -y}));
     }
 
@@ -61,7 +61,7 @@ bool World::loadFromFile(const std::string& filepath) {
         OR_COMPLAIN(direction == 'O' || direction == 'T');
         OR_COMPLAIN(0 <= u && u < num_nodes);
         OR_COMPLAIN(0 <= v && v < num_nodes);
-        OR_RETURN(consumeNewline(file));
+        OR_COMPLAIN(consumeNewline(file));
         m_nodes[u].addNeighbour(&m_nodes[v]);
         if (direction == 'T')
             m_nodes[v].addNeighbour(&m_nodes[u]);
@@ -72,7 +72,7 @@ bool World::loadFromFile(const std::string& filepath) {
     for (int i = 0; i < num_lines; i++) {
         float x1, y1, x2, y2;
         file >> x1 >> y1 >> x2 >> y2;
-        OR_RETURN(consumeNewline(file));
+        OR_COMPLAIN(consumeNewline(file));
         m_lineSegments.push_back(LineSegment{{x1,y1},{x2,y2}});
     }
 
@@ -81,7 +81,7 @@ bool World::loadFromFile(const std::string& filepath) {
     for (int i = 0; i < num_vertices; i++) {
         float x, y;
         file >> x >> y;
-        OR_RETURN(consumeNewline(file));
+        OR_COMPLAIN(consumeNewline(file));
         // Convert from (x=east,y=north) to (x=east,y=up,z=south)
         vertices.push_back(x);
         vertices.push_back(0.f);
@@ -93,7 +93,7 @@ bool World::loadFromFile(const std::string& filepath) {
     for (int i = 0; i < num_triangles; i++) {
         unsigned int a, b, c;
         file >> a >> b >> c;
-        OR_RETURN(consumeNewline(file));
+        OR_COMPLAIN(consumeNewline(file));
         indices.push_back(a);
         indices.push_back(b);
         indices.push_back(c);

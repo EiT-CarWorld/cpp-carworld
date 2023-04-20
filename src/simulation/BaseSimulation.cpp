@@ -46,18 +46,15 @@ bool BaseSimulation::handleOption(std::string &option, std::ifstream &file, bool
         for (size_t i = 0; i < layers; i++) {
             size_t layer_size;
             file >> layer_size;
-            if (!ignore_gene_pool)
-                m_brain_layers.push_back(layer_size);
+            //if (!ignore_gene_pool)
+            m_brain_layers.push_back(layer_size);
         }
 
         return true;
     }
 
     if (option == "poolSize") {
-        size_t new_pool_size;
-        file >> new_pool_size;
-        if (!ignore_gene_pool)
-            m_poolSize = new_pool_size;
+        file >> m_poolSize;
         return true;
     }
 
@@ -190,11 +187,15 @@ bool BaseSimulation::saveGenePool(const char *path) {
     TraceLog(LOG_INFO, "Saving generation to file '%s'", path);
 
     std::ofstream brainSave;
-    brainSave.open(path);
+    brainSave.open(path, std::ios::binary);
     OR_COMPLAIN(brainSave.good());
 
-    brainSave << m_generation << std::endl;
-    brainSave << m_geneticPool.size() << std::endl;
+    WRITEOUT(brainSave, m_generation);
+    WRITEOUT(brainSave, (size_t)m_brain_layers.size());
+    for ( size_t layerSize: m_brain_layers )
+        WRITEOUT(brainSave, layerSize);
+
+    WRITEOUT(brainSave, (size_t)m_geneticPool.size());
     for ( CarBrain& brain : m_geneticPool )
         brain.saveToFile(brainSave);
     return true;
@@ -205,20 +206,24 @@ bool BaseSimulation::loadGenePool(const char *path) {
     TraceLog(LOG_INFO, "Loading generation from file '%s'", path);
 
     std::ifstream brainLoad;
-    brainLoad.open(path);
+    brainLoad.open(path, std::ios::binary);
     OR_COMPLAIN(brainLoad.good());
 
-    brainLoad >> m_generation;
-    OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+    READIN(brainLoad, m_generation);
+
+    // Read in the definition of layers used in all the brains
+    size_t num_brain_layers;
+    READIN(brainLoad, num_brain_layers);
+    m_brain_layers.resize(num_brain_layers);
+    for ( size_t i = 0; i < num_brain_layers; i++ )
+        READIN(brainLoad, m_brain_layers[i]);
 
     size_t num_brains;
-    brainLoad >> num_brains;
-    OR_COMPLAIN(brainLoad.good() && brainLoad.get() == '\n');
+    READIN(brainLoad, num_brains);
     m_geneticPool.clear();
     for (size_t i = 0; i < num_brains; i++)
         m_geneticPool.emplace_back(CarBrain::loadFromFile(brainLoad));
-    m_poolSize = m_geneticPool.size();
-    // TODO: Set brain_layers based on loaded file
+
     return true;
 }
 
@@ -381,8 +386,10 @@ void BaseSimulation::startParallelGeneration(bool oneRealtime, size_t simulation
     fitGenePoolToSize();
 
     // Creates one simulation per brain, with identical seed and world
-    for ( size_t i = 0; i < simulation_count; i++ )
-        m_simulations.emplace_back(&m_world, i, m_seed+m_generation, false);
+    for (size_t i = 0; i < simulation_count; i++) {
+        bool particle_effects = i == 0 && m_hasRealtimeSimulation;
+        m_simulations.emplace_back(&m_world, i, m_seed + m_generation, particle_effects, false);
+    }
     m_simulationsLeft.store(simulation_count);
 
     // Partition up the simulations among the threads

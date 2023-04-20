@@ -117,6 +117,8 @@ void UserController::update() {
                 for (size_t i = 0; result && i < m_simulations->getGenerationNumber(); i++) {
                     result = m_simulations->loadParameterFileIfExists(configFileForGen(i), true);
                 }
+                if ( !result )
+                    TraceLog(LOG_ERROR, "Loading failed");
             }
         }
 

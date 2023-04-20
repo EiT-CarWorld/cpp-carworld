@@ -3,6 +3,7 @@
 #include <cmath>
 #include <random>
 #include <fstream>
+#include "util.h"
 
 CarBrain::CarBrain(std::vector<CarMatrix> matrices) : m_matrices(std::move(matrices)) {
     // Now we verify that the sizes of the matrices fit each other,
@@ -106,22 +107,24 @@ void CarBrain::mutate(std::mt19937& random, float mutateChance) {
 }
 
 void CarBrain::saveToFile(std::ofstream &file) {
-    file << m_matrices.size() << std::endl;
-    // Each matrix is printed as its own line
+    WRITEOUT(file, (float)m_best_score_achieved);
+    WRITEOUT(file, (size_t)m_matrices.size());
     for (auto& m : m_matrices)
         m.saveToFile(file);
 }
 
 CarBrain CarBrain::loadFromFile(std::ifstream &file) {
+    float best_score_achieved;
+    READIN(file, best_score_achieved);
     size_t N;
-    file >> N;
-    assert(file.good() && N > 0);
+    READIN(file, N);
     std::vector<CarMatrix> matrices;
     for (size_t i = 0; i < N; i++) {
-        assert (file.get() == '\n');
         matrices.emplace_back(CarMatrix::loadFromFile(file));
     }
-    return CarBrain(std::move(matrices));
+    CarBrain result = CarBrain(std::move(matrices));
+    result.informAboutScoreAchieved(best_score_achieved);
+    return result;
 }
 
 static CarMatrix initializeMatrix(std::mt19937& mt, size_t rows, size_t columns) {

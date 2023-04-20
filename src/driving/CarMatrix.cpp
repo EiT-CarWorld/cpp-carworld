@@ -2,6 +2,7 @@
 #include <cassert>
 #include <algorithm>
 #include <fstream>
+#include "util.h"
 
 CarMatrix::CarMatrix(size_t rows, size_t cols): rows(rows), cols(cols) {
     assert(rows > 0 && cols > 0);
@@ -73,22 +74,20 @@ void CarMatrix::mutate(std::mt19937 random, float mutationChance) {
 }
 
 void CarMatrix::saveToFile(std::ofstream& file) {
-    file << rows << " " << cols;
-    file.precision(15);
+    WRITEOUT(file, (size_t)rows);
+    WRITEOUT(file, (size_t)cols);
     for (int i = 0; i < rows*cols; i++)
-        file << " " << values[i];
-    file << std::endl;
+        WRITEOUT(file, values[i]);
 }
 
 CarMatrix CarMatrix::loadFromFile(std::ifstream& file) {
     size_t rows, cols;
-    file >> rows >> cols;
-    assert(file.good());
+    READIN(file, rows);
+    READIN(file, cols);
     CarMatrix result(rows, cols);
     for (int i = 0; i < rows*cols; i++) {
-        file >> result.values[i];
+        READIN(file, result.values[i]);
     }
-    assert(file.good());
     return result;
 }
 
