@@ -6,7 +6,7 @@
 #define SIM_DT (1.f/TARGET_SIMULATION_FRAMERATE)
 
 // Number of threads used for parallel learning
-#define THREAD_COUNT 2
+#define THREAD_COUNT 6
 
 // Updating this also requires updating the angles defined in Car.cpp
 #define NUM_LIDAR_ANGLES 9
@@ -28,7 +28,7 @@
 // Score gained for each meter closer to next target
 #define SCORE_GAIN_DISTANCE_COVER 5
 
-// !! The following two should maybe be 0 during initial learning !!
+// !! We know that learning works if these two are 0 to begin with !!
 // Score bonus for reaching the goal
 #define SCORE_GOAL_REACHED_BONUS 1000
 // When reaching the goal, give a bonus multiplied by its average speed (m/s) towards the goal
@@ -42,7 +42,7 @@
 #define CRASH_SPEED_MULTIPLIER_MAX 50
 // !! The following should maybe be 0 during initial learning !!
 // Extra penalty for crashing, multiplied with speed.
-#define SCORE_CRASH_SPEED_PENALTY 0 //20
+#define SCORE_CRASH_SPEED_PENALTY 0
 
 // How much score a new car spawns with
 #define SCORE_INITIAL_SCORE 0
