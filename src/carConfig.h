@@ -15,7 +15,7 @@
 
 // Maximum distance is the distance set if nothing is closer
 #define MAX_LIDAR_DIST 100.f
-#define MAX_CAR_ZONE_DIST 50.0f
+#define MAX_CAR_ZONE_DIST 100.0f
 
 // Used to calculate distances between cars, taking their rectangular size in account
 #define CAR_WIDTH 2.f
