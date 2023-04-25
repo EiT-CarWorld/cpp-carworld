@@ -155,11 +155,11 @@ bool BaseSimulation::loadParameterFile(const char* path, bool ignoreSaveLoad) {
         }
 
         file >> option;
-        if (file.eof())
+        if (file.fail())
             break;
 
         if (!handleOption(option, file, ignoreSaveLoad))
-            break;
+            return false;
 
         if (file.get() != '\n') {
             std::cerr << "error: expected newline after option '" << option << "'" << std::endl;
