@@ -20,7 +20,8 @@ void UserController::updateRealtimeSimulation() {
     }
 
     // Does things like spawning new cars, or freezing the score if enough frames have passed
-    m_simulations->preSimulationFrame(simulation);
+    if(!m_paused)
+        m_simulations->preSimulationFrame(simulation);
 
     // First we remove cars that have crashed, or finished their route
     // Making sure to automatically deselect removed cars
@@ -64,7 +65,8 @@ void UserController::updateRealtimeSimulation() {
     }
 
     // Finally do the actual update
-    simulation->updateCars();
+    if (!m_paused)
+        simulation->updateCars();
 }
 
 void UserController::update() {
@@ -84,6 +86,8 @@ void UserController::update() {
 
     if (IsKeyPressed(KEY_T))
         m_autoNextGeneration = !m_autoNextGeneration;
+    if (IsKeyPressed(KEY_P))
+        m_paused = !m_paused;
 
     if (m_simulations->hasGenerationRunning()) {
         if (m_simulations->getSimulationsRunning() == 0 && (IsKeyPressed(KEY_ENTER) || m_autoNextGeneration)) {
@@ -206,7 +210,7 @@ void UserController::renderHUD() {
 
     DRAW_LINE("=== Realtime simulation ===");
     DRAW_LINE(TextFormat("Frame %d/%d", simulation->getFrameNumber(), m_simulations->getFramesPerSimulation()));
-
+    DRAW_TOGGLE("P - pause (%c)", m_paused);
     DRAW_LINE(TextFormat("N - spawn car (%d)", simulation->getCars().size()));
     DRAW_TOGGLE("L - toggle lines (%c)", m_drawRoadBorders);
     DRAW_TOGGLE("V - toggle sensor view (%c)", m_drawCarSensors);

@@ -20,6 +20,7 @@ class UserController {
     bool m_drawClosestNode{false};
     int m_closestNode{-1}; // Or -1 if no close node
 
+    bool m_paused{false};
     bool m_drawRoadBorders{false};
     bool m_drawCarSensors{false};
     bool m_freewheelAllCars{false};

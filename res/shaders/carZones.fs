@@ -32,5 +32,5 @@ void main() {
     if (distance > closestInZone)
         discard;
 
-    finalColor = vec4(min(1, 5/closestInZone), max(0, 1-5/closestInZone), 0, 0.1);
+    finalColor = vec4(min(1, 5/closestInZone), max(0, 1-5/closestInZone), 0, 0.2);
 }
