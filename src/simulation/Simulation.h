@@ -25,6 +25,9 @@ class Simulation {
     // How many cars have crashed (either into each other or into the ditch)
     size_t m_num_dead_cars{};
 
+    // Used to calculate the average amount of cars
+    size_t m_integral_of_cars_per_frame{};
+
     // True if any car has been deleted due to crashing
     bool m_carHasDied{false};
 

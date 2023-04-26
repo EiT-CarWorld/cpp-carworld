@@ -42,6 +42,8 @@ protected:
     std::vector<Simulation> m_simulations{};
     // If true, simulation number 0 is not executed by the threads
     bool m_hasRealtimeSimulation{};
+    // If true, only one simulation is running, the realtime one
+    bool m_singleSimulationRunning{};
     // The number of simulations in the generation that still have frames left
     std::atomic<size_t> m_simulationsLeft{};
     // All threads running simulations in the background
@@ -91,6 +93,9 @@ public:
     // Instead, it is left up to the driver to update it until enough frames have been simulated.
     // If all methods on this class are called from the same thread, everything is safe
     virtual void startParallelGeneration(bool oneRealtime)=0;
+
+    // Uses the first brain in the gene pool to show a realtime simulation, without doing any learning
+    void startSingleSimulation();
 
     // Returns a simulation if the currently running generation has a realtime simulation
     Simulation* getRealtimeSimulation();

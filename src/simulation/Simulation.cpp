@@ -99,7 +99,7 @@ void Simulation::updateCars() {
         }
     }
 
-
+    m_integral_of_cars_per_frame += m_cars.size();
     m_frameNumber++;
 }
 
@@ -147,6 +147,8 @@ void Simulation::markAsFinished() {
 
     for (auto& car : m_cars)
         m_finalCarScores.emplace_back(car->getBrain(), car->getScore());
+
+    // TraceLog(LOG_INFO, "Average amount of cars: %f", (float)m_integral_of_cars_per_frame/m_frameNumber);
 }
 
 bool Simulation::isMarkedAsFinished() {

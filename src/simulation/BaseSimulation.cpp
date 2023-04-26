@@ -359,7 +359,7 @@ void BaseSimulation::geneticEvolveGenePool(std::vector<std::pair<float, int>> co
 void BaseSimulation::runSimulationsInThread(size_t offset, size_t stride, size_t end) {
     m_threads.emplace_back([=]() {
         for (size_t i = offset; i < end && !m_isGenerationAborted.load(std::memory_order_relaxed); i+=stride) {
-            while (preSimulationFrame(&m_simulations[i])) {
+            while (preSimulationFrame(&m_simulations[i]) && !m_isGenerationAborted.load(std::memory_order_relaxed)) {
                 m_simulations[i].takeCarActions();
                 m_simulations[i].updateCars();
             }
@@ -397,6 +397,12 @@ void BaseSimulation::startParallelGeneration(bool oneRealtime, size_t simulation
         runSimulationsInThread(oneRealtime ? i+1 : i, THREAD_COUNT, simulation_count);
 }
 
+// Allows a single simulation to run, not doing any learning
+void BaseSimulation::startSingleSimulation() {
+    startParallelGeneration(true, 1);
+    m_singleSimulationRunning = true;
+}
+
 Simulation* BaseSimulation::getRealtimeSimulation() {
     if (!m_hasRealtimeSimulation)
         return nullptr;
@@ -416,11 +422,14 @@ void BaseSimulation::finishGeneration() {
         thread.join();
     m_threads.clear();
 
-    evolveGenePool();
-    m_simulations.clear(); // The scores are stored in the brains, so the simulations are longer needed
+    if (!m_singleSimulationRunning) {
+        evolveGenePool();
+        m_generation++;
+    }
 
-    m_generation++;
+    m_singleSimulationRunning = false;
     m_hasRealtimeSimulation = false;
+    m_simulations.clear();
 }
 
 void BaseSimulation::abortGeneration() {
@@ -435,6 +444,7 @@ void BaseSimulation::abortGeneration() {
     // Remove all signs of the generation running, or having ever ran
     m_simulations.clear();
     m_simulationsLeft.store(0);
+    m_singleSimulationRunning = false;
     m_hasRealtimeSimulation = false;
 
     m_isGenerationAborted.store(false, std::memory_order_release);

@@ -4,7 +4,6 @@
 AverageScoreSimulations::AverageScoreSimulations() {}
 
 void AverageScoreSimulations::startParallelGeneration(bool oneRealtime) {
-    // The adversarial does not strictly need to have the simulation count match the pool size
     BaseSimulation::startParallelGeneration(oneRealtime, m_poolSize);
 }
 

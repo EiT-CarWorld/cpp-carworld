@@ -133,7 +133,10 @@ void UserController::update() {
                 m_autoNextGeneration = false;
                 return;
             }
-            m_simulations->startParallelGeneration(!m_autoNextGeneration);
+            if (IsKeyDown(KEY_LEFT_CONTROL) && !m_autoNextGeneration)
+                m_simulations->startSingleSimulation();
+            else
+                m_simulations->startParallelGeneration(!m_autoNextGeneration);
         }
     }
 
