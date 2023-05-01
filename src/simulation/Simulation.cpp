@@ -1,6 +1,7 @@
 #include <fstream>
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 #include "Simulation.h"
 #include "rlgl.h"
 
@@ -33,7 +34,8 @@ void Simulation::spawnCar(size_t route, CarBrain* brain, float spawnRandomness) 
     assert (route < routes.size());
     std::normal_distribution<float> dist(0.f, spawnRandomness);
     m_cars.emplace_back(std::make_unique<Car>(&routes[route], dist(m_random), brain));
-    m_num_spawned_cars++;
+    if (!m_markedAsFinished)
+        m_num_spawned_cars++;
 }
 
 std::vector<std::unique_ptr<Car>>& Simulation::getCars() {
@@ -60,7 +62,7 @@ void Simulation::updateCars() {
             m_carHasDied = m_carHasDied || crashed;
 
             // Count one more crashed car
-            if (crashed)
+            if (crashed && !m_markedAsFinished)
                 m_num_dead_cars++;
 
             if (m_draw_particle_effects)
@@ -99,7 +101,8 @@ void Simulation::updateCars() {
         }
     }
 
-    m_integral_of_cars_per_frame += m_cars.size();
+    if (!m_markedAsFinished)
+        m_integral_of_cars_per_frame += m_cars.size();
     m_frameNumber++;
 }
 
@@ -153,6 +156,11 @@ void Simulation::markAsFinished() {
 
 bool Simulation::isMarkedAsFinished() {
     return m_markedAsFinished;
+}
+
+void Simulation::printSummary() {
+    std::cout << "spawned cars: " << m_num_spawned_cars << " (" << (m_num_spawned_cars/(m_frameNumber*SIM_DT)) << " cars/sec)" << std::endl;
+    std::cout << "dead cars: " << m_num_dead_cars << " ratio: " << (m_num_dead_cars/(float)m_num_spawned_cars) << std::endl;
 }
 
 void Simulation::printHistoryToFile(const std::string& filename) {

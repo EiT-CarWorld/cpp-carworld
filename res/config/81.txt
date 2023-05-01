@@ -1,1 +1,1 @@
-# saveGeneration res/brains/v3S_81.brains
+saveGeneration res/brains/v3_100zones_81.brains

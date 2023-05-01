@@ -1,5 +1,6 @@
 #include "AverageScoreSimulations.h"
 #include <algorithm>
+#include <iostream>
 
 AverageScoreSimulations::AverageScoreSimulations() {}
 
@@ -46,6 +47,10 @@ void AverageScoreSimulations::evolveGenePool() {
     std::sort(scores.rbegin(), scores.rend());
 
     printBrainScores(scores);
+
+    int bestBrain = scores.begin()->second;
+    std::cout << "Generation " << m_generation << ": ";
+    m_simulations[bestBrain].printSummary();
 
     geneticEvolveGenePool(scores);
 }

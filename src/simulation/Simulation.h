@@ -62,6 +62,7 @@ public:
     float getTotalSimulationScore();
     void markAsFinished();
     bool isMarkedAsFinished();
+    void printSummary();
     void printHistoryToFile(const std::string& filename);
 };
 
