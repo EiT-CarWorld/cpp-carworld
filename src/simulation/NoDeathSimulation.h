@@ -4,11 +4,11 @@
 
 // A class for running multiple simulations with different brains, and using their scores to create new brains.
 // Multithreading is used internally, but all public functions must be called from the same thread
-class GeneticSimulation : public BaseSimulation {
+class NoDeathSimulation : public BaseSimulation {
 protected:
     virtual void evolveGenePool() override;
 public:
-    GeneticSimulation();
+    NoDeathSimulation();
 
     virtual void startParallelGeneration(bool oneRealtime) override;
 

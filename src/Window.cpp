@@ -10,6 +10,7 @@
 #include "UserController.h"
 #include "carConfig.h"
 #include "simulation/AverageScoreSimulations.h"
+#include "simulation/NoDeathSimulation.h"
 
 Window::Window(const char *title, int width, int height) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);

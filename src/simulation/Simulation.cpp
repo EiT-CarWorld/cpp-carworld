@@ -66,7 +66,7 @@ void Simulation::updateCars() {
             if (m_draw_particle_effects)
                 m_particleEffects.emplace_back(car->getPosition(),
                                                crashed ? RED : GREEN,
-                                               crashed ? 60 : 40,
+                                               crashed ? 60 : 40, crashed,
                                                crashed ? 8.f : 6.f);
 
             // Only note the car's score if we have not already frozen our scores.

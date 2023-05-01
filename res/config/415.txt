@@ -1,4 +1,4 @@
 # We save the generation a few generations before 420, since the routes change every 20
 # saveGeneration res/brains/v3S_415.brains
 
-pickRandomRoutes 20 1 200 300 5000
+# pickRandomRoutes 20 1 100 120 5000

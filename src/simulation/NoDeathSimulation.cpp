@@ -1,14 +1,14 @@
-#include "GeneticSimulation.h"
+#include "NoDeathSimulation.h"
 #include <cassert>
 #include <algorithm>
 
-GeneticSimulation::GeneticSimulation() {}
+NoDeathSimulation::NoDeathSimulation() {}
 
-void GeneticSimulation::startParallelGeneration(bool oneRealtime) {
+void NoDeathSimulation::startParallelGeneration(bool oneRealtime) {
     BaseSimulation::startParallelGeneration(oneRealtime, m_poolSize);
 }
 
-bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
+bool NoDeathSimulation::preSimulationFrame(Simulation* simulation) {
     size_t frame = simulation->getFrameNumber();
     if ((frame == m_framesPerSimulation || simulation->hasCarDied()) && !simulation->isMarkedAsFinished()) { // The simulation is now done
         simulation->markAsFinished(); // Stores the scores of all cars currently driving
@@ -23,7 +23,7 @@ bool GeneticSimulation::preSimulationFrame(Simulation* simulation) {
     return !simulation->isMarkedAsFinished();
 }
 
-void GeneticSimulation::evolveGenePool() {
+void NoDeathSimulation::evolveGenePool() {
     assert(m_simulations.size() == m_poolSize);
 
     std::vector<std::pair<float, int>> scores;
