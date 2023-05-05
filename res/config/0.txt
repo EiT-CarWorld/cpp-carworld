@@ -18,10 +18,10 @@ defineRoutes 8
 #130 118
 #106 95
 #95 106
-pickRandomRoutes 20 1 100 300 5000
+pickRandomRoutes 4 1 250 500 10000
 
 poolSize 100
 survivorsPerGeneration 20
-framesPerSimulation 6000
-mutationChance 0.05
+framesPerSimulation 12000
+mutationChance 0.01
 spawnRandomness 0.1

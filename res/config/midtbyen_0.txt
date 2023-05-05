@@ -5,9 +5,14 @@ brainLayers 3
 30 30 10
 
 world res/maps/midtbyen.txt
-defineRoutes 2
-1795 590
-590 1795
+defineRoutes 5
+1564 2195
+2204 2195
+1679 2204
+1679 2195
+1673 2204
+#1795 590
+#590 1795
 #2755 2752
 #2049 2752
 #2107 1948
@@ -15,6 +20,6 @@ pickRandomRoutes 20 1 100 300 1000
 
 poolSize 100
 survivorsPerGeneration 20
-framesPerSimulation 1800
+framesPerSimulation 3000
 mutationChance 0.05
 spawnRandomness 0.1

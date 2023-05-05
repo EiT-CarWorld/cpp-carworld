@@ -1,850 +1,416 @@
-Generation 0: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 1: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 2: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 3: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 4: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 5: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 6: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 7: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 8: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 9: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 10: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-INFO: loading parameters from res/config/11.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_11.brains'
-Generation 11: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 12: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 13: spawned cars: 98 (0.98 cars/sec)
-dead cars: 98 ratio: 1
-Generation 14: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 15: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 16: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 17: spawned cars: 98 (0.98 cars/sec)
-dead cars: 96 ratio: 0.979592
-Generation 18: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 19: spawned cars: 98 (0.98 cars/sec)
-dead cars: 97 ratio: 0.989796
-Generation 20: spawned cars: 96 (0.96 cars/sec)
-dead cars: 94 ratio: 0.979167
-Generation 21: spawned cars: 96 (0.96 cars/sec)
-dead cars: 92 ratio: 0.958333
-Generation 22: spawned cars: 96 (0.96 cars/sec)
-dead cars: 93 ratio: 0.96875
-Generation 23: spawned cars: 96 (0.96 cars/sec)
-dead cars: 92 ratio: 0.958333
-Generation 24: spawned cars: 96 (0.96 cars/sec)
-dead cars: 93 ratio: 0.96875
-Generation 25: spawned cars: 96 (0.96 cars/sec)
-dead cars: 92 ratio: 0.958333
-Generation 26: spawned cars: 96 (0.96 cars/sec)
-dead cars: 94 ratio: 0.979167
-Generation 27: spawned cars: 96 (0.96 cars/sec)
-dead cars: 94 ratio: 0.979167
-Generation 28: spawned cars: 96 (0.96 cars/sec)
-dead cars: 94 ratio: 0.979167
-Generation 29: spawned cars: 96 (0.96 cars/sec)
-dead cars: 94 ratio: 0.979167
-Generation 30: spawned cars: 96 (0.96 cars/sec)
-dead cars: 93 ratio: 0.96875
-INFO: loading parameters from res/config/31.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_31.brains'
-Generation 31: spawned cars: 96 (0.96 cars/sec)
-dead cars: 93 ratio: 0.96875
-Generation 32: spawned cars: 96 (0.96 cars/sec)
-dead cars: 92 ratio: 0.958333
-Generation 33: spawned cars: 96 (0.96 cars/sec)
-dead cars: 93 ratio: 0.96875
-Generation 34: spawned cars: 96 (0.96 cars/sec)
-dead cars: 91 ratio: 0.947917
-Generation 35: spawned cars: 96 (0.96 cars/sec)
-dead cars: 91 ratio: 0.947917
-Generation 36: spawned cars: 96 (0.96 cars/sec)
-dead cars: 89 ratio: 0.927083
-Generation 37: spawned cars: 96 (0.96 cars/sec)
-dead cars: 89 ratio: 0.927083
-Generation 38: spawned cars: 96 (0.96 cars/sec)
-dead cars: 90 ratio: 0.9375
-Generation 39: spawned cars: 96 (0.95984 cars/sec)
-dead cars: 86 ratio: 0.895833
-Generation 40: spawned cars: 99 (0.99 cars/sec)
-dead cars: 94 ratio: 0.949495
-Generation 41: spawned cars: 99 (0.99 cars/sec)
-dead cars: 84 ratio: 0.848485
-Generation 42: spawned cars: 99 (0.99 cars/sec)
-dead cars: 81 ratio: 0.818182
-INFO: loading parameters from res/config/43.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_43.brains'
-Generation 43: spawned cars: 99 (0.99 cars/sec)
-dead cars: 47 ratio: 0.474747
-Generation 44: spawned cars: 99 (0.99 cars/sec)
-dead cars: 51 ratio: 0.515152
-Generation 45: spawned cars: 99 (0.99 cars/sec)
-dead cars: 51 ratio: 0.515152
-Generation 46: spawned cars: 99 (0.99 cars/sec)
-dead cars: 48 ratio: 0.484848
-Generation 47: spawned cars: 99 (0.99 cars/sec)
-dead cars: 40 ratio: 0.40404
-Generation 48: spawned cars: 99 (0.99 cars/sec)
-dead cars: 48 ratio: 0.484848
-Generation 49: spawned cars: 99 (0.99 cars/sec)
-dead cars: 43 ratio: 0.434343
-Generation 50: spawned cars: 99 (0.99 cars/sec)
-dead cars: 35 ratio: 0.353535
-INFO: loading parameters from res/config/51.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_51.brains'
-Generation 51: spawned cars: 99 (0.99 cars/sec)
-dead cars: 34 ratio: 0.343434
-Generation 52: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 53: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 54: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 55: spawned cars: 99 (0.99 cars/sec)
-dead cars: 32 ratio: 0.323232
-Generation 56: spawned cars: 99 (0.99 cars/sec)
-dead cars: 28 ratio: 0.282828
-Generation 57: spawned cars: 99 (0.99 cars/sec)
-dead cars: 27 ratio: 0.272727
-Generation 58: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 59: spawned cars: 99 (0.99 cars/sec)
-dead cars: 29 ratio: 0.292929
-Generation 60: spawned cars: 103 (1.03 cars/sec)
-dead cars: 29 ratio: 0.281553
-Generation 61: spawned cars: 103 (1.03 cars/sec)
-dead cars: 30 ratio: 0.291262
-Generation 62: spawned cars: 103 (1.03 cars/sec)
-dead cars: 33 ratio: 0.320388
-Generation 63: spawned cars: 103 (1.03 cars/sec)
-dead cars: 32 ratio: 0.31068
-Generation 64: spawned cars: 103 (1.03 cars/sec)
-dead cars: 29 ratio: 0.281553
-Generation 65: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 66: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 67: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 68: spawned cars: 103 (1.03 cars/sec)
-dead cars: 30 ratio: 0.291262
-Generation 69: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 70: spawned cars: 103 (1.03 cars/sec)
-dead cars: 29 ratio: 0.281553
-Generation 71: spawned cars: 103 (1.03 cars/sec)
-dead cars: 30 ratio: 0.291262
-Generation 72: spawned cars: 103 (1.03 cars/sec)
-dead cars: 26 ratio: 0.252427
-Generation 73: spawned cars: 103 (1.03 cars/sec)
-dead cars: 27 ratio: 0.262136
-Generation 74: spawned cars: 103 (1.03 cars/sec)
-dead cars: 30 ratio: 0.291262
-Generation 75: spawned cars: 103 (1.03 cars/sec)
-dead cars: 25 ratio: 0.242718
-Generation 76: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 77: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 78: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 79: spawned cars: 103 (1.03 cars/sec)
-dead cars: 28 ratio: 0.271845
-Generation 80: spawned cars: 101 (1.01 cars/sec)
-dead cars: 29 ratio: 0.287129
-INFO: loading parameters from res/config/81.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_81.brains'
-Generation 81: spawned cars: 101 (1.01 cars/sec)
-dead cars: 30 ratio: 0.29703
-Generation 82: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 83: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 84: spawned cars: 101 (1.01 cars/sec)
-dead cars: 29 ratio: 0.287129
-Generation 85: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 86: spawned cars: 101 (1.01 cars/sec)
-dead cars: 29 ratio: 0.287129
-Generation 87: spawned cars: 101 (1.01 cars/sec)
-dead cars: 31 ratio: 0.306931
-Generation 88: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 89: spawned cars: 101 (1.01 cars/sec)
-dead cars: 25 ratio: 0.247525
-Generation 90: spawned cars: 101 (1.01 cars/sec)
-dead cars: 25 ratio: 0.247525
-Generation 91: spawned cars: 101 (1.01 cars/sec)
-dead cars: 27 ratio: 0.267327
-Generation 92: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 93: spawned cars: 101 (1.01 cars/sec)
-dead cars: 27 ratio: 0.267327
-Generation 94: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 95: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 96: spawned cars: 101 (1.01 cars/sec)
-dead cars: 22 ratio: 0.217822
-Generation 97: spawned cars: 101 (1.01 cars/sec)
-dead cars: 25 ratio: 0.247525
-Generation 98: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 99: spawned cars: 101 (1.01 cars/sec)
-dead cars: 28 ratio: 0.277228
-Generation 100: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 101: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 102: spawned cars: 99 (0.99 cars/sec)
-dead cars: 32 ratio: 0.323232
-Generation 103: spawned cars: 99 (0.99 cars/sec)
-dead cars: 31 ratio: 0.313131
-Generation 104: spawned cars: 99 (0.99 cars/sec)
-dead cars: 32 ratio: 0.323232
-Generation 105: spawned cars: 99 (0.99 cars/sec)
-dead cars: 26 ratio: 0.262626
-Generation 106: spawned cars: 99 (0.99 cars/sec)
-dead cars: 28 ratio: 0.282828
-Generation 107: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 108: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 109: spawned cars: 99 (0.99 cars/sec)
-dead cars: 29 ratio: 0.292929
-Generation 110: spawned cars: 99 (0.99 cars/sec)
-dead cars: 26 ratio: 0.262626
-INFO: loading parameters from res/config/111.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_111.brains'
-Generation 111: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 112: spawned cars: 99 (0.99 cars/sec)
-dead cars: 28 ratio: 0.282828
-Generation 113: spawned cars: 99 (0.99 cars/sec)
-dead cars: 30 ratio: 0.30303
-Generation 114: spawned cars: 99 (0.99 cars/sec)
-dead cars: 29 ratio: 0.292929
-Generation 115: spawned cars: 99 (0.99 cars/sec)
-dead cars: 31 ratio: 0.313131
-Generation 116: spawned cars: 99 (0.99 cars/sec)
-dead cars: 31 ratio: 0.313131
-Generation 117: spawned cars: 99 (0.99 cars/sec)
-dead cars: 31 ratio: 0.313131
-Generation 118: spawned cars: 99 (0.99 cars/sec)
-dead cars: 29 ratio: 0.292929
-Generation 119: spawned cars: 99 (0.99 cars/sec)
-dead cars: 27 ratio: 0.272727
-Generation 120: spawned cars: 96 (0.96 cars/sec)
-dead cars: 22 ratio: 0.229167
-Generation 121: spawned cars: 96 (0.96 cars/sec)
-dead cars: 22 ratio: 0.229167
-Generation 122: spawned cars: 96 (0.96 cars/sec)
-dead cars: 22 ratio: 0.229167
-Generation 123: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 124: spawned cars: 96 (0.96 cars/sec)
-dead cars: 22 ratio: 0.229167
-Generation 125: spawned cars: 96 (0.96 cars/sec)
-dead cars: 21 ratio: 0.21875
-Generation 126: spawned cars: 96 (0.96 cars/sec)
-dead cars: 21 ratio: 0.21875
-Generation 127: spawned cars: 96 (0.96 cars/sec)
-dead cars: 19 ratio: 0.197917
-Generation 128: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 129: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 130: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 131: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 132: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 133: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 134: spawned cars: 96 (0.96 cars/sec)
-dead cars: 18 ratio: 0.1875
-Generation 135: spawned cars: 96 (0.96 cars/sec)
-dead cars: 18 ratio: 0.1875
-Generation 136: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 137: spawned cars: 96 (0.96 cars/sec)
-dead cars: 20 ratio: 0.208333
-Generation 138: spawned cars: 96 (0.96 cars/sec)
-dead cars: 18 ratio: 0.1875
-Generation 139: spawned cars: 96 (0.96 cars/sec)
-dead cars: 18 ratio: 0.1875
-Generation 140: spawned cars: 100 (1 cars/sec)
-dead cars: 28 ratio: 0.28
-Generation 141: spawned cars: 100 (1 cars/sec)
-dead cars: 22 ratio: 0.22
-Generation 142: spawned cars: 100 (1 cars/sec)
-dead cars: 29 ratio: 0.29
-Generation 143: spawned cars: 100 (1 cars/sec)
-dead cars: 26 ratio: 0.26
-Generation 144: spawned cars: 100 (1 cars/sec)
-dead cars: 24 ratio: 0.24
-Generation 145: spawned cars: 100 (1 cars/sec)
-dead cars: 26 ratio: 0.26
-Generation 146: spawned cars: 100 (1 cars/sec)
-dead cars: 20 ratio: 0.2
-Generation 147: spawned cars: 100 (1 cars/sec)
-dead cars: 22 ratio: 0.22
-Generation 148: spawned cars: 100 (1 cars/sec)
-dead cars: 23 ratio: 0.23
-Generation 149: spawned cars: 100 (1 cars/sec)
-dead cars: 22 ratio: 0.22
-Generation 150: spawned cars: 100 (1 cars/sec)
-dead cars: 24 ratio: 0.24
-INFO: loading parameters from res/config/151.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_151.brains'
-Generation 151: spawned cars: 100 (1 cars/sec)
-dead cars: 24 ratio: 0.24
-Generation 152: spawned cars: 100 (1 cars/sec)
-dead cars: 22 ratio: 0.22
-Generation 153: spawned cars: 100 (1 cars/sec)
-dead cars: 24 ratio: 0.24
-Generation 154: spawned cars: 100 (1 cars/sec)
-dead cars: 23 ratio: 0.23
-Generation 155: spawned cars: 100 (1 cars/sec)
-dead cars: 24 ratio: 0.24
-Generation 156: spawned cars: 100 (1 cars/sec)
-dead cars: 20 ratio: 0.2
-Generation 157: spawned cars: 100 (1 cars/sec)
-dead cars: 20 ratio: 0.2
-Generation 158: spawned cars: 100 (1 cars/sec)
-dead cars: 20 ratio: 0.2
-Generation 159: spawned cars: 100 (1 cars/sec)
-dead cars: 22 ratio: 0.22
-Generation 160: spawned cars: 101 (1.01 cars/sec)
-dead cars: 30 ratio: 0.29703
-Generation 161: spawned cars: 101 (1.01 cars/sec)
-dead cars: 29 ratio: 0.287129
-Generation 162: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 163: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 164: spawned cars: 101 (1.01 cars/sec)
-dead cars: 27 ratio: 0.267327
-Generation 165: spawned cars: 101 (1.01 cars/sec)
-dead cars: 26 ratio: 0.257426
-Generation 166: spawned cars: 101 (1.01 cars/sec)
-dead cars: 23 ratio: 0.227723
-Generation 167: spawned cars: 101 (1.01 cars/sec)
-dead cars: 27 ratio: 0.267327
-Generation 168: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 169: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 170: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 171: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 172: spawned cars: 101 (1.01 cars/sec)
-dead cars: 22 ratio: 0.217822
-Generation 173: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 174: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 175: spawned cars: 101 (1.01 cars/sec)
-dead cars: 23 ratio: 0.227723
-Generation 176: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 177: spawned cars: 101 (1.01 cars/sec)
-dead cars: 22 ratio: 0.217822
-Generation 178: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 179: spawned cars: 101 (1.01 cars/sec)
-dead cars: 24 ratio: 0.237624
-Generation 180: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 181: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 182: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 183: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 184: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 185: spawned cars: 98 (0.98 cars/sec)
-dead cars: 16 ratio: 0.163265
-Generation 186: spawned cars: 98 (0.98 cars/sec)
-dead cars: 12 ratio: 0.122449
-Generation 187: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 188: spawned cars: 98 (0.98 cars/sec)
-dead cars: 12 ratio: 0.122449
-Generation 189: spawned cars: 98 (0.98 cars/sec)
-dead cars: 12 ratio: 0.122449
-Generation 190: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 191: spawned cars: 98 (0.98 cars/sec)
-dead cars: 13 ratio: 0.132653
-Generation 192: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 193: spawned cars: 98 (0.98 cars/sec)
-dead cars: 10 ratio: 0.102041
-Generation 194: spawned cars: 98 (0.98 cars/sec)
-dead cars: 16 ratio: 0.163265
-Generation 195: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 196: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 197: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 198: spawned cars: 98 (0.98 cars/sec)
-dead cars: 12 ratio: 0.122449
-Generation 199: spawned cars: 98 (0.98 cars/sec)
-dead cars: 14 ratio: 0.142857
-Generation 200: spawned cars: 102 (1.02 cars/sec)
-dead cars: 28 ratio: 0.27451
-Generation 201: spawned cars: 102 (1.02 cars/sec)
-dead cars: 29 ratio: 0.284314
-Generation 202: spawned cars: 102 (1.02 cars/sec)
-dead cars: 30 ratio: 0.294118
-Generation 203: spawned cars: 102 (1.02 cars/sec)
-dead cars: 26 ratio: 0.254902
-Generation 204: spawned cars: 102 (1.02 cars/sec)
-dead cars: 27 ratio: 0.264706
-Generation 205: spawned cars: 102 (1.02 cars/sec)
-dead cars: 26 ratio: 0.254902
-Generation 206: spawned cars: 102 (1.02 cars/sec)
-dead cars: 25 ratio: 0.245098
-Generation 207: spawned cars: 102 (1.02 cars/sec)
-dead cars: 26 ratio: 0.254902
-Generation 208: spawned cars: 102 (1.02 cars/sec)
-dead cars: 28 ratio: 0.27451
-Generation 209: spawned cars: 102 (1.02 cars/sec)
-dead cars: 26 ratio: 0.254902
-Generation 210: spawned cars: 102 (1.02 cars/sec)
-dead cars: 26 ratio: 0.254902
-Generation 211: spawned cars: 102 (1.02 cars/sec)
-dead cars: 23 ratio: 0.22549
-Generation 212: spawned cars: 102 (1.02 cars/sec)
-dead cars: 28 ratio: 0.27451
-Generation 213: spawned cars: 102 (1.02 cars/sec)
-dead cars: 23 ratio: 0.22549
-Generation 214: spawned cars: 102 (1.02 cars/sec)
-dead cars: 25 ratio: 0.245098
-Generation 215: spawned cars: 102 (1.02 cars/sec)
-dead cars: 23 ratio: 0.22549
-Generation 216: spawned cars: 102 (1.02 cars/sec)
-dead cars: 24 ratio: 0.235294
-Generation 217: spawned cars: 102 (1.02 cars/sec)
-dead cars: 21 ratio: 0.205882
-Generation 218: spawned cars: 102 (1.02 cars/sec)
-dead cars: 25 ratio: 0.245098
-Generation 219: spawned cars: 102 (1.02 cars/sec)
-dead cars: 20 ratio: 0.196078
-Generation 220: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 221: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 222: spawned cars: 99 (0.99 cars/sec)
-dead cars: 17 ratio: 0.171717
-Generation 223: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 224: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 225: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 226: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 227: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 228: spawned cars: 99 (0.99 cars/sec)
-dead cars: 15 ratio: 0.151515
-Generation 229: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 230: spawned cars: 99 (0.99 cars/sec)
-dead cars: 15 ratio: 0.151515
-INFO: loading parameters from res/config/231.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_231.brains'
-Generation 231: spawned cars: 99 (0.99 cars/sec)
-dead cars: 15 ratio: 0.151515
-Generation 232: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 233: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 234: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 235: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 236: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 237: spawned cars: 99 (0.99 cars/sec)
-dead cars: 10 ratio: 0.10101
-Generation 238: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 239: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 240: spawned cars: 107 (1.07 cars/sec)
-dead cars: 25 ratio: 0.233645
-Generation 241: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 242: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 243: spawned cars: 107 (1.07 cars/sec)
-dead cars: 22 ratio: 0.205607
-Generation 244: spawned cars: 107 (1.07 cars/sec)
-dead cars: 23 ratio: 0.214953
-Generation 245: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 246: spawned cars: 107 (1.07 cars/sec)
-dead cars: 22 ratio: 0.205607
-Generation 247: spawned cars: 107 (1.07 cars/sec)
-dead cars: 26 ratio: 0.242991
-Generation 248: spawned cars: 107 (1.07 cars/sec)
-dead cars: 22 ratio: 0.205607
-Generation 249: spawned cars: 107 (1.07 cars/sec)
-dead cars: 26 ratio: 0.242991
-Generation 250: spawned cars: 107 (1.07 cars/sec)
-dead cars: 23 ratio: 0.214953
-Generation 251: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 252: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 253: spawned cars: 107 (1.07 cars/sec)
-dead cars: 20 ratio: 0.186916
-Generation 254: spawned cars: 107 (1.07 cars/sec)
-dead cars: 20 ratio: 0.186916
-Generation 255: spawned cars: 107 (1.07 cars/sec)
-dead cars: 21 ratio: 0.196262
-Generation 256: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 257: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 258: spawned cars: 107 (1.07 cars/sec)
-dead cars: 24 ratio: 0.224299
-Generation 259: spawned cars: 107 (1.07 cars/sec)
-dead cars: 22 ratio: 0.205607
-Generation 260: spawned cars: 99 (0.99 cars/sec)
-dead cars: 20 ratio: 0.20202
-Generation 261: spawned cars: 99 (0.99 cars/sec)
-dead cars: 20 ratio: 0.20202
-Generation 262: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 263: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 264: spawned cars: 99 (0.99 cars/sec)
-dead cars: 20 ratio: 0.20202
-Generation 265: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 266: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 267: spawned cars: 99 (0.99 cars/sec)
-dead cars: 17 ratio: 0.171717
-Generation 268: spawned cars: 99 (0.99 cars/sec)
-dead cars: 20 ratio: 0.20202
-Generation 269: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 270: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 271: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 272: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 273: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 274: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 275: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 276: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 277: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 278: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 279: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 280: spawned cars: 101 (1.01 cars/sec)
-dead cars: 18 ratio: 0.178218
-Generation 281: spawned cars: 101 (1.01 cars/sec)
-dead cars: 19 ratio: 0.188119
-Generation 282: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 283: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 284: spawned cars: 101 (1.01 cars/sec)
-dead cars: 17 ratio: 0.168317
-Generation 285: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 286: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 287: spawned cars: 101 (1.01 cars/sec)
-dead cars: 18 ratio: 0.178218
-Generation 288: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 289: spawned cars: 101 (1.01 cars/sec)
-dead cars: 12 ratio: 0.118812
-Generation 290: spawned cars: 101 (1.01 cars/sec)
-dead cars: 15 ratio: 0.148515
-Generation 291: spawned cars: 101 (1.01 cars/sec)
-dead cars: 12 ratio: 0.118812
-Generation 292: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 293: spawned cars: 101 (1.01 cars/sec)
-dead cars: 15 ratio: 0.148515
-Generation 294: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 295: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 296: spawned cars: 101 (1.01 cars/sec)
-dead cars: 12 ratio: 0.118812
-Generation 297: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 298: spawned cars: 101 (1.01 cars/sec)
-dead cars: 13 ratio: 0.128713
-Generation 299: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 300: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 301: spawned cars: 104 (1.04 cars/sec)
-dead cars: 16 ratio: 0.153846
-Generation 302: spawned cars: 104 (1.04 cars/sec)
-dead cars: 14 ratio: 0.134615
-Generation 303: spawned cars: 104 (1.04 cars/sec)
-dead cars: 13 ratio: 0.125
-Generation 304: spawned cars: 104 (1.04 cars/sec)
-dead cars: 10 ratio: 0.0961538
-Generation 305: spawned cars: 104 (1.04 cars/sec)
-dead cars: 13 ratio: 0.125
-Generation 306: spawned cars: 104 (1.04 cars/sec)
-dead cars: 11 ratio: 0.105769
-Generation 307: spawned cars: 104 (1.04 cars/sec)
-dead cars: 14 ratio: 0.134615
-Generation 308: spawned cars: 104 (1.04 cars/sec)
-dead cars: 13 ratio: 0.125
-Generation 309: spawned cars: 104 (1.04 cars/sec)
-dead cars: 13 ratio: 0.125
-Generation 310: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-INFO: loading parameters from res/config/311.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_311.brains'
-Generation 311: spawned cars: 104 (1.04 cars/sec)
-dead cars: 14 ratio: 0.134615
-Generation 312: spawned cars: 104 (1.04 cars/sec)
-dead cars: 14 ratio: 0.134615
-Generation 313: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 314: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 315: spawned cars: 104 (1.04 cars/sec)
-dead cars: 10 ratio: 0.0961538
-Generation 316: spawned cars: 104 (1.04 cars/sec)
-dead cars: 9 ratio: 0.0865385
-Generation 317: spawned cars: 104 (1.04 cars/sec)
-dead cars: 11 ratio: 0.105769
-Generation 318: spawned cars: 104 (1.04 cars/sec)
-dead cars: 13 ratio: 0.125
-Generation 319: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 320: spawned cars: 100 (1 cars/sec)
-dead cars: 8 ratio: 0.08
-Generation 321: spawned cars: 100 (1 cars/sec)
-dead cars: 13 ratio: 0.13
-Generation 322: spawned cars: 100 (1 cars/sec)
-dead cars: 10 ratio: 0.1
-Generation 323: spawned cars: 100 (1 cars/sec)
-dead cars: 6 ratio: 0.06
-Generation 324: spawned cars: 100 (1 cars/sec)
-dead cars: 12 ratio: 0.12
-Generation 325: spawned cars: 100 (1 cars/sec)
-dead cars: 12 ratio: 0.12
-Generation 326: spawned cars: 100 (1 cars/sec)
-dead cars: 12 ratio: 0.12
-Generation 327: spawned cars: 100 (1 cars/sec)
-dead cars: 10 ratio: 0.1
-Generation 328: spawned cars: 100 (1 cars/sec)
-dead cars: 6 ratio: 0.06
-Generation 329: spawned cars: 100 (1 cars/sec)
-dead cars: 8 ratio: 0.08
-Generation 330: spawned cars: 100 (1 cars/sec)
-dead cars: 8 ratio: 0.08
-Generation 331: spawned cars: 100 (1 cars/sec)
-dead cars: 6 ratio: 0.06
-Generation 332: spawned cars: 100 (1 cars/sec)
-dead cars: 9 ratio: 0.09
-Generation 333: spawned cars: 100 (1 cars/sec)
-dead cars: 11 ratio: 0.11
-Generation 334: spawned cars: 100 (1 cars/sec)
-dead cars: 10 ratio: 0.1
-Generation 335: spawned cars: 100 (1 cars/sec)
-dead cars: 11 ratio: 0.11
-Generation 336: spawned cars: 100 (1 cars/sec)
-dead cars: 6 ratio: 0.06
-Generation 337: spawned cars: 100 (1 cars/sec)
-dead cars: 6 ratio: 0.06
-Generation 338: spawned cars: 100 (1 cars/sec)
-dead cars: 10 ratio: 0.1
-Generation 339: spawned cars: 100 (1 cars/sec)
-dead cars: 10 ratio: 0.1
-Generation 340: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 341: spawned cars: 102 (1.02 cars/sec)
-dead cars: 16 ratio: 0.156863
-Generation 342: spawned cars: 102 (1.02 cars/sec)
-dead cars: 12 ratio: 0.117647
-Generation 343: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 344: spawned cars: 102 (1.02 cars/sec)
-dead cars: 16 ratio: 0.156863
-Generation 345: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 346: spawned cars: 102 (1.02 cars/sec)
-dead cars: 16 ratio: 0.156863
-Generation 347: spawned cars: 102 (1.02 cars/sec)
-dead cars: 13 ratio: 0.127451
-Generation 348: spawned cars: 102 (1.02 cars/sec)
-dead cars: 16 ratio: 0.156863
-Generation 349: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 350: spawned cars: 102 (1.02 cars/sec)
-dead cars: 12 ratio: 0.117647
-Generation 351: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 352: spawned cars: 102 (1.02 cars/sec)
-dead cars: 13 ratio: 0.127451
-Generation 353: spawned cars: 102 (1.02 cars/sec)
-dead cars: 12 ratio: 0.117647
-Generation 354: spawned cars: 102 (1.02 cars/sec)
-dead cars: 12 ratio: 0.117647
-Generation 355: spawned cars: 102 (1.02 cars/sec)
-dead cars: 16 ratio: 0.156863
-Generation 356: spawned cars: 102 (1.02 cars/sec)
-dead cars: 13 ratio: 0.127451
-Generation 357: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 358: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 359: spawned cars: 102 (1.02 cars/sec)
-dead cars: 14 ratio: 0.137255
-Generation 360: spawned cars: 99 (0.99 cars/sec)
-dead cars: 18 ratio: 0.181818
-Generation 361: spawned cars: 99 (0.99 cars/sec)
-dead cars: 13 ratio: 0.131313
-Generation 362: spawned cars: 99 (0.99 cars/sec)
-dead cars: 15 ratio: 0.151515
-Generation 363: spawned cars: 99 (0.99 cars/sec)
-dead cars: 16 ratio: 0.161616
-Generation 364: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 365: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 366: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 367: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 368: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 369: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 370: spawned cars: 99 (0.99 cars/sec)
-dead cars: 13 ratio: 0.131313
-Generation 371: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 372: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 373: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 374: spawned cars: 99 (0.99 cars/sec)
-dead cars: 15 ratio: 0.151515
-Generation 375: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 376: spawned cars: 99 (0.99 cars/sec)
-dead cars: 10 ratio: 0.10101
-Generation 377: spawned cars: 99 (0.99 cars/sec)
-dead cars: 14 ratio: 0.141414
-Generation 378: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 379: spawned cars: 99 (0.99 cars/sec)
-dead cars: 12 ratio: 0.121212
-Generation 380: spawned cars: 101 (1.01 cars/sec)
-dead cars: 22 ratio: 0.217822
-Generation 381: spawned cars: 101 (1.01 cars/sec)
-dead cars: 23 ratio: 0.227723
-Generation 382: spawned cars: 101 (1.01 cars/sec)
-dead cars: 19 ratio: 0.188119
-Generation 383: spawned cars: 101 (1.01 cars/sec)
-dead cars: 20 ratio: 0.19802
-Generation 384: spawned cars: 101 (1.01 cars/sec)
-dead cars: 18 ratio: 0.178218
-Generation 385: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 386: spawned cars: 101 (1.01 cars/sec)
-dead cars: 19 ratio: 0.188119
-Generation 387: spawned cars: 101 (1.01 cars/sec)
-dead cars: 17 ratio: 0.168317
-Generation 388: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 389: spawned cars: 101 (1.01 cars/sec)
-dead cars: 19 ratio: 0.188119
-Generation 390: spawned cars: 101 (1.01 cars/sec)
-dead cars: 17 ratio: 0.168317
-INFO: loading parameters from res/config/391.txt
-INFO: Saving generation to file 'res/brains/v3_100zones_391.brains'
-Generation 391: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 392: spawned cars: 101 (1.01 cars/sec)
-dead cars: 14 ratio: 0.138614
-Generation 393: spawned cars: 101 (1.01 cars/sec)
-dead cars: 19 ratio: 0.188119
-Generation 394: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 395: spawned cars: 101 (1.01 cars/sec)
-dead cars: 16 ratio: 0.158416
-Generation 396: spawned cars: 101 (1.01 cars/sec)
-dead cars: 15 ratio: 0.148515
-Generation 397: spawned cars: 101 (1.01 cars/sec)
-dead cars: 12 ratio: 0.118812
-Generation 398: spawned cars: 101 (1.01 cars/sec)
-dead cars: 12 ratio: 0.118812
-Generation 399: spawned cars: 101 (1.01 cars/sec)
-dead cars: 17 ratio: 0.168317
-Generation 400: spawned cars: 104 (1.04 cars/sec)
-dead cars: 18 ratio: 0.173077
-Generation 401: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
-Generation 402: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
-Generation 403: spawned cars: 104 (1.04 cars/sec)
-dead cars: 16 ratio: 0.153846
-Generation 404: spawned cars: 104 (1.04 cars/sec)
-dead cars: 18 ratio: 0.173077
-Generation 405: spawned cars: 104 (1.04 cars/sec)
-dead cars: 14 ratio: 0.134615
-Generation 406: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
-Generation 407: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 408: spawned cars: 104 (1.04 cars/sec)
-dead cars: 18 ratio: 0.173077
-Generation 409: spawned cars: 104 (1.04 cars/sec)
-dead cars: 18 ratio: 0.173077
-Generation 410: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
-Generation 411: spawned cars: 104 (1.04 cars/sec)
-dead cars: 18 ratio: 0.173077
-Generation 412: spawned cars: 104 (1.04 cars/sec)
-dead cars: 12 ratio: 0.115385
-Generation 413: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
-Generation 414: spawned cars: 104 (1.04 cars/sec)
-dead cars: 17 ratio: 0.163462
+Gen,ratio
+0,1
+1,1
+2,1
+3,1
+4,1
+5,1
+6,1
+7,1
+8,1
+9,1
+10,1
+11,1
+12,0.989796
+13,1
+14,0.989796
+15,0.989796
+16,0.989796
+17,0.979592
+18,0.989796
+19,0.989796
+20,0.979167
+21,0.958333
+22,0.96875
+23,0.958333
+24,0.96875
+25,0.958333
+26,0.979167
+27,0.979167
+28,0.979167
+29,0.979167
+30,0.96875
+31,0.96875
+32,0.958333
+33,0.96875
+34,0.947917
+35,0.947917
+36,0.927083
+37,0.927083
+38,0.9375
+39,0.895833
+40,0.949495
+41,0.848485
+42,0.818182
+43,0.474747
+44,0.515152
+45,0.515152
+46,0.484848
+47,0.40404
+48,0.484848
+49,0.434343
+50,0.353535
+51,0.343434
+52,0.30303
+53,0.30303
+54,0.30303
+55,0.323232
+56,0.282828
+57,0.272727
+58,0.30303
+59,0.292929
+60,0.281553
+61,0.291262
+62,0.320388
+63,0.31068
+64,0.281553
+65,0.271845
+66,0.271845
+67,0.271845
+68,0.291262
+69,0.271845
+70,0.281553
+71,0.291262
+72,0.252427
+73,0.262136
+74,0.291262
+75,0.242718
+76,0.271845
+77,0.271845
+78,0.271845
+79,0.271845
+80,0.287129
+81,0.29703
+82,0.237624
+83,0.257426
+84,0.287129
+85,0.257426
+86,0.287129
+87,0.306931
+88,0.257426
+89,0.247525
+90,0.247525
+91,0.267327
+92,0.237624
+93,0.267327
+94,0.257426
+95,0.257426
+96,0.217822
+97,0.247525
+98,0.237624
+99,0.277228
+100,0.30303
+101,0.30303
+102,0.323232
+103,0.313131
+104,0.323232
+105,0.262626
+106,0.282828
+107,0.30303
+108,0.30303
+109,0.292929
+110,0.262626
+111,0.30303
+112,0.282828
+113,0.30303
+114,0.292929
+115,0.313131
+116,0.313131
+117,0.313131
+118,0.292929
+119,0.272727
+120,0.229167
+121,0.229167
+122,0.229167
+123,0.208333
+124,0.229167
+125,0.21875
+126,0.21875
+127,0.197917
+128,0.208333
+129,0.208333
+130,0.208333
+131,0.208333
+132,0.208333
+133,0.208333
+134,0.1875
+135,0.1875
+136,0.208333
+137,0.208333
+138,0.1875
+139,0.1875
+140,0.28
+141,0.22
+142,0.29
+143,0.26
+144,0.24
+145,0.26
+146,0.2
+147,0.22
+148,0.23
+149,0.22
+150,0.24
+151,0.24
+152,0.22
+153,0.24
+154,0.23
+155,0.24
+156,0.2
+157,0.2
+158,0.2
+159,0.22
+160,0.29703
+161,0.287129
+162,0.257426
+163,0.257426
+164,0.267327
+165,0.257426
+166,0.227723
+167,0.267327
+168,0.237624
+169,0.237624
+170,0.237624
+171,0.19802
+172,0.217822
+173,0.19802
+174,0.19802
+175,0.227723
+176,0.19802
+177,0.217822
+178,0.19802
+179,0.237624
+180,0.142857
+181,0.142857
+182,0.142857
+183,0.142857
+184,0.142857
+185,0.163265
+186,0.122449
+187,0.142857
+188,0.122449
+189,0.122449
+190,0.142857
+191,0.132653
+192,0.142857
+193,0.102041
+194,0.163265
+195,0.142857
+196,0.142857
+197,0.142857
+198,0.122449
+199,0.142857
+200,0.27451
+201,0.284314
+202,0.294118
+203,0.254902
+204,0.264706
+205,0.254902
+206,0.245098
+207,0.254902
+208,0.27451
+209,0.254902
+210,0.254902
+211,0.22549
+212,0.27451
+213,0.22549
+214,0.245098
+215,0.22549
+216,0.235294
+217,0.205882
+218,0.245098
+219,0.196078
+220,0.181818
+221,0.181818
+222,0.171717
+223,0.181818
+224,0.181818
+225,0.181818
+226,0.161616
+227,0.161616
+228,0.151515
+229,0.161616
+230,0.151515
+231,0.151515
+232,0.161616
+233,0.121212
+234,0.141414
+235,0.121212
+236,0.141414
+237,0.10101
+238,0.121212
+239,0.121212
+240,0.233645
+241,0.224299
+242,0.224299
+243,0.205607
+244,0.214953
+245,0.224299
+246,0.205607
+247,0.242991
+248,0.205607
+249,0.242991
+250,0.214953
+251,0.224299
+252,0.224299
+253,0.186916
+254,0.186916
+255,0.196262
+256,0.224299
+257,0.224299
+258,0.224299
+259,0.205607
+260,0.20202
+261,0.20202
+262,0.161616
+263,0.181818
+264,0.20202
+265,0.161616
+266,0.181818
+267,0.171717
+268,0.20202
+269,0.181818
+270,0.161616
+271,0.161616
+272,0.161616
+273,0.161616
+274,0.161616
+275,0.181818
+276,0.161616
+277,0.141414
+278,0.141414
+279,0.121212
+280,0.178218
+281,0.188119
+282,0.158416
+283,0.138614
+284,0.168317
+285,0.158416
+286,0.138614
+287,0.178218
+288,0.138614
+289,0.118812
+290,0.148515
+291,0.118812
+292,0.138614
+293,0.148515
+294,0.138614
+295,0.138614
+296,0.118812
+297,0.138614
+298,0.128713
+299,0.138614
+300,0.115385
+301,0.153846
+302,0.134615
+303,0.125
+304,0.0961538
+305,0.125
+306,0.105769
+307,0.134615
+308,0.125
+309,0.125
+310,0.115385
+311,0.134615
+312,0.134615
+313,0.115385
+314,0.115385
+315,0.0961538
+316,0.0865385
+317,0.105769
+318,0.125
+319,0.115385
+320,0.08
+321,0.13
+322,0.1
+323,0.06
+324,0.12
+325,0.12
+326,0.12
+327,0.1
+328,0.06
+329,0.08
+330,0.08
+331,0.06
+332,0.09
+333,0.11
+334,0.1
+335,0.11
+336,0.06
+337,0.06
+338,0.1
+339,0.1
+340,0.137255
+341,0.156863
+342,0.117647
+343,0.137255
+344,0.156863
+345,0.137255
+346,0.156863
+347,0.127451
+348,0.156863
+349,0.137255
+350,0.117647
+351,0.137255
+352,0.127451
+353,0.117647
+354,0.117647
+355,0.156863
+356,0.127451
+357,0.137255
+358,0.137255
+359,0.137255
+360,0.181818
+361,0.131313
+362,0.151515
+363,0.161616
+364,0.141414
+365,0.121212
+366,0.141414
+367,0.141414
+368,0.141414
+369,0.141414
+370,0.131313
+371,0.141414
+372,0.141414
+373,0.141414
+374,0.151515
+375,0.141414
+376,0.10101
+377,0.141414
+378,0.121212
+379,0.121212
+380,0.217822
+381,0.227723
+382,0.188119
+383,0.19802
+384,0.178218
+385,0.158416
+386,0.188119
+387,0.168317
+388,0.158416
+389,0.188119
+390,0.168317
+391,0.158416
+392,0.138614
+393,0.188119
+394,0.158416
+395,0.158416
+396,0.148515
+397,0.118812
+398,0.118812
+399,0.168317
+400,0.173077
+401,0.163462
+402,0.163462
+403,0.153846
+404,0.173077
+405,0.134615
+406,0.163462
+407,0.115385
+408,0.173077
+409,0.173077
+410,0.163462
+411,0.173077
+412,0.115385
+413,0.163462
+414,0.163462
